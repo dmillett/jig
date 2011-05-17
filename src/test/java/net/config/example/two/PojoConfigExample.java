@@ -27,7 +27,8 @@ public class PojoConfigExample {
     // Be sure your params narrow it down to just one stock -- Perhaps Map could be sorted
     public String findStock(Comparator compare, String... stocks) {
 
-        TreeMap<String,String> matches = _configLookup.getSortedResults(compare, STOCKS, stocks);
+        TreeMap<String,String> matches =
+                (TreeMap<String,String>) _configLookup.getSortedResults(compare, STOCKS, stocks);
 
         if ( matches.size() > 1 )
         {

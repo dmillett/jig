@@ -58,7 +58,7 @@ class XmlFlattener {
         Map<String, String> keyValues = new HashMap<String, String>()
 
         baseNode.keyValueProperties.property.each { entry ->
-            keyValues.put(entry.@name, checkNodeForValue(entry))
+            keyValues.put(entry.@name.toLowerCase(), checkNodeForValue(entry))
         }
 
         keyValues
@@ -173,7 +173,7 @@ class XmlFlattener {
             {
                 def childNodeName = flattenNodeName(childNode)
                 def key = currentName + "." + childNodeName
-                keyValues.put(key, childNodeValue)
+                keyValues.put(key.toLowerCase(), childNodeValue)
                 return
             }
 

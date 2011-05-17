@@ -13,6 +13,13 @@ import java.util.List;
 public class ConfigEnumKeyValueExampleTest
     extends TestCase {
 
+    @Override
+    protected void setUp()
+        throws Exception {
+
+        System.getProperties().put("jConfigMap.location", "/home/dave/dev/jConfigMap/src/test/resources/config");
+    }
+
     public void test__ONE() {
 
         String test = ConfigEnumExample.ONE.get(String.class);

@@ -9,6 +9,9 @@ import java.util.Map;
 
 
 /**
+ * Bind a Groovy object to load configuration files. See ConfigLoader.groovy.
+ * That provides a flattened map where the corresponding filename prefixes
+ * each config key entry.
  *
  * @author dmillett
  */
@@ -16,18 +19,41 @@ public class JavaGroovyConfigBinder {
 
     private static final Logger LOG = Logger.getLogger(JavaGroovyConfigBinder.class);
     /** Curiously, Gradle will eat the errors during compilation if this path is wrong  */
-    private static final String _groovyConfig = "src/main/groovy/net/config/ConfigController.groovy";
+    @Deprecated
+    private static final String _groovyConfigMapClass = "src/main/groovy/net/config/ConfigController.groovy";
+    private static final String _groovyConfigLoaderClass = "src/main/groovy/net/config/ConfigLoader.groovy";
 
-    private final GroovyObject _groovyObject;
+    @Deprecated
+    private final GroovyObject _groovyConfigMap;
+    private final GroovyObject _groovyConfigLoader;
 
     public JavaGroovyConfigBinder() {
-        _groovyObject = instantiateGroovyObject(_groovyConfig);
+        _groovyConfigMap = instantiateGroovyObject(_groovyConfigMapClass);
+        _groovyConfigLoader = instantiateGroovyObject(_groovyConfigLoaderClass);
     }
 
     @SuppressWarnings("unchecked")
+    public Map<String, Map<String,String>> getFileConfigMap() {
+
+        if ( _groovyConfigLoader == null )
+        {
+            LOG.fatal("Cannot Retrieve Map From Null Groovy Object. Check Configuration Location And Groovy Files.");
+            return null;
+        }
+
+        String methodName = "loadMapsFromFiles";
+        Object[] args = {};
+        Map<String, Map<String,String>> configKeyValues =
+                (Map<String, Map<String,String>>)_groovyConfigLoader.invokeMethod(methodName, args);
+
+        return configKeyValues;
+    }
+
+    @Deprecated
+    @SuppressWarnings("unchecked")
     public Map<String, String> getConfigMap() {
 
-        if ( _groovyObject == null )
+        if ( _groovyConfigMap == null )
         {
             LOG.fatal("Cannot Retrieve Map From Null Groovy Object. Check Configuration Location And Groovy Files.");
             return null;
@@ -35,7 +61,7 @@ public class JavaGroovyConfigBinder {
 
         String methodName = "getConfig";
         Object[] args = {};
-        Map<String, String> configKeyValues = (Map<String,String>)_groovyObject.invokeMethod(methodName, args);
+        Map<String, String> configKeyValues = (Map<String,String>) _groovyConfigMap.invokeMethod(methodName, args);
 
         return configKeyValues;
     }

@@ -32,6 +32,10 @@ public class GenericsHelper {
             {
                 return (T) Double.valueOf(value);
             }
+            else if ( clazz.equals(Long.class) )
+            {
+                return (T) Long.valueOf(value);
+            }
             else if ( clazz.equals(List.class) )
             {
                 List<String> results = Arrays.asList(value.split(","));

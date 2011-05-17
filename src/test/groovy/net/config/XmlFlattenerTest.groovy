@@ -40,7 +40,7 @@ class XmlFlattenerTest
         assertNotNull(keyValues)
         assertEquals(10, keyValues.size())
 
-        assertEquals("8.00", keyValues.get("xmlStructure.commission.type.Stocks.ticker.INTC.category.market"))
+        assertEquals("8.00", keyValues.get("xmlstructure.commission.type.stocks.ticker.intc.category.market"))
 
         keyValues.entrySet().each { entry ->
             println "$entry"
