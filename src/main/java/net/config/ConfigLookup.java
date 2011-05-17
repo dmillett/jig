@@ -18,11 +18,6 @@ import java.util.regex.Pattern;
 public class ConfigLookup {
 
     private static final Logger LOG = Logger.getLogger(ConfigLookup.class);
-
-    /** Created just one time -- */
-    @Deprecated
-    private static JavaGroovyConfigBinder _groovyBinder = new JavaGroovyConfigBinder();
-
     private static final ConfigMap CONFIG_MAP = new ConfigMap();
 
     /**
@@ -47,7 +42,7 @@ public class ConfigLookup {
             }
         }
 
-        return getConfigMapFromGroovy().get(key);
+        return null;
     }
 
     public String getByKey(String fileName, String key) {
@@ -303,35 +298,4 @@ public class ConfigLookup {
 
         return lowerCase;
     }
-
-
-    private Map<String,String> findConfigsForFile(List<String> downcaseParams) {
-
-        for ( String fileName : getFileConfigMapFromGroovy().keySet() )
-        {
-            for ( String param : downcaseParams)
-            {
-                if ( param.equals(fileName) )
-                {
-                    return getFileConfigMapFromGroovy().get(fileName);
-                }
-            }
-        }
-
-        return new HashMap<String,String>();
-    }
-
-
-    /** Grab the static config Map from the Groovy binder  */
-    @Deprecated
-    private Map<String, String> getConfigMapFromGroovy() {
-        return _groovyBinder.getConfigMap();
-    }
-
-    @Deprecated
-    private Map<String, Map<String,String>> getFileConfigMapFromGroovy() {
-        return _groovyBinder.getFileConfigMap();
-    }
 }
-
-

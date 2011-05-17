@@ -3,8 +3,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 
 sourceCompatibility = 1.5
-version=0.1
-
+version=0.7
 
 repositories {
   mavenCentral()
@@ -15,16 +14,17 @@ dependencies {
 
   groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.7.10'
 
-  // Compile
   compile group: 'log4j', name: 'log4j', version: '1.2.16'
 
-  // Test Compile
   testCompile  group: 'junit', name: 'junit', version: '4.8.1'
 }
 
-task logInfo {
-    logging.captureStandardOutput LogLevel.INFO
-}
+
 test {
-    systemProperties 'easyConfigLocation' : 'test/src/config/'
+
+    def basePath = new File('').absolutePath
+    def testConfigPath = basePath + "/src/test/resources/config"
+    println "Setting Test Config Path To: $testConfigPath"
+
+    systemProperties ['jConfigMap.location'] = "$testConfigPath"
 }
