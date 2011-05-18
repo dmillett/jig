@@ -1,0 +1,46 @@
+<config>
+    <xmlStructure>
+    <!-- flattened:
+    stocks.stock.AMD.sell-high, 25.00
+    stocks.stock.AMD.sell-low, 6.50
+    stocks.stock.AMD.shares, 200
+    -->
+    <stocks>
+      <stock name="WFM">
+        <sell-high>85.00</sell-high>
+        <sell-low>36.50</sell-low>
+        <shares>200</shares>
+      </stock>
+      <stock name="SCCO">
+        <sell-high>60.00</sell-high>
+        <sell-low>20.00</sell-low>
+        <shares>500</shares>
+      </stock>
+    </stocks>
+
+    <!-- flattened:
+    commissions.commission.type.Stocks.AMD.category.short, 10.00
+    commissions.commission.type.Stocks.AMD.category.market, 8.00
+    -->
+    <commissions>
+      <commission>
+        <type code="Stocks">
+          <ticker code="WFM">
+            <category name="short">12.00</category>
+            <category name="market">10.00</category>
+          </ticker>
+          <ticker code="ATT">
+            <category name="market">50.00</category>
+          </ticker>
+       </type>
+       <type code="ETF">
+          <ticker code="BAR">
+            <category name="market">12.00</category>
+          </ticker>
+        </type>
+      </commission>
+    </commissions>
+
+  </xmlStructure>
+
+</config>

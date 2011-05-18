@@ -1,0 +1,60 @@
+<config>
+
+  <!-- Should be good enough for most folk -->
+  <keyValueProperties>
+    <property name="key.one.string" value="first value" />
+    <property name="key.two.int">1</property>
+    <property name="key.three.double" value="2.0" />
+    <property name="key.four.boolean">true</property>
+    <property name="key.five.list" value="AMD, INTC, WFMI, SCCO" />
+  </keyValueProperties>
+
+  <xmlStructure>
+    <!-- flattened:
+    // Group and Lookup by AMD
+    stock.AMD.sell-high, 25.00
+    stock.AMD.sell-low, 6.50
+    stock.AMD.shares, 200
+
+    stock.INTC.sell-high, 60.00
+    stock.INTC.sell-low, 40.00
+    stock.INTC.shares, 50
+    -->
+
+    <stock name="AMD">
+      <sell-high>25.00</sell-high>
+      <sell-low>6.50</sell-low>
+      <shares>200</shares>
+    </stock>
+    <stock name="INTC">
+      <sell-high>60.00</sell-high>
+      <sell-low>40.00</sell-low>
+      <shares>50</shares>
+    </stock>
+
+    <!-- flattened:
+    commission.type.Stocks.AMD.category.short, 10.00
+    commission.type.Stocks.AMD.category.market, 8.00
+    comm
+    -->
+
+    <commission>
+      <type code="Stocks">
+        <ticker code="AMD">
+          <category name="short">10.00</category>
+          <category name="market">8.00</category>
+        </ticker>
+        <ticker code="INTC">
+          <category name="market">8.00</category>
+        </ticker>
+      </type>
+      <type code="ETF">
+        <ticker code="FOO">
+          <category name="market">12.00</category>
+        </ticker>
+      </type>
+    </commission>
+
+  </xmlStructure>
+
+</config>
