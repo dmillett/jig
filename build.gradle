@@ -23,7 +23,7 @@ dependencies {
 test {
 
     def basePath = new File('').absolutePath
-    def testConfigPath = basePath + "/src/test/resources/config"
+    def testConfigPath = basePath + "/src/test/resources/config/"
     println "Setting Test Config Path To: $testConfigPath"
 
     systemProperties ['jConfigMap.location'] = "$testConfigPath"
