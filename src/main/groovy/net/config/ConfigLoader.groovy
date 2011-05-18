@@ -11,7 +11,7 @@ class ConfigLoader {
 
     private static def LOG = Logger.getLogger(ConfigLoader.class)
     private static final def DEFAULT_CONFIG_LOCATION = ""
-    private static final def CONFIG_LOCATION = "jConfigMap.location"
+    public static final def CONFIG_LOCATION = "jConfigMap.location"
 
     def Map<String, String> loadFromXmlFile(String file) {
 

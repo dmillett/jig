@@ -6,21 +6,10 @@ package net.config
 class ConfigLoaderTest
     extends GroovyTestCase {
 
-    final def _testConfigPath = new File('').absolutePath + "/src/test/resources/config/"
-
-    @Override
-    protected void setUp() {
-
-        if ( System.getProperties().get(ConfigLoader.CONFIG_LOCATION) == null )
-        {
-            System.getProperties().setProperty(ConfigLoader.CONFIG_LOCATION, _testConfigPath)
-        }
-    }
-
     // Load a specific test config file
     void test__loadFromXmlFile_test_location() {
 
-        String testConfigFile = _testConfigPath + "ConfigOne.xml"
+        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertiesWithConfigLocation() + "ConfigOne.xml"
         def configLoader = new ConfigLoader()
 
         def configMap = configLoader.loadFromXmlFile(testConfigFile)

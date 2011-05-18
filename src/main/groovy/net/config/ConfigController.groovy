@@ -4,6 +4,9 @@ import groovy.transform.Synchronized
 import org.apache.log4j.Logger
 
 /**
+ * A simple cache map implementation for Groovy config lookups. Note that
+ * it is only updated within synchronized blocks, everything thing else
+ * is read-only for immutable values (String)
  * @author dmillett
  */
 class ConfigController {

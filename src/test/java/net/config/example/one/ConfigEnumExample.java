@@ -2,6 +2,7 @@ package net.config.example.one;
 
 import net.config.ConfigLookup;
 import net.util.GenericsHelper;
+import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -9,11 +10,8 @@ import java.util.regex.Pattern;
 
 
 /**
- * Created by IntelliJ IDEA.
- * User: dave
- * Date: 5/5/11
- * Time: 10:18 PM
- * To change this template use File | Settings | File Templates.
+ *
+ * @author dmillett
  */
 public enum ConfigEnumExample {
 
@@ -29,6 +27,7 @@ public enum ConfigEnumExample {
     STOCK_HIGHS("stocks.*.sell-high"),
     STOCK_LOWS("stocks.*.sell-low"),
     STOCK_SHARES("stocks.*.shares"),
+    STOCK_TWO("stocks.stock.*", "ExampleConfigTwo.xml"),
 
     COMMISSIONS("commissions.*"),
     COMMISSION_TYPES("commissions.commission.type.*"),
@@ -38,21 +37,39 @@ public enum ConfigEnumExample {
 
     private final Pattern _pattern;
     private final Class _clazz;
+    private final String _configFileName;
 
     private final static GenericsHelper _helper = new GenericsHelper();
     private static final ConfigLookup _configLookup = new ConfigLookup();
+    private static final Logger LOG = Logger.getLogger(ConfigEnumExample.class);
 
-    ConfigEnumExample(String regex, Class clazz) {
+    private ConfigEnumExample(String regex, Class clazz, String configFileName) {
+        _pattern = Pattern.compile(regex);
+        _clazz = clazz;
+        _configFileName = configFileName;
+    }
+
+    private ConfigEnumExample(String regex, Class clazz) {
 
         _pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         _clazz = clazz;
+        _configFileName = null;
     }
 
-    ConfigEnumExample(String regex) {
+    private ConfigEnumExample(String regex, String configFileName) {
+
+        _pattern = Pattern.compile(".*" + regex);
+        _configFileName = configFileName;
+        _clazz = null;
+    }
+
+    private ConfigEnumExample(String regex) {
 
         _pattern = Pattern.compile(".*" + regex);
         _clazz = null;
+        _configFileName = null;
     }
+
 
     public Pattern getPattern() {
         return _pattern;
@@ -62,12 +79,29 @@ public enum ConfigEnumExample {
         return _clazz;
     }
 
+    public String getConfigFileName() {
+        return _configFileName;
+    }
+
     public <T> T get(Class<T> clazz) {
 
         String value = _configLookup.getByKey(getPattern().pattern());
         if ( !clazz.equals(getClazz()) )
         {
+            //LOG.warn("Class Type Mismatch For Key Lookup! Returning 'null'");
             return (T) value;
+        }
+
+        return _helper.get(value, clazz);
+    }
+
+    public <T> T getByFile(Class<T> clazz) {
+
+        String value = _configLookup.getByKey(getConfigFileName(), getPattern().pattern());
+        if ( !clazz.equals(getClazz()) )
+        {
+            LOG.warn("Class Type Mismatch For Key Lookup! Returning 'null'");
+            return null;
         }
 
         return _helper.get(value, clazz);
@@ -79,5 +113,9 @@ public enum ConfigEnumExample {
 
     public Map<String, String> get(String... params) {
         return _configLookup.get(getPattern(), params);
+    }
+
+    public Map<String, String> getByFile(String... params) {
+        return  _configLookup.get(getConfigFileName(), getPattern(), params);
     }
 }

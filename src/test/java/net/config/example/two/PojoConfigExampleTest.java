@@ -15,7 +15,7 @@ public class PojoConfigExampleTest
         PojoConfigExample pojo = new PojoConfigExample();
         Map<String, String> allStocks = pojo.findAllStocks();
 
-        assertEquals(6, allStocks.size());
+        assertEquals(12, allStocks.size());
     }
 
     public void test__findStock() {

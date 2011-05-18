@@ -1,21 +1,15 @@
 package net.config
 
-import net.config.XmlFlattener
-
 /**
- * Created by IntelliJ IDEA.
- * User: dave
- * Date: 4/25/11
- * Time: 1:01 PM
- * To change this template use File | Settings | File Templates.
+ *
  */
 class XmlFlattenerTest
     extends GroovyTestCase {
 
-
     void test__findSimpleKeyValueNodes() {
 
-        def baseNode = new XmlParser().parse('/home/dave/dev/easy-config/data/ConfigOne.xml')
+        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertiesWithConfigLocation() + "ConfigOne.xml"
+        def baseNode = new XmlParser().parse(testConfigFile) //'/home/dave/dev/jConfigMap/data/ConfigOne.xml')
         def xmlFlatten = new XmlFlattener()
         def keyValues = xmlFlatten.findSimpleKeyValueNodes(baseNode)
 
@@ -31,7 +25,8 @@ class XmlFlattenerTest
 
     void test__findXmlStructures() {
 
-        def baseNode = new XmlParser().parse('/home/dave/dev/easy-config/data/ConfigOne.xml')
+        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertiesWithConfigLocation() + "ConfigOne.xml"
+        def baseNode = new XmlParser().parse(testConfigFile)
         def xmlFlatten = new XmlFlattener()
 
         def structureNode = baseNode.xmlStructure[0]
