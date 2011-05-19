@@ -3,7 +3,24 @@ package net.config
 import org.apache.log4j.Logger
 
 /**
+ * Load XML configuration files from "classpath/config" or "jConfigMap.location"
+ * System property.  The configs will load in that order. Each config
+ * file must have a valid form to get picked up.
  *
+ * <pre>
+ * <config>
+ *   <!-- optional -->
+ *   <keyValueProperties>
+ *   </keyValueProperties>
+ *
+ *   <!-- or
+ *       structured xml
+ *   -->
+ *
+ *   <xmlStructure>
+ *   </xmlStructure>
+ * </config>
+ * </pre>
  *
  * @author dmillett
  */
@@ -28,19 +45,34 @@ class ConfigLoader {
     }
 
     /**
-     * Load more than one file and store each config files map as a separate map
+     * Load more than one file and store each config files map as a separate map.
+     * It will first load from the "classpath/config" directory, then
+     * it will load from the override directory if defined in the
+     * System.properties (see CONFIG_LOCATION)
      *
      * @return
      */
     def Map<String, String> loadFromXmlFiles() {
 
         def keyValuesMap = new HashMap<String, String>()
-        def files = loadConfigFiles()
 
-        files.each { xmlFile ->
+        LOG.info("Loading Files From 'classpath/config' Location")
+        def classpathConfigs = loadConfigFilesFromClasspath()
+        classpathConfigs.each { xmlFile ->
             keyValuesMap.putAll(loadFromXmlFile(xmlFile))
         }
+        LOG.info("Loaded ${keyValuesMap.size()} Classpath Config Key-Values")
 
+        LOG.info("Loading Files From Override Location")
+        def overrideKeyValues = new HashMap<String, String>()
+        def overrideConfigs = loadConfigFilesFromOverride()
+
+        overrideConfigs.each { xmlFile ->
+            overrideKeyValues.putAll(loadFromXmlFile(xmlFile))
+        }
+        LOG.info("Loaded ${overrideConfigs.size()} Override Config Key-Values")
+
+        keyValuesMap.putAll(overrideKeyValues)
         return keyValuesMap
     }
 
@@ -53,7 +85,7 @@ class ConfigLoader {
     def Map<String, Map<String, String>> loadMapsFromFiles() {
 
         def filesKeyValueMap = new HashMap<String, Map<String,String>>();
-        def files = loadConfigFiles()
+        def files = loadConfigFilesFromOverride()
 
         files.each { xmlFile ->
             filesKeyValueMap.put(xmlFile, loadFromXmlFile(xmlFile))
@@ -64,18 +96,40 @@ class ConfigLoader {
 
     /**
      * Just loads XML files for now. Will adjust it to handle JSON files at some point.
+     * It relies on CONFIG_LOCATION to lookup the config files.
      *
      * @return A list of xml file names for a specific directory (see CONFIG_LOCATION)
      */
-    def List<String> loadConfigFiles() {
+    def List<String> loadConfigFilesFromOverride() {
 
-        def suffix = ~/.*\.xml/
-        def location = System.getProperties().getProperty(CONFIG_LOCATION) + File.separator
+        def location = System.getProperty(CONFIG_LOCATION) + File.separator
         def configFiles = new ArrayList<String>()
+        def suffix = ~/.*\.xml/
 
         new File(location).eachFileMatch(suffix) { file ->
-            def filePath = location + file.name
-            configFiles.add(filePath)
+            configFiles.add(file.toString())
+        }
+
+        return configFiles
+    }
+
+    /**
+     * Load these configuration files from the "'classpath'/config" directory.
+     * It only loads "xml" files for now.
+     *
+     * @return A list of xml filenames (and paths)
+     */
+    def List<String> loadConfigFilesFromClasspath() {
+
+        // Trim of the "file:" prefix from the classpath
+        def codePathUrl = getClass().getProtectionDomain().codeSource.location
+        def codePath = codePathUrl.toString().substring(5) + "config"
+
+        def suffix = ~/.*\.xml/
+        def configFiles = new ArrayList<String>()
+
+        new File(codePath).eachFileMatch(suffix) { configFile ->
+            configFiles.add(configFile.toString())
         }
 
         return configFiles

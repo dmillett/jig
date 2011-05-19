@@ -9,23 +9,23 @@ class ConfigLoaderTest
     // Load a specific test config file
     void test__loadFromXmlFile_test_location() {
 
-        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertiesWithConfigLocation() + "ConfigOne.xml"
+        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "ConfigOne.xml"
         def configLoader = new ConfigLoader()
 
         def configMap = configLoader.loadFromXmlFile(testConfigFile)
         assertNotNull(configMap)
         assertFalse(configMap.isEmpty())
-        assertEquals(15, configMap.size())
+        assertEquals(17, configMap.size())
     }
 
     // List all of the config files to load
     void test__loadConfigFiles() {
 
         def configLoader = new ConfigLoader()
-        def configFileNames = configLoader.loadConfigFiles()
+        def configFileNames = configLoader.loadConfigFilesFromOverride()
 
         assertNotNull(configFileNames)
-        assertEquals(3, configFileNames.size())
+        assertEquals(4, configFileNames.size())
     }
 
     // Load all the test configs into a single depth map
@@ -36,7 +36,7 @@ class ConfigLoaderTest
 
         assertNotNull(configMap)
         assertFalse(configMap.isEmpty())
-        assertEquals(35, configMap.size())
+        assertEquals(37, configMap.size())
     }
 
     // Load a two deep map with filename as the first level
@@ -47,6 +47,12 @@ class ConfigLoaderTest
 
         assertNotNull(configMaps)
         assertFalse(configMaps.isEmpty())
-        assertEquals(3, configMaps.size())
+        assertEquals(4, configMaps.size())
+    }
+
+    void test__loadConfigFilesFromClasspath() {
+
+        def configLoader = new ConfigLoader()
+        configLoader.loadConfigFilesFromClasspath()
     }
 }

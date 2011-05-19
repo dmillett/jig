@@ -55,6 +55,15 @@
       </type>
     </commission>
 
+    <cities>
+      <Chicago>
+        <bars>
+          <bar>Sheffields</bar>
+          <bar>Nissei</bar>
+        </bars>
+      </Chicago>
+    </cities>
+
   </xmlStructure>
 
 </config>

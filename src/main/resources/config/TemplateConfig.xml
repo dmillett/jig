@@ -1,0 +1,9 @@
+<config>
+  <keyValueProperties>
+    <!-- todo: enter any key value direct lookup properties here -->
+  </keyValueProperties>
+
+  <xmlStructure>
+    <!-- todo: entry and structured xml configs here  -->
+  </xmlStructure>
+</config>

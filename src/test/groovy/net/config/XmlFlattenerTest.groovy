@@ -6,10 +6,19 @@ package net.config
 class XmlFlattenerTest
     extends GroovyTestCase {
 
+    void test__flatten_IgnoredConfigFile() {
+
+        def ignoredConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "IgnoredConfig.xml"
+        def xmlFlatten = new XmlFlattener()
+        
+        xmlFlatten.flatten(ignoredConfigFile)
+    }
+
     void test__findSimpleKeyValueNodes() {
 
-        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertiesWithConfigLocation() + "ConfigOne.xml"
-        def baseNode = new XmlParser().parse(testConfigFile) //'/home/dave/dev/jConfigMap/data/ConfigOne.xml')
+        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "ConfigOne.xml"
+        def baseNode = new XmlParser().parse(testConfigFile)
+
         def xmlFlatten = new XmlFlattener()
         def keyValues = xmlFlatten.findSimpleKeyValueNodes(baseNode)
 
@@ -25,15 +34,15 @@ class XmlFlattenerTest
 
     void test__findXmlStructures() {
 
-        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertiesWithConfigLocation() + "ConfigOne.xml"
+        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "ConfigOne.xml"
         def baseNode = new XmlParser().parse(testConfigFile)
         def xmlFlatten = new XmlFlattener()
 
         def structureNode = baseNode.xmlStructure[0]
-        Map keyValues = xmlFlatten.findXmlStructures(structureNode, "")
+        def keyValues = xmlFlatten.findXmlStructures(structureNode, "")
 
         assertNotNull(keyValues)
-        assertEquals(10, keyValues.size())
+        assertEquals(12, keyValues.size())
 
         assertEquals("8.00", keyValues.get("xmlstructure.commission.type.stocks.ticker.intc.category.market"))
 

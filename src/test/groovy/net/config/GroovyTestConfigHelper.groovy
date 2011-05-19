@@ -9,7 +9,7 @@ package net.config
  */
 class GroovyTestConfigHelper {
 
-    def static String updateSystemPropertiesWithConfigLocation() {
+    def static String updateSystemPropertyConfigLocation() {
 
         if ( System.getProperty(ConfigLoader.CONFIG_LOCATION) == null )
         {

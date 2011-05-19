@@ -26,10 +26,14 @@ class XmlFlattener {
 
         LOG.info("Loading Xml File To Flatten To Map $configFile")
 
-        def currentDir = new File('').absolutePath
         def configNode = new XmlParser().parse(configFile)
+        if ( !validConfigFile(configNode) )
+        {
+            return new HashMap<String,String>()
+        }
 
-        Map<String,String> keyValues = findSimpleKeyValueNodes(configNode)
+        def keyValues = findSimpleKeyValueNodes(configNode)
+        println "xmlStructure? ${configNode.xmlStructure[0]}"
         keyValues.putAll(findXmlStructures(configNode.xmlStructure[0], ""))
 
         return keyValues
@@ -55,7 +59,7 @@ class XmlFlattener {
     def Map<String, String> findSimpleKeyValueNodes(Node baseNode) {
 
         LOG.info("Loading Simple Key Values")
-        Map<String, String> keyValues = new HashMap<String, String>()
+        def keyValues = new HashMap<String, String>()
 
         baseNode.keyValueProperties.property.each { entry ->
             keyValues.put(entry.@name.toLowerCase(), checkNodeForValue(entry))
@@ -97,15 +101,102 @@ class XmlFlattener {
         return null
     }
 
+    /**
+     * To flatten or not to flatten. This recursive method works for:
+     *
+     * stock.AMD.sell-high, 25.00
+     * stock.AMD.sell-low, 6.50
+     * stock.AMD.shares, 200
+     * <config>
+     *   <xmlStructure>
+     *     <pre>
+     *      <stock name="AMD">
+     *        <sell-high>25.00</sell-high>
+     *        <sell-low>6.50</sell-low>
+     *        <shares>200</shares>
+     *      </stock>
+     *     </pre>
+     *
+     *   </xmlStructure>
+     * </config>
+     *
+     * @param baseNode
+     * @return
+     */
+    def Map<String, String> findXmlStructures(Node baseNode, String name) {
+
+        LOG.info("Loading Structured Xml Flattened Key Values")
+        def currentName = findCurrentFlattenedName(name, baseNode)
+        def duplicateKeyCount = 1
+        def keyValues = new HashMap<String, String>()
+
+        baseNode.children().each { childNode ->
+
+            def childNodeValue = checkNodeForValue(childNode)
+
+            if ( childNodeValue != null )
+            {
+                def lowerCaseKey = buildKeyForChildNode(currentName, childNode)
+
+                if ( keyValues.containsKey(lowerCaseKey) )
+                {
+                    def keyWithIndex = lowerCaseKey + DELIM + duplicateKeyCount
+                    keyValues.put(keyWithIndex, childNodeValue)
+                    duplicateKeyCount++
+                }
+                else
+                {
+                    keyValues.put(lowerCaseKey, childNodeValue)
+                }
+
+                return
+            }
+
+            // Recursive call (some day it will be tail recursion)
+            keyValues.putAll(findXmlStructures(childNode, currentName))
+        }
+
+        return keyValues
+    }
+
+    /**
+     * A valid jConfigMap file must have a "config" root node
+     * and either/both of "keyValueProperties" or "xmlStructure" child
+     * nodes.
+     *
+     * @param configBaseNode
+     * @return
+     */
+    def boolean validConfigFile(Node configBaseNode) {
+
+        if ( configBaseNode == null || !configBaseNode.name().equals("config") )
+        {
+            LOG.warn("Invalid Configuration Structure For Root Node: ${configBaseNode}")
+            return false
+        }
+
+        println "${configBaseNode.keyValueProperties.dump()}"
+
+        if ( configBaseNode.keyValueProperties[0] == null && configBaseNode.xmlStructure[0] == null )
+        {
+            return false
+        }
+
+        return true
+    }
 
     /**
      * Look at the attributes for a given Node and only take the "value"
      * for each attribute. It gets chained into a flattened form.
      *
      * <pre>
-     * <node name="foo" description="bar>
-     *   <subNode key="really" value="no shite"/>
-     * </node>
+     * <config>
+     *   <xmlStructure>
+     *     <node name="foo" description="bar>
+     *       <subNode key="really" value="no shite"/>
+     *     </node>
+     *   </xmlStructure>
+     * </config>
      * </pre>
      *
      * Flattens into "foo.bar.really","no shite"
@@ -113,7 +204,7 @@ class XmlFlattener {
      * @param attributes
      * @return
      */
-    def String flattenNodeName(Node node) {
+    private def String flattenNodeName(Node node) {
 
         if ( node == null )
         {
@@ -122,37 +213,17 @@ class XmlFlattener {
 
         def name = node.name()
         node.attributes().entrySet().each { entry ->
-
-            name += "." + entry.getValue()
+            name += DELIM + entry.getValue()
         }
 
         return name
     }
 
-    /**
-     * To flatten or not to flatten. This works for:
-     *
-     * stock.AMD.sell-high, 25.00
-     * stock.AMD.sell-low, 6.50
-     * stock.AMD.shares, 200
-     *
-     * <pre>
-     *  <stock name="AMD">
-     *    <sell-high>25.00</sell-high>
-     *    <sell-low>6.50</sell-low>
-     *    <shares>200</shares>
-     *  </stock>
-     * </pre>
-     *
-     * @param baseNode
-     * @return
-     */
-    def Map<String, String> findXmlStructures(Node baseNode, String name) {
-
-        LOG.info("Loading Structured Xml Flattened Key Values")
+    // Determine the current name from the current node and base name value
+    private def String findCurrentFlattenedName(String name, Node node) {
 
         def currentName = ""
-        def flattenedNodeName = flattenNodeName(baseNode)
+        def flattenedNodeName = flattenNodeName(node)
 
         if ( name == null || name.empty )
         {
@@ -160,26 +231,16 @@ class XmlFlattener {
         }
         else
         {
-            currentName = name + "." + flattenedNodeName
+            currentName = name + DELIM + flattenedNodeName
         }
 
-        Map keyValues = new HashMap<String, String>()
+        return currentName
+    }
 
-        baseNode.children().each { childNode ->
+    // Append node attributes as names to the current name
+    private def String buildKeyForChildNode(String currentName, Node childNode) {
 
-            def childNodeValue = checkNodeForValue(childNode)
-
-            if ( childNodeValue != null )
-            {
-                def childNodeName = flattenNodeName(childNode)
-                def key = currentName + "." + childNodeName
-                keyValues.put(key.toLowerCase(), childNodeValue)
-                return
-            }
-
-            keyValues.putAll(findXmlStructures(childNode, currentName))
-        }
-
-        return keyValues
+        def childNodeName = flattenNodeName(childNode)
+        return (currentName + DELIM + childNodeName).toLowerCase()
     }
 }
