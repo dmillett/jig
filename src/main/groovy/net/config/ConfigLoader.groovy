@@ -72,8 +72,32 @@ class ConfigLoader {
         }
         LOG.info("Loaded ${overrideConfigs.size()} Override Config Key-Values")
 
-        keyValuesMap.putAll(overrideKeyValues)
+        updateWithOverrides(keyValuesMap, overrideKeyValues)
+
         return keyValuesMap
+    }
+
+    /**
+     * Updates the original "classpath" map with override map values. It will dump
+     * any differences/replacements to the Log file.
+     *
+     * @param original The config map from classpath/config location
+     * @param overrides The config map from overrides location
+     */
+    private def updateWithOverrides(Map<String,String> original, Map<String,String> overrides) {
+
+        overrides.entrySet().each { entry ->
+
+            if ( original.containsKey(entry.getKey()) )
+            {
+                def key = entry.getKey()
+                LOG.info("Overriding ${key}: '${original.get(key)}' With '${entry.getValue()}'")
+            }
+
+            original.put(entry.getKey(), entry.getValue())
+        }
+
+        println original
     }
 
     /**
@@ -88,7 +112,11 @@ class ConfigLoader {
         def files = loadConfigFilesFromOverride()
 
         files.each { xmlFile ->
-            filesKeyValueMap.put(xmlFile, loadFromXmlFile(xmlFile))
+            def keyValues = loadFromXmlFile(xmlFile)
+            if ( !keyValues.isEmpty() )
+            {
+                filesKeyValueMap.put(xmlFile, loadFromXmlFile(xmlFile))
+            }
         }
 
         return filesKeyValueMap

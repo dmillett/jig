@@ -29,11 +29,11 @@ class XmlFlattener {
         def configNode = new XmlParser().parse(configFile)
         if ( !validConfigFile(configNode) )
         {
+            LOG.info("Skipping ${configFile} Due To Improper Config Structure")
             return new HashMap<String,String>()
         }
 
         def keyValues = findSimpleKeyValueNodes(configNode)
-        println "xmlStructure? ${configNode.xmlStructure[0]}"
         keyValues.putAll(findXmlStructures(configNode.xmlStructure[0], ""))
 
         return keyValues
@@ -180,14 +180,13 @@ class XmlFlattener {
 
         if ( configBaseNode == null || !configBaseNode.name().equals("config") )
         {
-            LOG.warn("Invalid Configuration Structure For Root Node: ${configBaseNode}")
+            LOG.warn("Skipping: Invalid Configuration Structure For Root Node: ${configBaseNode}")
             return false
         }
 
-        println "${configBaseNode.keyValueProperties.dump()}"
-
         if ( configBaseNode.keyValueProperties[0] == null && configBaseNode.xmlStructure[0] == null )
         {
+            LOG.info("Skipping: Missing 'keyValuesProperties' Or 'xmlStructure' Node(s)")
             return false
         }
 

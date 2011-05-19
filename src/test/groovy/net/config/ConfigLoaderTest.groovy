@@ -47,7 +47,7 @@ class ConfigLoaderTest
 
         assertNotNull(configMaps)
         assertFalse(configMaps.isEmpty())
-        assertEquals(4, configMaps.size())
+        assertEquals(3, configMaps.size())
     }
 
     void test__loadConfigFilesFromClasspath() {
