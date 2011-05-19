@@ -37,7 +37,7 @@ public class ConfigMap {
         loadConfigMapFromFiles();
     }
 
-    public void revertConfig() {
+    public synchronized void revertConfig() {
 
         CURRENT_CONFIG.clear();
         CURRENT_CONFIG.putAll(PREVIOUS_CONFIG);
@@ -45,35 +45,97 @@ public class ConfigMap {
 
     public void compareAndLogDifferences() {
 
-        int currentSize = CURRENT_CONFIG.size();
-        int previousSize = PREVIOUS_CONFIG.size();
+        compareMapFiles(CURRENT_CONFIG, PREVIOUS_CONFIG, "Previous Config Missing File");
+        compareMapFiles(PREVIOUS_CONFIG, CURRENT_CONFIG, "Current Config Missing File");
 
-        LOG.info("Current Config File Count: " + currentSize + ", Previous: "  + previousSize);
-
-        compareLoadedConfigFileNames();
-
-        // todo: entry comparisons
+        compareConfigMap(CURRENT_CONFIG, PREVIOUS_CONFIG, "Current Config", "Previous Config");
+        compareConfigMap(PREVIOUS_CONFIG, CURRENT_CONFIG, "Previous Config", "Current Config");
     }
 
-    private void compareLoadedConfigFileNames() {
+    public void dumpCurrentConfig() {
+        dumpConfigMap(CURRENT_CONFIG, "Current Config");
+    }
 
-        for ( String fileName : CURRENT_CONFIG.keySet() )
-        {
-            if ( !PREVIOUS_CONFIG.containsKey(fileName) )
-            {
-                LOG.info("Current Config Removed From Previous: " + fileName);
-            }
-        }
+    public void dumpAllConfig() {
+        dumpConfigMap(CURRENT_CONFIG, "Current Config");
+        dumpConfigMap(PREVIOUS_CONFIG, "Previous Config");
+    }
 
-        for ( String fileName : PREVIOUS_CONFIG.keySet() )
+    private void dumpConfigMap(Map<String, Map<String,String>> map, String text) {
+
+        LOG.info("Dumping Config For: " + text)
+        ;
+        for ( String configFile : map.keySet() )
         {
-            if ( !CURRENT_CONFIG.containsKey(fileName) )
+            for ( Map.Entry<String, String> entry : map.get(configFile).entrySet() )
             {
-                LOG.info("Previous Config Removed From Current: " + fileName);
+                LOG.info(entry.getKey() + ":" + entry.getValue());
             }
         }
     }
 
+    /**
+     * @return A copy of the Date that indicates the last config load occurrence.
+     */
+    public Date getLastUpdated() {
+        return new Date(_lastUpdated.getTime());
+    }
+
+    /** Look at config files and their entries */
+    private void compareConfigMap(Map<String, Map<String, String>> m1, Map<String, Map<String, String>> m2,
+                                  String text1, String text2) {
+
+        LOG.info("Items Missing/Changed From: " + text2 + " To " + text1);
+        for ( String configFile : m1.keySet() )
+        {
+            Map<String,String> map2 = m2.get(configFile);
+            compareEntries(m1, map2, configFile,text2);
+        }
+    }
+
+    /** Look at config entries */
+    private void compareEntries(Map<String, Map<String, String>> m1, Map<String, String> map2, String configFile,
+                                String text) {
+
+        for ( Map.Entry<String, String> entry : m1.get(configFile).entrySet() )
+        {
+            if ( map2 == null )
+            {
+                LOG.info(text + " Missing" + configFile + ":" + entry.getKey() + ", " + entry.getValue());
+                continue;
+            }
+
+            String map2Value = map2.get(entry.getKey());
+
+            if ( map2Value == null )
+            {
+                LOG.info(text + " Missing: '" + entry.getKey() + "'");
+            }
+            else if ( !entry.getValue().equals(map2Value) )
+            {
+                LOG.info("Key '" + entry.getKey() + "' Changed From: '" + map2Value + "' To:" + entry.getValue());
+            }
+        }
+    }
+
+    /** Look for missing config files for these two version */
+    private void compareMapFiles(Map<String, Map<String,String>> m1, Map<String, Map<String,String>> m2, String msg) {
+
+        for ( String keyOneFile : m1.keySet() )
+        {
+            if ( m1.containsKey(keyOneFile) && !m2.containsKey(keyOneFile) )
+            {
+                LOG.info(msg + ": " + keyOneFile);
+            }
+        }
+    }
+
+    /**
+     * Locks the previous and current config maps for updates. It also
+     * resets the '_lastUpdated' time stamp.
+     *
+     * This should be the only means to update the HashMap configs!
+     */
     private synchronized void loadConfigMapFromFiles() {
 
         if ( !CURRENT_CONFIG.isEmpty() )
@@ -84,5 +146,12 @@ public class ConfigMap {
 
         JavaGroovyConfigBinder configBinder = new JavaGroovyConfigBinder();
         CURRENT_CONFIG.putAll(configBinder.getFileConfigMap());
+
+        if ( PREVIOUS_CONFIG.isEmpty() )
+        {
+            PREVIOUS_CONFIG.putAll(CURRENT_CONFIG);
+        }
+
+        _lastUpdated = new Date();
     }
 }
