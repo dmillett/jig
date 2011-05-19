@@ -102,7 +102,16 @@ class XmlFlattener {
     }
 
     /**
-     * To flatten or not to flatten. This recursive method works for:
+     * To flatten or not to flatten. This recursive method works for the structure
+     * below. If there are any identical key node names, then the 2 - N identical
+     * keys encountered will automatically append the count in the load order.
+     *
+     * some.not.so.unique.key, "foo"
+     * some.not.so.unique.key.1, "bar"
+     * some.not.so.unique.key.2, "sh!t"
+     *
+     * The config retrieval already returns a Map, this forces the user to
+     * deal with the possible results instead of overwriting them.
      *
      * stock.AMD.sell-high, 25.00
      * stock.AMD.sell-low, 6.50
