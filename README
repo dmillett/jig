@@ -1,4 +1,4 @@
-jConfigMap:
+jConfigMap (See LICENSE AND NOTICE):
 ==========
 
 Is a Java client configuration tool that uses Groovy (for now), to flatten
@@ -16,17 +16,20 @@ Examples:
 ---------
 
 Structured XML to flatten:
-
-<stocks>
-    <stock name="FOO">
-       <low>8.00</low>
-       <high>8.32</high>
-    </stock>
-    <stock name="BAR">
-       <low>4.50</low>
-       <high>4.65</high>
-    </stock>
-</stocks>
+<config>
+  <xmlStructure>
+    <stocks>
+        <stock name="FOO">
+           <low>8.00</low>
+           <high>8.32</high>
+        </stock>
+        <stock name="BAR">
+           <low>4.50</low>
+           <high>4.65</high>
+        </stock>
+    </stocks>
+  </xmlStructure>
+</config>
 
 generates:
 stocks.stock.FOO.low, 8.00
@@ -35,15 +38,17 @@ stocks.stock.BAR.low, 4.50
 stocks.stock.BAR.high, 4.65
 
 Pattern stocks = Pattern.compile("stocks.*");
+
 Config.get(stocks) --> 4 results
 Config.get(stocks).get("FOO") --> 2 results
 Config.get(stocks).get("low") --> 2 results
 Config.get(stocks).get("FOO", "low") --> 1 result
 
-See:
-jConfigMap/src/test/java/net/config/example/ConfigEnumExample.java
-jConfigMap/src/test/java/net/config/example/ConfigEnumKeyValueExampleTest.java
-jConfigMap/src/test/java/net/config/example/ConfigEnumStructuredXmlTest.java
+See (test package example.one, example.two):
+jConfigMap/src/test/java/net/config/example/one/ConfigEnumExample.java
+jConfigMap/src/test/java/net/config/example/one/ConfigEnumKeyValueExampleTest.java
+jConfigMap/src/test/java/net/config/example/one/ConfigEnumStructuredXmlTest.java
+
 
 Requirements:
 -------------

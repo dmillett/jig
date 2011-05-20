@@ -1,7 +1,8 @@
-package net.config.example;
+package net.util;
+
+import junit.framework.TestCase;
 
 /**
- *
  * @author dmillett
  *
  * Copyright 2011 David Millett
@@ -17,18 +18,22 @@ package net.config.example;
  * See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-public class JavaTestConfigHelper {
+public class GenericsHelperTest
+    extends TestCase {
 
-    public static final String CONFIG_PROP = "jConfigMap.location";
+    public void test__get_Integer() {
 
-    public static String updatePropertiesWithTestConfigPath() {
-
-        if ( System.getProperty(CONFIG_PROP) == null )
-        {
-            String path = System.getProperty("user.dir") + "/src/test/resources/config/";
-            System.setProperty(CONFIG_PROP, path);
-        }
-
-        return System.getProperty(CONFIG_PROP);
+        GenericsHelper helper = new GenericsHelper();
+        Integer value = helper.get("1", Integer.class);
+        assertEquals(new Integer(1), value);
     }
+
+    public void test__get_Integer_fail() {
+
+        GenericsHelper helper = new GenericsHelper();
+        Integer value = helper.get("A", Integer.class);
+        assertNull(value);
+    }
+
+    // The others are tested in ConfigEnumKeyValueExample
 }

@@ -3,7 +3,40 @@ package net.config
 import org.apache.log4j.Logger
 
 /**
+ * This class flattens xml structures and their values into
+ * a HashMap. Each config file must have the following form:
+ *
+ * <pre>
+ *
+ * <!-- required root node -->
+ * <config>
+ *   <keyValueProperties>
+ *       <!-- Define optional nodes here -->
+ *   </keyValueProperties>
+ *   <xmlStructure>
+ *      <!-- Define optional nodes here -->
+ *   </xmlStructure>
+ * </config>
+ * </pre>
+ *
+ * Where the root node 'config' is required and one or both
+ * of the child nodes 'keyValueProperties' and 'xmlStructure'
+ * are required.
+ *
  * @author dmillett
+ *
+ * Copyright 2011 David Millett
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 class XmlFlattener {
 
@@ -11,8 +44,14 @@ class XmlFlattener {
     private static final def String DELIM = "."
 
     /**
-     * This creates a map from the following two XML nodes in 'configFile'. It looks for the following
-     * two node names:
+     * This creates a map from the following two XML child nodes in 'configFile'.
+     * It requires the root node and one or both of the child nodes below. If the
+     * xml is not well formed, then XmlParser throws an exception and the file is
+     * ignored.
+     *
+     * root node: 'config'
+     *
+     * child node(s):
      * 'keyValueProperties'
      * 'structureXml'
      *
@@ -25,16 +64,24 @@ class XmlFlattener {
     def Map<String, String> flatten(String configFile) {
 
         LOG.info("Loading Xml File To Flatten To Map $configFile")
+        def keyValues
 
-        def configNode = new XmlParser().parse(configFile)
-        if ( !validConfigFile(configNode) )
+        try
         {
-            LOG.info("Skipping ${configFile} Due To Improper Config Structure")
-            return new HashMap<String,String>()
-        }
+            def configNode = new XmlParser().parse(configFile)
+            if ( !isValidConfigFile(configNode) )
+            {
+                LOG.info("Skipping ${configFile} Due To Improper Config Structure")
+                return new HashMap<String,String>()
+            }
 
-        def keyValues = findSimpleKeyValueNodes(configNode)
-        keyValues.putAll(findXmlStructures(configNode.xmlStructure[0], ""))
+            keyValues = findSimpleKeyValueNodes(configNode)
+            keyValues.putAll(findXmlStructures(configNode.xmlStructure[0], ""))
+        }
+        catch ( Throwable t )
+        {
+            LOG.error("Could Not Parse ${configFile} Due To", t)
+        }
 
         return keyValues
     }
@@ -106,7 +153,7 @@ class XmlFlattener {
      * below. If there are any identical key node names, then the 2 - N identical
      * keys encountered will automatically append the count in the load order.
      *
-     * some.not.so.unique.key, "foo"
+     * some.not.so.unique.key,0 "foo"
      * some.not.so.unique.key.1, "bar"
      * some.not.so.unique.key.2, "sh!t"
      *
@@ -176,7 +223,7 @@ class XmlFlattener {
      * @param configBaseNode
      * @return
      */
-    def boolean validConfigFile(Node configBaseNode) {
+    def boolean isValidConfigFile(Node configBaseNode) {
 
         if ( configBaseNode == null || !configBaseNode.name().equals("config") )
         {

@@ -12,8 +12,22 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 /**
+ * Use this to access the ConfigMap (cache) from Config POJOs or Enums.
  *
  * @author dmillett
+ *
+ * Copyright 2011 David Millett
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 public class ConfigLookup {
 
@@ -45,6 +59,14 @@ public class ConfigLookup {
         return null;
     }
 
+    /**
+     * Use the filename as a namespace to expedite config single value lookup
+     * instead of iterating across all files.
+     *
+     * @param fileName The config file that contains this single key-value property style entry
+     * @param key There should be only one entry that matches this.
+     * @return A String value for the single entry
+     */
     public String getByKey(String fileName, String key) {
 
         if ( key == null )
@@ -115,9 +137,11 @@ public class ConfigLookup {
     }
 
     /**
+     * Use the pattern to retrieve a Map of values and then reduce the
+     * Map size using additional key names as a filter.
      *
-     * @param pattern
-     * @param params
+     * @param pattern For Map key lookup
+     * @param params Any additional portions of the key name to help reduce the Map
      * @return
      */
     public Map<String, String> get(Pattern pattern, String... params) {
@@ -258,6 +282,14 @@ public class ConfigLookup {
         return matches;
     }
 
+    /**
+     * Find all Key matches, by pattern, for a given config map and then reduce by 'params'.
+     *
+     * @param configMap Any config map loaded from the config files
+     * @param pattern To use against the Map keys
+     * @param params Reduce by matching params in the Map key
+     * @return A map of reduced results
+     */
     protected Map<String, String> findMatches(Map<String, String> configMap, Pattern pattern, String... params) {
 
         Map<String, String> matches = new HashMap<String, String>();
