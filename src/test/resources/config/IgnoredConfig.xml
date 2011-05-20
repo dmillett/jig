@@ -1,0 +1,7 @@
+<config>
+  <someValues>
+    <values>
+      <value key="one">Ignore Me</value>
+    </values>
+  </someValues>
+</config>
