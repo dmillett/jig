@@ -1,6 +1,7 @@
 package net.config.example.two;
 
 import junit.framework.TestCase;
+import net.config.example.JavaTestConfigHelper;
 
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class PojoConfigExampleTest
     protected void setUp()
         throws Exception {
 
-        System.getProperties().put("jConfigMap.location", "/home/dave/dev/jConfigMap/src/test/resources/config");
+        JavaTestConfigHelper.updatePropertiesWithTestConfigPath();;
     }
 
     public void test__getAllStocks() {
