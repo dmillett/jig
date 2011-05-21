@@ -11,11 +11,12 @@ the matching value is returned.
 Currently jConfigMap supports XML configuration files during startup and those
 Map values are accessed statically by Java-Groovy binding class.
 
+Examples (additional examples in test directory):
+-------------------------------------------------
+* 'xmlStructure' nodes always return a Map<String,String>
+* 'keyValueProperties' nodes return a String, List, or primitive wrapped object
+* 'value' attribute key stores the corresponding value in the config map
 
-Examples:
----------
-
-Structured XML to flatten:
 <config>
   <xmlStructure>
     <stocks>
@@ -28,27 +29,44 @@ Structured XML to flatten:
            <high>4.65</high>
         </stock>
     </stocks>
+    <cities>
+      <Chicago>
+        <bars>
+          <bar>Sheffields</bar>
+          <bar>Map Room</bar>
+          <bar>Redmonds</bar>
+        </bars>
+      </Chicago>
+      <Ann Arbor>
+        <bars>
+          <bar>Grizzly Peak</bar>
+        </bars>
+      </Ann Arbor>
+    </cities>
   </xmlStructure>
 </config>
 
 generates:
-stocks.stock.FOO.low, 8.00
-stocks.stock.FOO.high, 8.32
-stocks.stock.BAR.low, 4.50
-stocks.stock.BAR.high, 4.65
+stocks.stock.foo.low, 8.00
+stocks.stock.foo.high, 8.32
+stocks.stock.bar.low, 4.50
+stocks.stock.bar.high, 4.65
 
-Pattern stocks = Pattern.compile("stocks.*");
+cities.chicago.bars.bar, Sheffields
+cities.chicago.bars.bar.1, Map Room
+cities.chicago.bars.bar.2, Redmonds
+cities.ann arbor.bars.bar, Grizzly Peak
 
-Config.get(stocks) --> 4 results
-Config.get(stocks).get("FOO") --> 2 results
-Config.get(stocks).get("low") --> 2 results
-Config.get(stocks).get("FOO", "low") --> 1 result
+Pattern stocks = Pattern.compile(".*stocks.*");
 
-See (test package example.one, example.two):
-jConfigMap/src/test/java/net/config/example/one/ConfigEnumExample.java
-jConfigMap/src/test/java/net/config/example/one/ConfigEnumKeyValueExampleTest.java
-jConfigMap/src/test/java/net/config/example/one/ConfigEnumStructuredXmlTest.java
+ConfigLookup.get(stocks) --> 4 results
+ConfigLookup.get(stocks, "FOO") --> 2 results
+ConfigLookup.get(stocks, "low") --> 2 results
+ConfigLookup.get(stocks, "FOO", "low") --> 1 result
 
+Pattern bars = Pattern.compile(".*bars.*);
+ConfigLookup.get(bars) --> 4 results
+ConfigLookup.get(bars, "Chicago") --> 3 results
 
 Requirements:
 -------------
