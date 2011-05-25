@@ -28,7 +28,7 @@ public class PojoConfigExampleTest
     protected void setUp()
         throws Exception {
 
-        JavaTestConfigHelper.updatePropertiesWithTestConfigPath();;
+        //JavaTestConfigHelper.updatePropertiesWithTestConfigPath();;
     }
 
     public void test__getAllStocks() {

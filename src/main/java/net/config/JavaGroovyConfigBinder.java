@@ -31,18 +31,12 @@ import java.util.Map;
 public class JavaGroovyConfigBinder {
 
     private static final Logger LOG = Logger.getLogger(JavaGroovyConfigBinder.class);
-    /** Curiously, Gradle will eat the errors during compilation if this path is wrong  */
-    @Deprecated
-    private static final String _groovyConfigMapClass = "src/main/groovy/net/config/ConfigController.groovy";
-    private static final String _groovyConfigLoaderClass = "src/main/groovy/net/config/ConfigLoader.groovy";
 
-    @Deprecated
-    private final GroovyObject _groovyConfigMap;
+    private static final String _groovyConfigLoaderClass = "net.config.ConfigLoader";
     private final GroovyObject _groovyConfigLoader;
 
     public JavaGroovyConfigBinder() {
-        _groovyConfigMap = instantiateGroovyObject(_groovyConfigMapClass);
-        _groovyConfigLoader = instantiateGroovyObject(_groovyConfigLoaderClass);
+        _groovyConfigLoader = createGroovyObject(_groovyConfigLoaderClass);
     }
 
     @SuppressWarnings("unchecked")
@@ -54,50 +48,60 @@ public class JavaGroovyConfigBinder {
             return null;
         }
 
-        String methodName = "loadMapsFromFiles";
-        Object[] args = {};
-        Map<String, Map<String,String>> configKeyValues =
-                (Map<String, Map<String,String>>)_groovyConfigLoader.invokeMethod(methodName, args);
+        Map<String, Map<String,String>> configKeyValues = null;
 
-        return configKeyValues;
-    }
-
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public Map<String, String> getConfigMap() {
-
-        if ( _groovyConfigMap == null )
+        try
         {
-            LOG.fatal("Cannot Retrieve Map From Null Groovy Object. Check Configuration Location And Groovy Files.");
-            return null;
+            String methodName = "loadMapsFromFiles";
+            Object[] args = {};
+            configKeyValues = (Map<String, Map<String,String>>)_groovyConfigLoader.invokeMethod(methodName, args);
         }
-
-        String methodName = "getConfig";
-        Object[] args = {};
-        Map<String, String> configKeyValues = (Map<String,String>) _groovyConfigMap.invokeMethod(methodName, args);
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         return configKeyValues;
     }
 
     /**
-     * Use for any Groovy object needed for execution within Java classes.
-     *
-     * @param groovyFileName
+     * Look this up from the Classloader (it better be in there).
+     * @param className
      * @return
      */
-    public GroovyObject instantiateGroovyObject(String groovyFileName) {
+    private GroovyObject createGroovyObject(String className) {
+
+        try
+        {
+            Class groovyClass = Class.forName(className);
+            return (GroovyObject) groovyClass.newInstance();
+        }
+        catch ( Exception e )
+        {
+            LOG.fatal("Cannot Create Instance Of Groovy Class: " + className);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Use for any Groovy object needed for execution within Java classes.
+     *
+     * @param groovySourceName
+     * @return
+     */
+    private GroovyObject createGroovyObjectFromSource(String groovySourceName) {
 
         try
         {
             ClassLoader parent = getClass().getClassLoader();
             GroovyClassLoader loader = new GroovyClassLoader(parent);
-            Class groovyClass = loader.parseClass(new File(groovyFileName));
+            Class groovyClass = loader.parseClass(new File(groovySourceName));
 
             return (GroovyObject) groovyClass.newInstance();
         }
         catch ( Exception e )
         {
-            LOG.fatal("Cannot Create Groovy Class From: " + groovyFileName, e);
+            LOG.fatal("Cannot Create Groovy Class From: " + groovySourceName, e);
             throw new RuntimeException(e);
         }
     }

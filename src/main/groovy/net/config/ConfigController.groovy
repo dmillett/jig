@@ -43,7 +43,6 @@ class ConfigController {
 
     def Map<String, String> getConfig() {
         LOG.error("ConfigController.getConfig()")
-        println "ConfigController.getConfig()"
         return CONFIG_CURRENT
     }
 

@@ -1,21 +1,30 @@
 jConfigMap (See LICENSE AND NOTICE):
-==========
+====================================
 
 Is a Java client configuration tool that uses Groovy (for now), to flatten
-configuration files into a key-value Map structure. Each key and value are
-stored as String values. Value retrieval is based upon applying regular
-expressions across the Key set or Entry set. The matching values are then
-returned in a new map. Or, if it is a simple key value property, then only
-the matching value is returned.
+XML (for now) configuration files into a key-value Map structure. Each key
+and value are stored as String values. Value retrieval is based upon applying regular
+expressions across the Map key set. The matching values are then returned in a new map.
+Or, if it is a simple key value property, then only the matching value is returned.
 
-Currently jConfigMap supports XML configuration files during startup and those
-Map values are accessed statically by Java-Groovy binding class.
+Currently jConfigMap supports XML configuration files during startup. A global config
+map (see java ConfigMap), can then be used statically for config access.
 
-Examples (additional examples in test directory):
--------------------------------------------------
+Usage:
+------
+* Each config file has a 'config' root node and either/both 'keyValueProperties' and 'xmlStructure'
 * 'xmlStructure' nodes always return a Map<String,String>
 * 'keyValueProperties' nodes return a String, List, or primitive wrapped object
 * 'value' attribute key stores the corresponding value in the config map
+
+* Configuration File(s) Config Map entry order (reverse priority - see JConfigProperties):
+    1) Default config location is "classpath/config" directory
+    2) Remote URL file location
+    3) System properties override location "jConfigMap.location"
+    4) Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
+
+Examples (additional examples in test directory):
+-------------------------------------------------
 
 <config>
   <xmlStructure>
@@ -57,16 +66,17 @@ cities.chicago.bars.bar.1, Map Room
 cities.chicago.bars.bar.2, Redmonds
 cities.ann arbor.bars.bar, Grizzly Peak
 
+ConfigLookup configHelper = new ConfigLookup()
 Pattern stocks = Pattern.compile(".*stocks.*");
 
-ConfigLookup.get(stocks) --> 4 results
-ConfigLookup.get(stocks, "FOO") --> 2 results
-ConfigLookup.get(stocks, "low") --> 2 results
-ConfigLookup.get(stocks, "FOO", "low") --> 1 result
+configHelper.get(stocks) --> 4 results
+configHelper.get(stocks, "FOO") --> 2 results
+configHelper.get(stocks, "low") --> 2 results
+configHelper.get(stocks, "FOO", "low") --> 1 result
 
 Pattern bars = Pattern.compile(".*bars.*);
-ConfigLookup.get(bars) --> 4 results
-ConfigLookup.get(bars, "Chicago") --> 3 results
+configHelper.get(bars) --> 4 results
+configHelper.get(bars, "Chicago") --> 3 results
 
 Requirements:
 -------------

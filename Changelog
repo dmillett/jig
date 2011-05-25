@@ -1,0 +1,12 @@
+
+Version 0.91 May 24, 2011
+-------------------------
+* Corrected classpath loading
+* Added support for remote URL config files
+* Added support for global command line overrides
+* Updated README
+* Added Changelog
+
+Version 0.90  May 19, 2011
+--------------------------
+* Pushed up to github

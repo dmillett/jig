@@ -1,5 +1,7 @@
 package net.config.example;
 
+import net.common.JConfigProperties;
+
 /**
  *
  * @author dmillett
@@ -19,16 +21,14 @@ package net.config.example;
  */
 public class JavaTestConfigHelper {
 
-    public static final String CONFIG_PROP = "jConfigMap.location";
-
     public static String updatePropertiesWithTestConfigPath() {
 
-        if ( System.getProperty(CONFIG_PROP) == null )
+        if ( System.getProperty(JConfigProperties.jCONFIG_LOCATION.getName()) == null )
         {
             String path = System.getProperty("user.dir") + "/src/test/resources/config/";
-            System.setProperty(CONFIG_PROP, path);
+            System.setProperty(JConfigProperties.jCONFIG_LOCATION.getName(), path);
         }
 
-        return System.getProperty(CONFIG_PROP);
+        return System.getProperty(JConfigProperties.jCONFIG_LOCATION.getName());
     }
 }

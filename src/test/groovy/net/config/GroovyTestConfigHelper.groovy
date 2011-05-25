@@ -1,5 +1,7 @@
 package net.config
 
+import net.common.JConfigProperties
+
 /**
  * Useful for setting config locations for individual unit tests.
  *
@@ -22,12 +24,12 @@ class GroovyTestConfigHelper {
 
     def static String updateSystemPropertyConfigLocation() {
 
-        if ( System.getProperty(ConfigLoader.CONFIG_LOCATION) == null )
+        if ( System.getProperty(JConfigProperties.jCONFIG_LOCATION.getName()) == null )
         {
             def testConfigPath = new File('').absolutePath + "/src/test/resources/config/"
-            System.setProperty(ConfigLoader.CONFIG_LOCATION, testConfigPath)
+            System.setProperty(JConfigProperties.jCONFIG_LOCATION.getName(), testConfigPath)
         }
 
-        return System.getProperty(ConfigLoader.CONFIG_LOCATION)
+        return System.getProperty(JConfigProperties.jCONFIG_LOCATION.getName())
     }
 }

@@ -52,7 +52,6 @@ public class ConfigEnumStructuredXmlTest
     public void test__COMMISSIONS() {
 
         Map<String, String> commissions = ConfigEnumExample.COMMISSIONS.get();
-        System.out.println(commissions);
         assertEquals(8, commissions.size());
     }
 

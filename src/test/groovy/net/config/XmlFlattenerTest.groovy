@@ -74,9 +74,5 @@ class XmlFlattenerTest
         assertEquals(14, keyValues.size())
 
         assertEquals("8.00", keyValues.get("xmlstructure.commission.type.stocks.ticker.intc.category.market"))
-
-        keyValues.entrySet().each { entry ->
-            println "$entry"
-        }
     }
 }

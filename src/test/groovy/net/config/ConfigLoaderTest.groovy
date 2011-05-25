@@ -1,6 +1,10 @@
 package net.config
 
 /**
+ * Intellij and possibly Eclipse do not compile and move
+ * directories in the same manner as Gradle. Intellij will dump all the
+ * test config files in with the non-test files.
+ *
  * @author dmillett
  *
  * Copyright 2011 David Millett
@@ -18,6 +22,12 @@ package net.config
  */
 class ConfigLoaderTest
     extends GroovyTestCase {
+
+    @Override
+    protected void setUp() {
+
+         GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "ConfigOne.xml"
+    }
 
     // Load a specific test config file
     void test__loadFromXmlFile_test_location() {
@@ -38,7 +48,7 @@ class ConfigLoaderTest
         def configFileNames = configLoader.loadConfigFilesFromOverride()
 
         assertNotNull(configFileNames)
-        assertEquals(4, configFileNames.size())
+        assertEquals(5, configFileNames.size())
     }
 
     // Load all the test configs into a single depth map
@@ -66,6 +76,9 @@ class ConfigLoaderTest
     void test__loadConfigFilesFromClasspath() {
 
         def configLoader = new ConfigLoader()
-        configLoader.loadConfigFilesFromClasspath()
+        List<String> classpathFiles = configLoader.loadConfigFilesFromClasspath()
+
+        assertEquals(1, classpathFiles.size())
     }
+
 }
