@@ -1,6 +1,6 @@
 package net.config.example.one;
 
-import net.config.ConfigLookup;
+import net.client.ConfigLookup;
 import net.util.GenericsHelper;
 import org.apache.log4j.Logger;
 

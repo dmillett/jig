@@ -1,5 +1,6 @@
-package net.config;
+package net.client;
 
+import net.util.JavaGroovyConfigBinder;
 import org.apache.log4j.Logger;
 
 import java.util.Date;

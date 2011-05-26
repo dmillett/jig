@@ -151,7 +151,7 @@ class ConfigLoader {
 
         if ( canonicalFilePath.contains(File.separator) )
         {
-            def shortened =  canonicalFilePath.substring(canonicalFilePath.lastIndexOf(File.separator) +1)
+            def shortened =  canonicalFilePath.substring(canonicalFilePath.lastIndexOf(File.separator) + 1)
             return shortened
         }
 

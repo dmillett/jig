@@ -1,3 +1,8 @@
+Version 0.92 May XX, 2011
+-------------------------
+* Adding JSON config file support with Groovy Loading
+* Groovy 1.8
+* Java package name changes from 'net.config' to 'net.client'
 
 Version 0.91 May 24, 2011
 -------------------------

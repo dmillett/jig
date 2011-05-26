@@ -16,6 +16,7 @@ Usage:
 * 'xmlStructure' nodes always return a Map<String,String>
 * 'keyValueProperties' nodes return a String, List, or primitive wrapped object
 * 'value' attribute key stores the corresponding value in the config map
+* 'xmlStructure' config map results support comparators
 
 * Configuration File(s) Config Map entry order (reverse priority - see JConfigProperties):
     1) Default config location is "classpath/config" directory

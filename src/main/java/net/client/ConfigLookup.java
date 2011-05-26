@@ -1,4 +1,4 @@
-package net.config;
+package net.client;
 
 import net.util.GenericsHelper;
 import org.apache.log4j.Logger;

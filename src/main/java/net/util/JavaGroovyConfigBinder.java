@@ -1,4 +1,4 @@
-package net.config;
+package net.util;
 
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
