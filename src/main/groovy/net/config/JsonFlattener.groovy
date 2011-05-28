@@ -4,7 +4,20 @@ import groovy.json.JsonSlurper
 
 /**
  *
+ * @author dmillett
  *
+ * Copyright 2011 David Millett
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 class JsonFlattener {
 
@@ -12,12 +25,41 @@ class JsonFlattener {
 
         def jsSlurper = new JsonSlurper()
         def parsedFile = jsSlurper.parseText(jsonFileName.toURL().text)
-
-        def flattenedKeyValues = transformGroovyJsonMap(parsedFile, "")
-        println("")
-        println("flattenedKeyValues: ${flattenedKeyValues}")
+        def flattenedKeyValues = flattenGroovyJsonObject(parsedFile)
 
         return flattenedKeyValues
+    }
+
+    /**
+     * Groovy transforms JSON to either a Map or List based on the root node.
+     *
+     * @param groovyJsonObject
+     * @return A Map of String,String
+     */
+    def Map<String,String> flattenGroovyJsonObject(groovyJsonObject) {
+
+        def keyValues = new HashMap<String,String>()
+
+        if ( groovyJsonObject == null )
+        {
+            return keyValues
+        }
+
+        if ( groovyJsonObject instanceof Map )
+        {
+            keyValues.putAll(transformGroovyJsonMap(groovyJsonObject, ""))
+        }
+        else if ( groovyJsonObject instanceof List )
+        {
+            keyValues.putAll(transformJsonArray(groovyJsonObject, ""))
+        }
+        else
+        {
+            // todo "foo": "bar"
+
+        }
+
+        return keyValues
     }
 
     // todo: Refactor some of this into smaller methods
@@ -36,10 +78,9 @@ class JsonFlattener {
             def key = entry.getKey()
             if ( currentName != null && !currentName.empty )
             {
-                key = currentName + "." + entry.getKey()
+                key = currentName + "." + key
             }
 
-            // Either a Map, Array, or String here
             if ( entry == null || entry.getValue() == null )
             {
                 println("Null Entry Or Entry Value")
@@ -47,36 +88,19 @@ class JsonFlattener {
             else if ( entry.getValue() instanceof List )
             {
                 def jsonListKeyValues = transformJsonArray(entry.getValue(), key)
-                if ( !jsonListKeyValues.isEmpty() )
-                {
-                    keyValues.putAll(jsonListKeyValues)
-                }
+                keyValues.putAll(jsonListKeyValues)
             }
             else if ( entry.getValue() instanceof Map)
             {
-                //println "JsonMap Map entry value dump: ${entry.getValue().dump()}"
                 def jsonMapKeyValues = transformGroovyJsonMap(entry.getValue(), key)
-                if ( !jsonMapKeyValues.isEmpty() )
-                {
-                    keyValues.putAll(jsonMapKeyValues)
-                }
+                keyValues.putAll(jsonMapKeyValues)
             }
-            else if ( entry.getValue() instanceof String )
+            else
             {
-                //println "JsonMap 'else' entry value dump: ${entry.getValue().dump()}"
-                if ( keyValues.containsKey(key) )
-                {
-                    def indexedKey = key + "." + keyCount
-                    keyCount++
-                    keyValues.put(indexedKey, entry.getValue())
-                    println("indexedKey: ${indexedKey}")
-                }
-                else
-                {
-                    keyValues.put(key, entry.getValue())
-                }
-
-                //println("key: ${key}, keyValues: ${keyValues}")
+                def value = String.valueOf(entry.getValue())
+                def keyVersion = new KeyVersion()
+                keyValues.putAll(keyVersion.getKeyValues(keyCount, key, value, keyValues))
+                keyCount = keyVersion._keyVersion
             }
         }
 
@@ -95,46 +119,34 @@ class JsonFlattener {
         def keyValues = new HashMap<String,String>()
 
         jsonArray.each { jsonElement ->
-            if ( jsonElement != null && jsonElement instanceof Map)
+
+            if ( jsonElement == null )
+            {
+                keyValues.put(currentName, null)
+            }
+            else if ( jsonElement instanceof Map)
             {
                 def jsonMapKeyValues = transformGroovyJsonMap(jsonElement, currentName)
-                jsonMapKeyValues.entrySet().each { entry ->
-                    if ( keyValues.containsKey(entry.getKey()) )
-                    {
-                        def indexedKey = entry.getKey() + "." + keyCount
-                        keyCount++
-                        keyValues.put(indexedKey, entry.getValue())
-                    }
-                    else
-                    {
-                        keyValues.put(entry.getKey(), entry.getValue())
-                    }
-                }
+                def keyVersion = new KeyVersion()
+                keyValues.putAll(keyVersion.getKeyValues(keyCount, keyValues, jsonMapKeyValues))
+                keyCount = keyVersion._keyVersion
             }
-            else if ( jsonElement != null && jsonElement instanceof List )
+            else if ( jsonElement instanceof List )
             {
-                println("non map value: ${jsonElement.dump()}")
-            }
-            else if ( jsonElement != null && jsonElement instanceof String )
-            {
-                if ( keyValues.containsKey(currentName) )
-                {
-                    def indexedKey = currentName + "." + keyCount
-                    keyCount++
-                    keyValues.put(indexedKey, jsonElement)
-                }
-                else
-                {
-                    keyValues.put(currentName, jsonElement)
-                }
+                def jsonArrayKeyValues = transformJsonArray(jsonElement, currentName)
+                def keyVersion = new KeyVersion()
+                keyValues.putAll(keyVersion.getKeyValues(keyCount, keyValues, jsonArrayKeyValues))
+                keyCount = keyVersion._keyVersion
             }
             else
             {
-                println "dammit null"
+                def value = String.valueOf(jsonElement)
+                def keyVersion = new KeyVersion()
+                keyValues.putAll(keyVersion.getKeyValues(keyCount, currentName, value, keyValues))
+                keyCount = keyVersion._keyVersion
             }
         }
 
         return keyValues
     }
-
 }
