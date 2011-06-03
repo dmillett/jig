@@ -20,12 +20,11 @@ package net.config
 class JsonFlattenerTest
     extends GroovyTestCase {
 
-    // todo: fix hardcoded files ... investigate url options
     void test__flattenJsonFile() {
 
-        def fileUrl = "file:///home/dave/dev/jConfigMap/src/test/resources/config/JsonExampleOne.json"
+        def fileUrl = "file://" + GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "JsonExampleOne.json"
         def jsonFlattener = new JsonFlattener()
-        def exampleThreeKeyValues = jsonFlattener.flattenJsonFile(fileUrl)
+        def exampleThreeKeyValues = jsonFlattener.flatten(fileUrl)
 
         assertNotNull(exampleThreeKeyValues)
         assertEquals(9, exampleThreeKeyValues.size())
@@ -33,9 +32,9 @@ class JsonFlattenerTest
 
     void test__flattenJsonFile_simple2() {
 
-        def fileUrl = "file:///home/dave/dev/jConfigMap/src/test/resources/config/JsonExampleTwo.json"
+        def fileUrl = "file://" + GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "JsonExampleTwo.json"
         def jsonFlattener = new JsonFlattener()
-        def simpleJsonTwo = jsonFlattener.flattenJsonFile(fileUrl)
+        def simpleJsonTwo = jsonFlattener.flatten(fileUrl)
 
         assertNotNull(simpleJsonTwo)
         assertEquals(18, simpleJsonTwo.size())
@@ -43,20 +42,11 @@ class JsonFlattenerTest
 
     void test__flattenJsonFile_simple3() {
 
-        def fileUrl = "file:///home/dave/dev/jConfigMap/src/test/resources/config/JsonExampleThree.json"
+        def fileUrl = "file://" + GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "JsonExampleThree.json"
         def jsonFlattener = new JsonFlattener()
-        def simpleJsonThree = jsonFlattener.flattenJsonFile(fileUrl)
+        def simpleJsonThree = jsonFlattener.flatten(fileUrl)
 
         assertNotNull(simpleJsonThree)
         assertEquals(26, simpleJsonThree.size())
-    }
-
-    void test__flattenJson_complex1() {
-
-        def fileUrl = "file:///home/dave/dev/jConfigMap/src/test/resources/config/JsonExampleFour.json"
-        def jsonFlattener = new JsonFlattener()
-        def simpleJsonFour = jsonFlattener.flattenJsonFile(fileUrl)
-
-        assertNotNull(simpleJsonFour)
     }
 }

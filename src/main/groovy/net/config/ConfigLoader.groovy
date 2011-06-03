@@ -41,14 +41,6 @@ import net.common.JConfigProperties
 class ConfigLoader {
 
     private static def LOG = Logger.getLogger(ConfigLoader.class)
-    //private static final def DEFAULT_CONFIG_LOCATION = ""
-
-    /** Set/pull config files from this file location */
-    //public static final def CONFIG_LOCATION = "jConfigMap.location"
-    /** Set/pull from System properties with this prefix */
-    //public static final def COMMAND_LINE_ARG = "jConfigMap.entry"
-    /** Set/pull from System properties with this prefix */
-    //public static final def CONFIG_URL = "jConfigMap.url"
 
     /**
      * Load a XML configuration file if that file exists and has the correct
@@ -264,8 +256,8 @@ class ConfigLoader {
                 String overrideKey = overrideEntry.getKey()
                 if ( fileMaps.get(fileKey).containsKey(overrideKey) )
                 {
-                    String overrideValue = overrideEntry.getValue()
-                    String oldValue = fileMaps.get(fileKey).put(overrideKey, overrideValue)
+                    def overrideValue = overrideEntry.getValue()
+                    def oldValue = fileMaps.get(fileKey).put(overrideKey, overrideValue)
                     LOG.info("Replaced ${fileKey}:${overrideKey} '${oldValue}' With '${overrideValue}'")
                 }
             }
@@ -285,7 +277,7 @@ class ConfigLoader {
         def commandLineOverrides = new HashMap<String,String>()
         System.getProperties().entrySet().each { entry ->
 
-            if ( entry.getKey().startsWith(JConfigProperties.jCONFIG_COMMAND_LINE_PROP.getName()) ) //COMMAND_LINE_ARG) )
+            if ( entry.getKey().startsWith(JConfigProperties.jCONFIG_COMMAND_LINE_PROP.getName()) )
             {
                 commandLineOverrides.put(entry.getKey(), entry.getValue())
             }
@@ -307,7 +299,7 @@ class ConfigLoader {
         def urlConfigs = new ArrayList<String>()
         System.getProperties().entrySet().each { entry ->
 
-            if ( entry.getKey().startsWith(JConfigProperties.jCONFIG_URL_LOCATION.getName()) ) //CONFIG_URL) )
+            if ( entry.getKey().startsWith(JConfigProperties.jCONFIG_URL_LOCATION.getName()) )
             {
                 urlConfigs.add(entry.getValue())
             }
@@ -345,7 +337,7 @@ class ConfigLoader {
 
         // Trim of the "file:" prefix from the classpath
         def codePathUrl = getClass().getProtectionDomain().codeSource.location
-        def codePath = codePathUrl.toString().substring(5) //+ "config"
+        def codePath = codePathUrl.toString().substring(5)
 
         def xmlFilePattern = ~/.*\.xml/
         def classpathConfigs = new ArrayList<String>()

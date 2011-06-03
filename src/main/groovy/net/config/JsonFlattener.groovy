@@ -1,8 +1,13 @@
 package net.config
 
 import groovy.json.JsonSlurper
+import org.apache.log4j.Logger
 
 /**
+ * This uses Groovy's JSON tranformer and flattens the structure
+ * into a key-value pair similar to XmlFlattener.  Maps and Arrays
+ * 'keys' are flattened to represent the path their corresponding value.
+ *
  *
  * @author dmillett
  *
@@ -21,13 +26,47 @@ import groovy.json.JsonSlurper
  */
 class JsonFlattener {
 
-    def Map<String,String> flattenJsonFile(String jsonFileName) {
+    private static final def Logger LOG = Logger.getLogger(JsonFlattener.class)
+    private final def KeyVersion _keyVersion = new KeyVersion()
 
-        def jsSlurper = new JsonSlurper()
-        def parsedFile = jsSlurper.parseText(jsonFileName.toURL().text)
-        def flattenedKeyValues = flattenGroovyJsonObject(parsedFile)
+    /**
+     * For Groovy JsonSlurper to work properly, it will only take the file
+     * in URL format. If it's a local file, then "file:///foo/bar/file.json"
+     *
+     * @param jsonFileName
+     * @return
+     */
+    def Map<String,String> flatten(String jsonFileName) {
+
+        def flattenedKeyValues
+
+        try
+        {
+            def jsSlurper = new JsonSlurper()
+            def parsedFile = jsSlurper.parseText(jsonFileName.toURL().text)
+            flattenedKeyValues = flattenGroovyJsonObject(parsedFile)
+        }
+        catch ( Exception e )
+        {
+            LOG.error("Could Not Load JSON Configuration File")
+            flattenedKeyValues = new HashMap<String,String>()
+        }
 
         return flattenedKeyValues
+    }
+
+    private def isValidUrlFile(urlFile) {
+
+        try
+        {
+            new URL(urlFile)
+            return true
+        }
+        catch ( Exception e )
+        {
+            LOG.error("Cannot Parse JSON Config From Non URL File", e)
+            return false;
+        }
     }
 
     /**
@@ -56,13 +95,17 @@ class JsonFlattener {
         else
         {
             // todo "foo": "bar"
-
         }
 
         return keyValues
     }
 
-    // todo: Refactor some of this into smaller methods
+    /**
+     *
+     * @param jsonMap
+     * @param currentName
+     * @return
+     */
     def Map<String,String> transformGroovyJsonMap(Map jsonMap, String currentName) {
 
         if ( jsonMap == null || jsonMap.isEmpty() )
@@ -70,52 +113,54 @@ class JsonFlattener {
             return new HashMap<String,String>()
         }
 
-        def keyCount = 1
         def keyValues = new HashMap<String,String>()
 
         jsonMap.each { entry ->
 
-            def key = entry.getKey()
+            def key = entry.key
             if ( currentName != null && !currentName.empty )
             {
                 key = currentName + "." + key
             }
 
-            if ( entry == null || entry.getValue() == null )
+            if ( entry == null || entry.value == null )
             {
                 println("Null Entry Or Entry Value")
             }
-            else if ( entry.getValue() instanceof List )
+            else if ( entry.value instanceof List )
             {
-                def jsonListKeyValues = transformJsonArray(entry.getValue(), key)
+                def jsonListKeyValues = transformJsonArray(entry.value, key)
                 keyValues.putAll(jsonListKeyValues)
             }
-            else if ( entry.getValue() instanceof Map)
+            else if ( entry.value instanceof Map)
             {
-                def jsonMapKeyValues = transformGroovyJsonMap(entry.getValue(), key)
+                def jsonMapKeyValues = transformGroovyJsonMap(entry.value, key)
                 keyValues.putAll(jsonMapKeyValues)
             }
             else
             {
-                def value = String.valueOf(entry.getValue())
-                def keyVersion = new KeyVersion()
-                keyValues.putAll(keyVersion.getKeyValues(keyCount, key, value, keyValues))
-                keyCount = keyVersion._keyVersion
+                def value = String.valueOf(entry.value)
+                _keyVersion.updateMapWithKeyValue(keyValues, key, value)
             }
         }
 
         return keyValues
     }
 
-    // todo: refactor some of this into smaller methods
+    /**
+     * Flatten Groovy-JSON Array objects
+     *
+     * @param jsonArray
+     * @param currentName
+     * @return A map of String,String
+     */
     def Map<String,String> transformJsonArray(List jsonArray, String currentName) {
 
-        if ( jsonArray == null || jsonArray.isEmpty() )
+        if ( jsonArray == null || jsonArray.empty )
         {
             return new HashMap<String, String>()
         }
 
-        int keyCount = 1
         def keyValues = new HashMap<String,String>()
 
         jsonArray.each { jsonElement ->
@@ -127,26 +172,76 @@ class JsonFlattener {
             else if ( jsonElement instanceof Map)
             {
                 def jsonMapKeyValues = transformGroovyJsonMap(jsonElement, currentName)
-                def keyVersion = new KeyVersion()
-                keyValues.putAll(keyVersion.getKeyValues(keyCount, keyValues, jsonMapKeyValues))
-                keyCount = keyVersion._keyVersion
+                _keyVersion.updateMapWithKeyValues(keyValues, jsonMapKeyValues)
             }
             else if ( jsonElement instanceof List )
             {
                 def jsonArrayKeyValues = transformJsonArray(jsonElement, currentName)
-                def keyVersion = new KeyVersion()
-                keyValues.putAll(keyVersion.getKeyValues(keyCount, keyValues, jsonArrayKeyValues))
-                keyCount = keyVersion._keyVersion
+                _keyVersion.updateMapWithKeyValues(keyValues, jsonArrayKeyValues)
             }
             else
             {
                 def value = String.valueOf(jsonElement)
-                def keyVersion = new KeyVersion()
-                keyValues.putAll(keyVersion.getKeyValues(keyCount, currentName, value, keyValues))
-                keyCount = keyVersion._keyVersion
+                _keyVersion.updateMapWithKeyValue(keyValues, currentName, value)
             }
         }
 
         return keyValues
+    }
+
+
+    private def keyCount = new HashMap<String,Integer>()
+
+    private def updateMapWithKeyValue(Map<String,String> originalMap, String key, String value) {
+
+        if ( key == null || value == null )
+        {
+            return
+        }
+
+        if ( keyCount.containsKey(key) )
+        {
+            def indexedKey = buildIndexedKeyAndUpdateKeyCount(key)
+            originalMap.put(indexedKey, value)
+        }
+        else
+        {
+            originalMap.put(key, value)
+        }
+    }
+
+    private def String buildIndexedKeyAndUpdateKeyCount(String key) {
+
+        def indexedKey = key
+
+        if ( keyCount.containsKey(key) )
+        {
+            def keyIndex = keyCount.get(key) + 1
+            indexedKey = key + "." + keyIndex
+            keyCount.put(key, keyIndex)
+        }
+        else
+        {
+            indexedKey = key + "." + 1
+            keyCount.put(key, 1)
+        }
+
+        return indexedKey
+    }
+
+    private def updateMapWithKeyValues(Map<String,String> originalMap, Map<String,String> additionalMap) {
+
+        additionalMap.entrySet().each { entry ->
+
+            if ( originalMap.containsKey(entry.key) )
+            {
+                def indexedKey = buildIndexedKeyAndUpdateKeyCount(entry.key)
+                originalMap.put(indexedKey, entry.value)
+            }
+            else
+            {
+                originalMap.put(entry.key, entry.value)
+            }
+        }
     }
 }

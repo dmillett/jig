@@ -40,7 +40,7 @@ import org.apache.log4j.Logger
  */
 class XmlFlattener {
 
-    private static final def Logger LOG = Logger.getLogger("XmlFlattener")
+    private static final def Logger LOG = Logger.getLogger(XmlFlattener.class)
     private static final def String DELIM = "."
 
     /**
