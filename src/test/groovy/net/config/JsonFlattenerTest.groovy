@@ -47,6 +47,6 @@ class JsonFlattenerTest
         def simpleJsonThree = jsonFlattener.flatten(fileUrl)
 
         assertNotNull(simpleJsonThree)
-        assertEquals(26, simpleJsonThree.size())
+        assertEquals(18, simpleJsonThree.size())
     }
 }

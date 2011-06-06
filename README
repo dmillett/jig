@@ -2,7 +2,7 @@ jConfigMap (See LICENSE AND NOTICE):
 ====================================
 
 Is a Java client configuration tool that uses Groovy (for now), to flatten
-XML (for now) configuration files into a key-value Map structure. Each key
+XML (JSON soon) configuration files into a key-value Map structure. Each key
 and value are stored as String values. Value retrieval is based upon applying regular
 expressions across the Map key set. The matching values are then returned in a new map.
 Or, if it is a simple key value property, then only the matching value is returned.
@@ -27,6 +27,23 @@ Usage:
 Examples (additional examples in test directory):
 -------------------------------------------------
 
+Usage:
+-----
+ConfigLookup configHelper = new ConfigLookup()
+Pattern stocks = Pattern.compile(".*stocks.*");
+
+configHelper.get(stocks) --> 4 results
+configHelper.get(stocks, "FOO") --> 2 results
+configHelper.get(stocks, "low") --> 2 results
+configHelper.get(stocks, "FOO", "low") --> 1 result
+
+Pattern bars = Pattern.compile(".*bars.*);
+configHelper.get(bars) --> 4 results
+configHelper.get(bars, "Chicago") --> 3 results
+
+
+Configuration:
+-------------
 <config>
   <xmlStructure>
     <stocks>
@@ -67,20 +84,8 @@ cities.chicago.bars.bar.1, Map Room
 cities.chicago.bars.bar.2, Redmonds
 cities.ann arbor.bars.bar, Grizzly Peak
 
-ConfigLookup configHelper = new ConfigLookup()
-Pattern stocks = Pattern.compile(".*stocks.*");
-
-configHelper.get(stocks) --> 4 results
-configHelper.get(stocks, "FOO") --> 2 results
-configHelper.get(stocks, "low") --> 2 results
-configHelper.get(stocks, "FOO", "low") --> 1 result
-
-Pattern bars = Pattern.compile(".*bars.*);
-configHelper.get(bars) --> 4 results
-configHelper.get(bars, "Chicago") --> 3 results
-
 Requirements:
 -------------
 jdk 1.6
-groovy 1.7.10
+groovy 1.8.0
 * built by gradle
