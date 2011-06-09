@@ -37,7 +37,7 @@ class ConfigController {
 
     // Correct -- this would trigger a load for every instantiation
     public ConfigController() {
-        CONFIG_CURRENT.putAll(_configLoader.loadFromXmlFiles())
+        CONFIG_CURRENT.putAll(_configLoader.loadFromFiles())
     }
 
 

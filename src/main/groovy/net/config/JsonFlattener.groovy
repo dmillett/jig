@@ -43,6 +43,8 @@ class JsonFlattener {
         try
         {
             def jsSlurper = new JsonSlurper()
+            //def urlFileName = correctToValidUrlFile(jsonFileName)
+            //def parsedFile = jsSlurper.parseText(urlFileName.toString())
             def parsedFile = jsSlurper.parseText(jsonFileName.toURL().text)
             flattenedKeyValues = flattenGroovyJsonObject(parsedFile)
         }
@@ -55,18 +57,21 @@ class JsonFlattener {
         return flattenedKeyValues
     }
 
-    private def isValidUrlFile(urlFile) {
+    private def correctToValidUrlFile(urlFileName) {
 
         try
         {
-            new URL(urlFile)
-            return true
+            def urlFile = new URL(urlFileName)
+            return urlFile
         }
         catch ( Exception e )
         {
-            LOG.error("Cannot Parse JSON Config From Non URL File", e)
-            return false;
+            LOG.error("JSON Config Is Not A URL File", e)
+            //def localeFileUrl = "file://${urlFileName}"
+            //return correctToValidUrlFile(urlFileName);
         }
+
+        return "file://${urlFileName}";
     }
 
     /**

@@ -48,14 +48,14 @@ class ConfigLoaderTest
         def configFileNames = configLoader.loadConfigFilesFromOverride()
 
         assertNotNull(configFileNames)
-        assertEquals(5, configFileNames.size())
+        assertEquals(8, configFileNames.size())
     }
 
     // Load all the test configs into a single depth map
-    void test__loadFromXmlFiles() {
+    void test__loadFromFiles() {
 
         def configLoader = new ConfigLoader()
-        def configMap = configLoader.loadFromXmlFiles()
+        def configMap = configLoader.loadFromFiles()
 
         assertNotNull(configMap)
         assertFalse(configMap.isEmpty())

@@ -41,6 +41,8 @@ import net.common.JConfigProperties
 class ConfigLoader {
 
     private static def LOG = Logger.getLogger(ConfigLoader.class)
+    private final def _supportedFiles = /.*\.xml/ //|json)/
+
 
     /**
      * Load a XML configuration file if that file exists and has the correct
@@ -51,7 +53,7 @@ class ConfigLoader {
      */
     def Map<String, String> loadFromXmlFile(String file) {
 
-        LOG.info("Loading Xml Config From File ${file}")
+        LOG.info("Loading XML Config From File ${file}")
 
         if ( file != null && (new File(file)).exists() )
         {
@@ -59,73 +61,29 @@ class ConfigLoader {
             return xmlFlattener.flatten(file)
         }
 
-        LOG.fatal("Could Not Load Configuration File ${file}. Returning Null")
+        LOG.fatal("Could Not Load XML Configuration File ${file}. Returning Null")
         return null;
     }
 
     /**
-     * Load more than one file and store in one large map.
+     * Load a JSON configuration file into a Map. First ensure the
+     * file exists before loading it.
      *
-     * Load Order (reverse priority)
-     * 1) classpath/config (local)
-     * 2) config urls (remote)
-     * 3) config file override location (local)
-     * 4) command line entries (startup)
-     *
-     * @return
+     * @param jsonFileUrl Must be in URL format (file:// or http://)
+     * @return A map of <string,string>. Null if no file, an empty map if there are problems with the file
      */
-    def Map<String, String> loadFromXmlFiles() {
+    def Map<String, String> loadFromJsonFile(String jsonFileUrl) {
 
-        def keyValuesMap = new HashMap<String, String>()
+        LOG.info("Loading JSON Config From File: ${jsonFileUrl}")
 
-        LOG.info("Loading Files From 'classpath/config' Location")
-        def classpathConfigs = loadConfigFilesFromClasspath()
-        if ( !classpathConfigs.isEmpty() )
+        if ( jsonFileUrl != null && (new File(jsonFileUrl.toString())).exists() )
         {
-            classpathConfigs.each { xmlFile ->
-                keyValuesMap.putAll(loadFromXmlFile(xmlFile))
-            }
-            LOG.info("Loaded ${keyValuesMap.size()} Classpath Config Key-Values")
+            def jsonFlattener = new JsonFlattener()
+            return jsonFlattener.flatten(jsonFileUrl)
         }
 
-        LOG.info("Loading Files From URL Location(s)")
-        def urlConfigs = loadXmlConfigsFromUrls()
-
-        if ( !urlConfigs.isEmpty() )
-        {
-            def urlConfigMap = new HashMap<String,String>()
-            urlConfigs.each { url ->
-                urlConfigMap.putAll(loadFromXmlFile(url))
-            }
-
-            LOG.info("Loaded ${urlConfigMap.size()} From URL Location(s)")
-            updateWithOverrides(keyValuesMap, urlConfigMap)
-        }
-
-        LOG.info("Loading Files From Override Location")
-        def overrideConfigs = loadConfigFilesFromOverride()
-
-        if ( !overrideConfigs.isEmpty() )
-        {
-            def overrideKeyValues = new HashMap<String, String>()
-            overrideConfigs.each { xmlFile ->
-                overrideKeyValues.putAll(loadFromXmlFile(xmlFile))
-            }
-
-            LOG.info("Loaded ${overrideConfigs.size()} Override Config Key-Values")
-            updateWithOverrides(keyValuesMap, overrideKeyValues)
-        }
-
-        LOG.info("Loading Command Line Overrides")
-        def commandLineConfig = loadFromCommandLineSystemProperties()
-
-        if ( !commandLineConfig.isEmpty() )
-        {
-            LOG.info("Loaded ${commandLineConfig.size()} Config Command Line Overrides")
-            updateWithOverrides(keyValuesMap, commandLineConfig)
-        }
-
-        return keyValuesMap
+        LOG.fatal("Could Not Load JSON Configuration File ${jsonFileUrl}. Returning Null")
+        return null;
     }
 
     /**
@@ -151,11 +109,102 @@ class ConfigLoader {
     }
 
     /**
+     * Load configs from XML or JSON
+     * @param fileName A XML file name or url or a JSON file url
+     * @return A map of key values regardless of config file type
+     */
+    def Map<String,String> loadKeyValuesFromFile(fileName) {
+
+        if ( fileName == null )
+        {
+            return new HashMap<String,String>()
+        }
+
+        if ( fileName.endsWith("xml") )
+        {
+            return loadFromXmlFile(fileName)
+        }
+        else if ( fileName.endsWith("json") )
+        {
+            return loadFromJsonFile(fileName)
+        }
+
+        return new HashMap<String,String>()
+    }
+
+    /**
+     * Load more than one file and store in one large map.
+     *
+     * Load Order (reverse priority)
+     * 1) classpath/config (local)
+     * 2) config urls (remote)
+     * 3) config file override location (local)
+     * 4) command line entries (startup)
+     *
+     * @return
+     * todo: refactor this into smaller parts
+     */
+    def Map<String, String> loadFromFiles() {
+
+        def keyValuesMap = new HashMap<String, String>()
+
+        LOG.info("Loading Files From 'classpath/config' Location")
+        def classpathConfigs = loadConfigFilesFromClasspath()
+        if ( !classpathConfigs.isEmpty() )
+        {
+            classpathConfigs.each { classpathFile ->
+                keyValuesMap.putAll(loadKeyValuesFromFile(classpathFile))
+            }
+            LOG.info("Loaded ${keyValuesMap.size()} Classpath Config Key-Values")
+        }
+
+        LOG.info("Loading Files From URL Location(s)")
+        def urlConfigs = loadConfigsFromUrls()
+
+        if ( !urlConfigs.isEmpty() )
+        {
+            def urlConfigMap = new HashMap<String,String>()
+            urlConfigs.each { urlFile ->
+                urlConfigMap.putAll(loadKeyValuesFromFile(urlFile))
+            }
+
+            LOG.info("Loaded ${urlConfigMap.size()} From URL Location(s)")
+            updateWithOverrides(keyValuesMap, urlConfigMap)
+        }
+
+        LOG.info("Loading Files From Override Location")
+        def overrideConfigs = loadConfigFilesFromOverride()
+
+        if ( !overrideConfigs.isEmpty() )
+        {
+            def overrideKeyValues = new HashMap<String, String>()
+            overrideConfigs.each { overrideFile ->
+                overrideKeyValues.putAll(loadKeyValuesFromFile(overrideFile))
+            }
+
+            LOG.info("Loaded ${overrideConfigs.size()} Override Config Key-Values")
+            updateWithOverrides(keyValuesMap, overrideKeyValues)
+        }
+
+        LOG.info("Loading Command Line Overrides")
+        def commandLineConfig = loadFromCommandLineSystemProperties()
+
+        if ( !commandLineConfig.isEmpty() )
+        {
+            LOG.info("Loaded ${commandLineConfig.size()} Config Command Line Overrides")
+            updateWithOverrides(keyValuesMap, commandLineConfig)
+        }
+
+        return keyValuesMap
+    }
+
+    /**
      * Include the file name, that has the config entries, as the outer map key.
      * For example:
      * file1 -> Map<String,String> file1 config map
      * file2 -> Map<String,String> file2 config map
-     * @return
+     * @return A Map with shortened file name for the key and that files key-values
+     * todo: refactor into smaller parts
      */
     def Map<String, Map<String, String>> loadMapsFromFiles() {
 
@@ -165,23 +214,23 @@ class ConfigLoader {
         if ( !classpathFiles.isEmpty() )
         {
             LOG.info("Loading Configs From Default Location: classpath/config")
-            classpathFiles.each { classpathXmlFile ->
+            classpathFiles.each { classpathFile ->
 
-                def classpathKeyValues = loadFromXmlFile(classpathXmlFile)
+                def classpathKeyValues = loadKeyValuesFromFile(classpathFile)
                 if ( !classpathKeyValues.isEmpty() )
                 {
-                    def shortName = shortenFileName(classpathXmlFile)
+                    def shortName = shortenFileName(classpathFile)
                     filesKeyValueMap.put(shortName, classpathKeyValues)
                 }
             }
         }
 
-        def urlFiles = loadXmlConfigsFromUrls()
+        def urlFiles = loadConfigsFromUrls()
         if ( !urlFiles.isEmpty() )
         {
             LOG.info("Loading Configs From Remote URL(s)")
             urlFiles.each { urlFile ->
-                def urlKeyValues = loadFromXmlFile(urlFile)
+                def urlKeyValues = loadKeyValuesFromFile(urlFile)
                 if ( !urlKeyValues.isEmpty() )
                 {
                     def shortName = shortenFileName(urlFile)
@@ -194,11 +243,11 @@ class ConfigLoader {
         if ( !overrideFiles.isEmpty() )
         {
             LOG.info("Loading Configs From Override Location")
-            overrideFiles.each { xmlFile ->
-                def overrideLocationKeyValues = loadFromXmlFile(xmlFile)
+            overrideFiles.each { overrideFile ->
+                def overrideLocationKeyValues = loadKeyValuesFromFile(overrideFile)
                 if ( !overrideLocationKeyValues.isEmpty() )
                 {
-                    def shortName = shortenFileName(xmlFile)
+                    def shortName = shortenFileName(overrideFile)
                     filesKeyValueMap.put(shortName, overrideLocationKeyValues)
 
                     LOG.info("Updating All File Maps From Override Config Location")
@@ -294,7 +343,7 @@ class ConfigLoader {
      *
      * @return A list of xml configs defined in System properties.
      */
-    def List<String> loadXmlConfigsFromUrls() {
+    def List<String> loadConfigsFromUrls() {
 
         def urlConfigs = new ArrayList<String>()
         System.getProperties().entrySet().each { entry ->
@@ -318,7 +367,7 @@ class ConfigLoader {
 
         def location = System.getProperty(JConfigProperties.jCONFIG_LOCATION.getName()) + File.separator
         def configFiles = new ArrayList<String>()
-        def suffix = ~/.*\.xml/
+        def suffix = ~/.*\.(xml|json)/
 
         new File(location).eachFileMatch(suffix) { file ->
             configFiles.add(file.toString())
@@ -339,7 +388,7 @@ class ConfigLoader {
         def codePathUrl = getClass().getProtectionDomain().codeSource.location
         def codePath = codePathUrl.toString().substring(5)
 
-        def xmlFilePattern = ~/.*\.xml/
+        def filePattern = ~/.*\.(xml|json)/
         def classpathConfigs = new ArrayList<String>()
 
         new File(codePath).eachDirRecurse {subDirectory ->
@@ -347,7 +396,7 @@ class ConfigLoader {
             def absPath = subDirectory.getAbsolutePath()
             if ( absPath.endsWith("config") && !absPath.contains("test") )
             {
-                subDirectory.eachFileMatch(xmlFilePattern) { file ->
+                subDirectory.eachFileMatch(filePattern) { file ->
                     classpathConfigs.add(file.getCanonicalPath())
                 }
             }
