@@ -51,12 +51,13 @@ public class PojoConfigExampleTest
         assertEquals("25.00", stock);
     }
 
+    // Note that this pull identical values for chicago bars, but the keys are different.
     public void test__findChicagoBars() {
 
         PojoConfigExample pojo = new PojoConfigExample();
         Map<String,String> chicagoBars = pojo.findChicagoBars();
 
-        assertEquals(4, chicagoBars.size());
+        assertEquals(8, chicagoBars.size());
     }
 
     public void test__findAnnArborBars() {
@@ -64,6 +65,17 @@ public class PojoConfigExampleTest
         PojoConfigExample pojo = new PojoConfigExample();
         Map<String,String> annArborBars = pojo.findAnnArborBars();
 
-        assertEquals(4, annArborBars.size());
+        assertEquals(dumpMap(annArborBars), 4, annArborBars.size());
+    }
+
+    private String dumpMap(Map<String,String> map) {
+
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> entry : map.entrySet())
+        {
+            sb.append(entry.getKey()).append(":").append(entry.getValue()).append(",");
+        }
+
+        return  sb.toString();
     }
 }

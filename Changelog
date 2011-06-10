@@ -1,3 +1,8 @@
+Version 0.93 June 9, 2011
+-------------------------
+* Now supports both xml and json configs (more unit tests needed)
+* All JSON keys stored as lowercase (like keys from XML files)
+* Alert: next version will require outer JSON Map/Array to start with "config"
 
 Version 0.92 June 5, 2011
 -------------------------
