@@ -22,7 +22,7 @@ class JsonFlattenerTest
 
     void test__flattenJsonFile() {
 
-        def fileUrl = "file://" + GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "JsonExampleOne.json"
+        def fileUrl = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "JsonExampleOne.json"
         def jsonFlattener = new JsonFlattener()
         def exampleThreeKeyValues = jsonFlattener.flatten(fileUrl)
 
@@ -37,7 +37,7 @@ class JsonFlattenerTest
         def simpleJsonTwo = jsonFlattener.flatten(fileUrl)
 
         assertNotNull(simpleJsonTwo)
-        assertEquals(18, simpleJsonTwo.size())
+        assertEquals(17, simpleJsonTwo.size())
     }
 
     void test__flattenJsonFile_simple3() {

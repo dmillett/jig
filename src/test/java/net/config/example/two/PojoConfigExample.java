@@ -59,11 +59,17 @@ public class PojoConfigExample {
     }
 
 
-    private static final Pattern BARS = Pattern.compile(".*.cities.*");
+    private static final Pattern BARS = Pattern.compile(".*cities.*");
 
     public Map<String, String> findChicagoBars() {
 
         Map<String,String> chicagoBars = _configLookup.get(BARS, "Chicago", "Bars");
         return chicagoBars;
+    }
+
+    public Map<String,String> findAnnArborBars() {
+
+        Map<String,String> annArborBors = _configLookup.get(BARS, "ann arbor", "bars");
+        return annArborBors;
     }
 }

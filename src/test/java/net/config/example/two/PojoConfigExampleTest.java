@@ -28,7 +28,7 @@ public class PojoConfigExampleTest
     protected void setUp()
         throws Exception {
 
-        //JavaTestConfigHelper.updatePropertiesWithTestConfigPath();;
+        JavaTestConfigHelper.updatePropertiesWithTestConfigPath();;
     }
 
     public void test__getAllStocks() {
@@ -57,5 +57,13 @@ public class PojoConfigExampleTest
         Map<String,String> chicagoBars = pojo.findChicagoBars();
 
         assertEquals(4, chicagoBars.size());
+    }
+
+    public void test__findAnnArborBars() {
+
+        PojoConfigExample pojo = new PojoConfigExample();
+        Map<String,String> annArborBars = pojo.findAnnArborBars();
+
+        assertEquals(4, annArborBars.size());
     }
 }

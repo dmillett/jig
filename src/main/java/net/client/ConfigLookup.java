@@ -301,7 +301,8 @@ public class ConfigLookup {
 
         for (Map.Entry<String, String> entry : configMap.entrySet())
         {
-            if ( pattern.matcher(entry.getKey().toLowerCase()).matches() )
+            String lowerCaseKey = entry.getKey().toLowerCase();
+            if ( pattern.matcher(lowerCaseKey).matches() )
             {
                 matches.put(entry.getKey(), entry.getValue());
             }

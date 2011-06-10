@@ -40,14 +40,15 @@ class KeyVersion {
             return
         }
 
-        if ( keyVersionCount.containsKey(key) )
+        def downcaseKey = key.toLowerCase()
+        if ( keyVersionCount.containsKey(downcaseKey) )
         {
-            def indexedKey = buildIndexedKeyAndUpdateKeyCount(key)
+            def indexedKey = buildIndexedKeyAndUpdateKeyCount(downcaseKey)
             originalMap.put(indexedKey, value)
         }
         else
         {
-            originalMap.put(key, value)
+            originalMap.put(downcaseKey, value)
         }
     }
 
@@ -56,14 +57,15 @@ class KeyVersion {
 
         additionalMap.entrySet().each { entry ->
 
-            if ( originalMap.containsKey(entry.key) )
+            def downcaseKey = entry.key.toLowerCase()
+            if ( originalMap.containsKey(downcaseKey) )
             {
-                def indexedKey = buildIndexedKeyAndUpdateKeyCount(entry.key)
+                def indexedKey = buildIndexedKeyAndUpdateKeyCount(downcaseKey)
                 originalMap.put(indexedKey, entry.value)
             }
             else
             {
-                originalMap.put(entry.key, entry.value)
+                originalMap.put(downcaseKey, entry.value)
             }
         }
     }
@@ -80,18 +82,19 @@ class KeyVersion {
 
     private def String buildIndexedKeyAndUpdateKeyCount(String key) {
 
+        def downcaseKey = key.toLowerCase()
         def indexedKey = key
 
         if ( keyVersionCount.containsKey(key) )
         {
-            def keyIndex = keyVersionCount.get(key) + 1
+            def keyIndex = keyVersionCount.get(downcaseKey) + 1
             indexedKey = key + "." + keyIndex
-            keyVersionCount.put(key, keyIndex)
+            keyVersionCount.put(downcaseKey, keyIndex)
         }
         else
         {
-            indexedKey = key + "." + 1
-            keyVersionCount.put(key, 1)
+            indexedKey = downcaseKey + "." + 1
+            keyVersionCount.put(downcaseKey, 1)
         }
 
         return indexedKey

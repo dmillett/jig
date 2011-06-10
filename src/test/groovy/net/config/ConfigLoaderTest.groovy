@@ -59,7 +59,7 @@ class ConfigLoaderTest
 
         assertNotNull(configMap)
         assertFalse(configMap.isEmpty())
-        assertEquals(39, configMap.size())
+        assertEquals(83, configMap.size())
     }
 
     // Load a two deep map with filename as the first level
@@ -70,7 +70,7 @@ class ConfigLoaderTest
 
         assertNotNull(configMaps)
         assertFalse(configMaps.isEmpty())
-        assertEquals(3, configMaps.size())
+        assertEquals(6, configMaps.size())
     }
 
     void test__loadConfigFilesFromClasspath() {

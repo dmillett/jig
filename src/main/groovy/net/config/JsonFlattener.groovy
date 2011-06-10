@@ -43,9 +43,8 @@ class JsonFlattener {
         try
         {
             def jsSlurper = new JsonSlurper()
-            //def urlFileName = correctToValidUrlFile(jsonFileName)
-            //def parsedFile = jsSlurper.parseText(urlFileName.toString())
-            def parsedFile = jsSlurper.parseText(jsonFileName.toURL().text)
+            def urlFile = correctToValidUrlFile(jsonFileName)
+            def parsedFile = jsSlurper.parseText(urlFile.text)
             flattenedKeyValues = flattenGroovyJsonObject(parsedFile)
         }
         catch ( Exception e )
@@ -67,11 +66,9 @@ class JsonFlattener {
         catch ( Exception e )
         {
             LOG.error("JSON Config Is Not A URL File", e)
-            //def localeFileUrl = "file://${urlFileName}"
-            //return correctToValidUrlFile(urlFileName);
         }
 
-        return "file://${urlFileName}";
+        return "file://${urlFileName}".toURL();
     }
 
     /**
@@ -192,61 +189,5 @@ class JsonFlattener {
         }
 
         return keyValues
-    }
-
-
-    private def keyCount = new HashMap<String,Integer>()
-
-    private def updateMapWithKeyValue(Map<String,String> originalMap, String key, String value) {
-
-        if ( key == null || value == null )
-        {
-            return
-        }
-
-        if ( keyCount.containsKey(key) )
-        {
-            def indexedKey = buildIndexedKeyAndUpdateKeyCount(key)
-            originalMap.put(indexedKey, value)
-        }
-        else
-        {
-            originalMap.put(key, value)
-        }
-    }
-
-    private def String buildIndexedKeyAndUpdateKeyCount(String key) {
-
-        def indexedKey = key
-
-        if ( keyCount.containsKey(key) )
-        {
-            def keyIndex = keyCount.get(key) + 1
-            indexedKey = key + "." + keyIndex
-            keyCount.put(key, keyIndex)
-        }
-        else
-        {
-            indexedKey = key + "." + 1
-            keyCount.put(key, 1)
-        }
-
-        return indexedKey
-    }
-
-    private def updateMapWithKeyValues(Map<String,String> originalMap, Map<String,String> additionalMap) {
-
-        additionalMap.entrySet().each { entry ->
-
-            if ( originalMap.containsKey(entry.key) )
-            {
-                def indexedKey = buildIndexedKeyAndUpdateKeyCount(entry.key)
-                originalMap.put(indexedKey, entry.value)
-            }
-            else
-            {
-                originalMap.put(entry.key, entry.value)
-            }
-        }
     }
 }
