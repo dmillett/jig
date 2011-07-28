@@ -29,6 +29,7 @@ Examples (additional examples in test directory):
 
 Usage:
 -----
+```java
 ConfigLookup configHelper = new ConfigLookup()
 Pattern stocks = Pattern.compile(".*stocks.*");
 
@@ -40,10 +41,11 @@ configHelper.get(stocks, "FOO", "low") --> 1 result
 Pattern bars = Pattern.compile(".*bars.*);
 configHelper.get(bars) --> 4 results
 configHelper.get(bars, "Chicago") --> 3 results
-
+```
 
 Configuration:
 -------------
+```
 <config>
   <xmlStructure>
     <stocks>
@@ -83,6 +85,7 @@ cities.chicago.bars.bar, Sheffields
 cities.chicago.bars.bar.1, Map Room
 cities.chicago.bars.bar.2, Redmonds
 cities.ann arbor.bars.bar, Grizzly Peak
+```
 
 Requirements:
 -------------
