@@ -1,6 +1,7 @@
 package net.config.example.one;
 
 import junit.framework.TestCase;
+import net.config.example.JavaTestConfigHelper;
 import net.config.example.one.ConfigEnumExample;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class ConfigEnumKeyValueExampleTest
     protected void setUp()
         throws Exception {
 
-        System.getProperties().put("jConfigMap.location", "/home/dave/dev/jConfigMap/src/test/resources/config");
+        JavaTestConfigHelper.updatePropertiesWithTestConfigPath();
     }
 
     public void test__ONE() {
