@@ -7,7 +7,7 @@ and value are stored as String values. Value retrieval is based upon applying re
 expressions across the Map key set. The matching values are then returned in a new map.
 Or, if it is a simple key value property, then only the matching value is returned.
 
-Currently jConfigMap supports XML configuration files during startup. A global config
+Currently jConfigMap supports XML and JSON configuration files during startup. A global config
 map (see java ConfigMap), can then be used statically for config access.
 
 Usage:
@@ -23,6 +23,7 @@ Usage:
     2) Remote URL file location
     3) System properties override location "jConfigMap.location"
     4) Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
+    5) Environment specific config file loading. Ex "SomeConfig_dev.xml"
 
 Examples (additional examples in test directory):
 -------------------------------------------------
@@ -30,6 +31,7 @@ Examples (additional examples in test directory):
 Usage:
 -----
 ```java
+// See configuration files below
 ConfigLookup configHelper = new ConfigLookup()
 Pattern stocks = Pattern.compile(".*stocks.*");
 
