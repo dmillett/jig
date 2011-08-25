@@ -2,6 +2,7 @@ package net.config
 
 import org.apache.log4j.Logger
 import net.common.JConfigProperties
+import java.util.regex.Pattern
 
 /**
  * Load XML configuration files from "classpath/config" or "jConfigMap.location"
@@ -41,7 +42,7 @@ import net.common.JConfigProperties
 class ConfigLoader {
 
     private static def LOG = Logger.getLogger(ConfigLoader.class)
-    private final def _supportedFiles = /.*\.xml/ //|json)/
+    //private final def _supportedFiles = /.*\.xml/ //|json)/
 
 
     /**
@@ -326,7 +327,7 @@ class ConfigLoader {
         def commandLineOverrides = new HashMap<String,String>()
         System.getProperties().entrySet().each { entry ->
 
-            if ( entry.getKey().startsWith(JConfigProperties.jCONFIG_COMMAND_LINE_PROP.getName()) )
+            if ( entry.getKey().startsWith(JConfigProperties.JCONFIG_COMMAND_LINE_PROP.getName()) )
             {
                 commandLineOverrides.put(entry.getKey(), entry.getValue())
             }
@@ -348,7 +349,7 @@ class ConfigLoader {
         def urlConfigs = new ArrayList<String>()
         System.getProperties().entrySet().each { entry ->
 
-            if ( entry.getKey().startsWith(JConfigProperties.jCONFIG_URL_LOCATION.getName()) )
+            if ( entry.getKey().startsWith(JConfigProperties.JCONFIG_URL_LOCATION.getName()) )
             {
                 urlConfigs.add(entry.getValue())
             }
@@ -365,15 +366,37 @@ class ConfigLoader {
      */
     def List<String> loadConfigFilesFromOverride() {
 
-        def location = System.getProperty(JConfigProperties.jCONFIG_LOCATION.getName()) + File.separator
+        def location = System.getProperty(JConfigProperties.JCONFIG_LOCATION.getName()) + File.separator
         def configFiles = new ArrayList<String>()
-        def suffix = ~/.*\.(xml|json)/
+        def suffix = findFileNamePattern()
 
         new File(location).eachFileMatch(suffix) { file ->
             configFiles.add(file.toString())
         }
 
         return configFiles
+    }
+
+    /**
+     * Supports the following file types:
+     * XML
+     * JSON
+     *
+     * Supports case insensitive environment indicators. For example:
+     * SomeConfig_dev.xml or SomeConfig_Dev.xml
+     *
+     * @return Only config files with that environment indicator are loaded OR all config files
+     */
+    def Pattern findFileNamePattern() {
+
+        def fileSuffix = System.getProperty(JConfigProperties.JCONFIG_FILE_ENVIRONMENT.getName())
+        if ( fileSuffix == null || fileSuffix.empty )
+        {
+            return ~/.*\.(xml|json)/
+        }
+
+        def pattern = ".*$fileSuffix\\.(xml|json)"
+        return Pattern.compile(pattern, Pattern.CASE_INSENSITIVE)
     }
 
     /**
@@ -388,7 +411,7 @@ class ConfigLoader {
         def codePathUrl = getClass().getProtectionDomain().codeSource.location
         def codePath = codePathUrl.toString().substring(5)
 
-        def filePattern = ~/.*\.(xml|json)/
+        def filePattern = findFileNamePattern()
         def classpathConfigs = new ArrayList<String>()
 
         new File(codePath).eachDirRecurse {subDirectory ->

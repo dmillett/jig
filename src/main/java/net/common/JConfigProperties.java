@@ -22,11 +22,13 @@ package net.common;
 public enum JConfigProperties {
 
     /** System Property for local configuration file(s) location outside of 'classpath/config' */
-    jCONFIG_LOCATION("jConfigMap.location"),
+    JCONFIG_LOCATION("jConfigMap.location"),
     /** A remote URL based location with config files */
-    jCONFIG_URL_LOCATION("jConfigMap.url"),
-    /** Global overrides entered as JVM args */
-    jCONFIG_COMMAND_LINE_PROP("jConfigMap.entry"),
+    JCONFIG_URL_LOCATION("jConfigMap.url"),
+    /** Global overrides entered as JVM args. Ex: jConfigMap.entry.foo=bar */
+    JCONFIG_COMMAND_LINE_PROP("jConfigMap.entry"),
+    /** A config file suffix to support environment specific configurations  */
+    JCONFIG_FILE_ENVIRONMENT("jConfigMap.file.env")
     ;
 
     private final String _systemPropertyName;

@@ -1,5 +1,7 @@
 package net.config
 
+import net.client.ConfigMap
+
 /**
  * Intellij and possibly Eclipse do not compile and move
  * directories in the same manner as Gradle. Intellij will dump all the
@@ -26,7 +28,7 @@ class ConfigLoaderTest
     @Override
     protected void setUp() {
 
-         GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "ConfigOne.xml"
+        GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "ConfigOne.xml"
     }
 
     // Load a specific test config file
@@ -48,7 +50,7 @@ class ConfigLoaderTest
         def configFileNames = configLoader.loadConfigFilesFromOverride()
 
         assertNotNull(configFileNames)
-        assertEquals(8, configFileNames.size())
+        assertEquals(9, configFileNames.size())
     }
 
     // Load all the test configs into a single depth map
@@ -59,7 +61,7 @@ class ConfigLoaderTest
 
         assertNotNull(configMap)
         assertFalse(configMap.isEmpty())
-        assertEquals(83, configMap.size())
+        assertEquals(85, configMap.size())
     }
 
     // Load a two deep map with filename as the first level
@@ -70,7 +72,7 @@ class ConfigLoaderTest
 
         assertNotNull(configMaps)
         assertFalse(configMaps.isEmpty())
-        assertEquals(6, configMaps.size())
+        assertEquals(7, configMaps.size())
     }
 
     void test__loadConfigFilesFromClasspath() {
@@ -81,4 +83,15 @@ class ConfigLoaderTest
         assertEquals(1, classpathFiles.size())
     }
 
+    void test__loadConfigFilesForEnvironment() {
+
+        GroovyTestConfigHelper.updateSystemPropertiesWithConfigEnv("Dev")
+        def configLoader = new ConfigLoader()
+        def configMap = configLoader.loadFromFiles()
+
+        assertNotNull(configMap)
+        assertEquals(2, configMap.size())
+
+        GroovyTestConfigHelper.updateSystemPropertiesWithConfigEnv("")
+    }
 }

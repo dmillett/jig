@@ -23,12 +23,12 @@ public class JavaTestConfigHelper {
 
     public static String updatePropertiesWithTestConfigPath() {
 
-        if ( System.getProperty(JConfigProperties.jCONFIG_LOCATION.getName()) == null )
+        if ( System.getProperty(JConfigProperties.JCONFIG_LOCATION.getName()) == null )
         {
             String path = System.getProperty("user.dir") + "/src/test/resources/config/";
-            System.setProperty(JConfigProperties.jCONFIG_LOCATION.getName(), path);
+            System.setProperty(JConfigProperties.JCONFIG_LOCATION.getName(), path);
         }
 
-        return System.getProperty(JConfigProperties.jCONFIG_LOCATION.getName());
+        return System.getProperty(JConfigProperties.JCONFIG_LOCATION.getName());
     }
 }
