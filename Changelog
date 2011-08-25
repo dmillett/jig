@@ -1,3 +1,8 @@
+Version 0.94 TBD, 2011
+----------------------
+* environment specific configuration now supported. See java/JConfigProperties.JCONFIG_FILE_ENVIRONMENT
+* All JConfigProperties have fully uppercase enums
+
 Version 0.93 June 9, 2011
 -------------------------
 * Now supports both xml and json configs (more unit tests needed)
