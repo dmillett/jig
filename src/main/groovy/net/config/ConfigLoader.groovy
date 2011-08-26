@@ -245,6 +245,7 @@ class ConfigLoader {
         {
             LOG.info("Loading Configs From Override Location")
             overrideFiles.each { overrideFile ->
+
                 def overrideLocationKeyValues = loadKeyValuesFromFile(overrideFile)
                 if ( !overrideLocationKeyValues.isEmpty() )
                 {
@@ -327,10 +328,15 @@ class ConfigLoader {
         def commandLineOverrides = new HashMap<String,String>()
         System.getProperties().entrySet().each { entry ->
 
-            if ( entry.getKey().startsWith(JConfigProperties.JCONFIG_COMMAND_LINE_PROP.getName()) )
+            if ( !entry.getKey().startsWith(JConfigProperties.JCONFIG_COMMAND_LINE_PROP.getName()) )
             {
-                commandLineOverrides.put(entry.getKey(), entry.getValue())
+                return
             }
+
+            def remove = JConfigProperties.JCONFIG_COMMAND_LINE_PROP.getName() + "."
+            def overrideKey = "${entry.getKey()}".replace(remove, "")
+            LOG.info("Overriding $overrideKey")
+            commandLineOverrides.put(overrideKey, entry.getValue())
         }
 
         return commandLineOverrides

@@ -1,7 +1,5 @@
 package net.config
 
-import net.client.ConfigMap
-
 /**
  * Intellij and possibly Eclipse do not compile and move
  * directories in the same manner as Gradle. Intellij will dump all the
@@ -81,6 +79,41 @@ class ConfigLoaderTest
         List<String> classpathFiles = configLoader.loadConfigFilesFromClasspath()
 
         assertEquals(1, classpathFiles.size())
+    }
+
+//    void test__loadFromCommandLineSystemProperties() {
+//
+//        GroovyTestConfigHelper.addSystemPropertyWithSpecificValue("foo", "2")
+//        GroovyTestConfigHelper.addSystemPropertyWithSpecificValue("bar", "false")
+//
+//        def configLoader = new ConfigLoader()
+//        def commandLineOverrides = configLoader.loadFromCommandLineSystemProperties();
+//
+//        assertNotNull(commandLineOverrides)
+//        assertEquals(2, commandLineOverrides.size())
+//
+//        GroovyTestConfigHelper.removeSystemPropertyWithSpecificValue("foo")
+//        GroovyTestConfigHelper.removeSystemPropertyWithSpecificValue("bar")
+//    }
+
+    void test__loadFromCommandLineSystemProperties_override() {
+
+        def testKey = "key.two.int"
+        def originalValue = "1"
+        GroovyTestConfigHelper.addSystemPropertyWithSpecificValue(testKey, "42")
+
+        // Overriding a value in ConfigOne.xml
+        def configLoader = new ConfigLoader()
+        def configMap = configLoader.loadFromFiles()
+
+        assertNotNull(configMap)
+        assertEquals(85, configMap.size())
+        assertEquals("42", configMap.get(testKey))
+
+        // Cleanup
+        GroovyTestConfigHelper.removeSystemPropertyWithSpecificValue(testKey)
+        configMap.put(testKey, originalValue)
+        assertEquals("1", configMap.get(testKey))
     }
 
     void test__loadConfigFilesForEnvironment() {

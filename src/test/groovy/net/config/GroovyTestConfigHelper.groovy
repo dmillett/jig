@@ -40,4 +40,32 @@ class GroovyTestConfigHelper {
             System.setProperty(JConfigProperties.JCONFIG_FILE_ENVIRONMENT.getName(), envIndicator)
         }
     }
+
+    def static addSystemPropertyWithSpecificValue(String key, String value) {
+
+        if ( key != null )
+        {
+            def configKey = buildOverrideKey(key)
+            System.setProperty(configKey, value)
+        }
+    }
+
+    def static removeSystemPropertyWithSpecificValue(String key) {
+
+        if ( key != null )
+        {
+            def configKey = buildOverrideKey(key)
+            System.getProperties().remove(configKey)
+        }
+    }
+
+    private static def String buildOverrideKey(String key) {
+
+        if ( key != null )
+        {
+            return JConfigProperties.JCONFIG_COMMAND_LINE_PROP.getName() + "." + key
+        }
+
+        return null;
+    }
 }
