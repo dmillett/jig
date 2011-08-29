@@ -2,6 +2,8 @@ Version 0.94 TBD, 2011
 ----------------------
 * environment specific configuration now supported. See java/JConfigProperties.JCONFIG_FILE_ENVIRONMENT
 * All JConfigProperties have fully uppercase enums
+* XML 'keyValueProperties' tag indicators are now 'keyValues'
+* XML 'xmlStructure' tag indicators are now 'structures'
 
 Version 0.93 June 9, 2011
 -------------------------

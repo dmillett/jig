@@ -13,10 +13,10 @@ map (see java ConfigMap), can then be used statically for config access.
 Usage:
 ------
 * Each config file has a 'config' root node and either/both 'keyValueProperties' and 'xmlStructure'
-* 'xmlStructure' nodes always return a Map<String,String>
-* 'keyValueProperties' nodes return a String, List, or primitive wrapped object
+* 'structures' nodes always return a Map<String,String>
+* 'keyValue' nodes return a String, List, or primitive wrapped object
 * 'value' attribute key stores the corresponding value in the config map
-* 'xmlStructure' config map results support comparators
+* 'structures' config map results support comparators
 
 * Configuration File(s) Config Map entry order (reverse priority - see JConfigProperties):
     1) Default config location is "classpath/config" directory
@@ -31,25 +31,36 @@ Examples (additional examples in test directory):
 Usage:
 -----
 ```java
-// See configuration files below
+// See XML configuration files below (ConfigLookup has a number of client utility methods)
 ConfigLookup configHelper = new ConfigLookup()
 Pattern stocks = Pattern.compile(".*stocks.*");
 
-configHelper.get(stocks) --> 4 results
-configHelper.get(stocks, "FOO") --> 2 results
-configHelper.get(stocks, "low") --> 2 results
-configHelper.get(stocks, "FOO", "low") --> 1 result
+// 4 results (all stocks)
+Map<String,String> stocksMap = configHelper.get(stocks);
+
+// 2 results (values: 8.00, 8.32)
+Map<String,String> fooStocks = configHelper.get(stocks, "FOO");
+
+// 2 results (values: 8.00, 4.50)
+Map<String,String> lowStocks = configHelper.get(stocks, "low");
+
+// 1 result (values: 8.00)
+Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
 
 Pattern bars = Pattern.compile(".*bars.*);
-configHelper.get(bars) --> 4 results
-configHelper.get(bars, "Chicago") --> 3 results
+
+// 4 results (values: Sheffields, Map Room, Redmonds, Grizzly Peak)
+Map<String, String> allBars = configHelper.get(bars) --> 4 results
+
+// 3 results (values: Sheffields, Map Room, Redmongds)
+Map<String, String> chicagoBars = configHelper.get(bars, "Chicago") --> 3 results
 ```
 
 Configuration:
 -------------
 ```
 <config>
-  <xmlStructure>
+  <structures>
     <stocks>
         <stock name="FOO">
            <low>8.00</low>
@@ -74,14 +85,14 @@ Configuration:
         </bars>
       </Ann Arbor>
     </cities>
-  </xmlStructure>
+  </structures>
 </config>
 
 generates:
-stocks.stock.foo.low, 8.00
-stocks.stock.foo.high, 8.32
-stocks.stock.bar.low, 4.50
-stocks.stock.bar.high, 4.65
+stocks.stock.name.foo.low, 8.00
+stocks.stock.name.foo.high, 8.32
+stocks.stock.name.bar.low, 4.50
+stocks.stock.name.bar.high, 4.65
 
 cities.chicago.bars.bar, Sheffields
 cities.chicago.bars.bar.1, Map Room
