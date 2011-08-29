@@ -33,33 +33,42 @@ Usage:
 ```java
 // See XML configuration files below (ConfigLookup has a number of client utility methods)
 ConfigLookup configHelper = new ConfigLookup()
+
+// Simple 1:1 config key-value lookup
+Pattern keyOne = Pattern.compile("key.one.string");
+assertEquals("first value", configHelper.getByKey(keyOne));
+
+Pattern keyTwo = Pattern.compile("key.two.int");
+assertEquals(1, configHelper.getByKey(keyTwo));
+
+Pattern keyThree = Pattern.compile("key.three.double");
+assertEquals(2.0, configHelper.getByKey(keyThree));
+
+// Structured XML configs (something more complex than 1:1)
 Pattern stocks = Pattern.compile(".*stocks.*");
 
 // 4 results (all stocks)
-Map<String,String> stocksMap = configHelper.get(stocks);
+Map<String, String> stocksMap = configHelper.get(stocks);
 
 // 2 results (values: 8.00, 8.32)
-Map<String,String> fooStocks = configHelper.get(stocks, "FOO");
+Map<String, String> fooStocks = configHelper.get(stocks, "FOO");
 
 // 2 results (values: 8.00, 4.50)
-Map<String,String> lowStocks = configHelper.get(stocks, "low");
+Map<String, String> lowStocks = configHelper.get(stocks, "low");
 
 // 1 result (values: 8.00)
 Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
-
-Pattern bars = Pattern.compile(".*bars.*");
-
-// 4 results (values: Sheffields, Map Room, Redmonds, Grizzly Peak)
-Map<String, String> allBars = configHelper.get(bars);
-
-// 3 results (values: Sheffields, Map Room, Redmongds)
-Map<String, String> chicagoBars = configHelper.get(bars, "Chicago");
 ```
 
 Configuration:
 -------------
 ```
 <config>
+  <keyValues>
+    <property name="key.one.string" value="first value" />
+    <property name="key.two.int">1</property>
+    <property name="key.three.double" value="2.0" />
+  </keyValues>
   <structures>
     <stocks>
         <stock name="FOO">
