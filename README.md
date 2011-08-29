@@ -47,7 +47,7 @@ Map<String,String> lowStocks = configHelper.get(stocks, "low");
 // 1 result (values: 8.00)
 Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
 
-Pattern bars = Pattern.compile(".*bars.*);
+Pattern bars = Pattern.compile(".*bars.*");
 
 // 4 results (values: Sheffields, Map Room, Redmonds, Grizzly Peak)
 Map<String, String> allBars = configHelper.get(bars);
