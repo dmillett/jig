@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 -->
 <config>
 
-  <keyValueProperties>
+  <keyValues>
     <property name="env.one.string" value="first value" />
     <property name="env.two.int">1</property>
-  </keyValueProperties>
+  </keyValues>
 
 </config>

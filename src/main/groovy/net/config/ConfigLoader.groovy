@@ -12,8 +12,8 @@ import java.util.regex.Pattern
  * <pre>
  * <config>
  *   <!-- optional -->
- *   <keyValueProperties>
- *   </keyValueProperties>
+ *   <keyValues>
+ *   </keyValues>
  *
  *   <!-- or
  *       structured xml

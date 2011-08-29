@@ -15,13 +15,13 @@ See the License for the specific language governing permissions and
 <config>
 
   <!-- Should be good enough for most folk -->
-  <keyValueProperties>
+  <keyValues>
     <property name="key.one.string" value="first value" />
     <property name="key.two.int">1</property>
     <property name="key.three.double" value="2.0" />
     <property name="key.four.boolean">true</property>
     <property name="key.five.list" value="AMD, INTC, WFMI, SCCO" />
-  </keyValueProperties>
+  </keyValues>
 
   <xmlStructure>
     <!-- flattened:

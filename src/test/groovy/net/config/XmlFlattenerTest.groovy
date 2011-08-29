@@ -28,7 +28,7 @@ class XmlFlattenerTest
         String xmlOne = '''<config></config>'''
         assertFalse(flattener.isValidConfigFile(new XmlParser().parseText(xmlOne)))
 
-        String validXmlOne = '''<config><keyValueProperties></keyValueProperties></config>'''
+        String validXmlOne = '''<config><keyValues></keyValues></config>'''
         assertTrue(flattener.isValidConfigFile(new XmlParser().parseText(validXmlOne)))
 
         String validXmlTwo = '''<config><xmlStructure></xmlStructure></config>'''

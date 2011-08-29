@@ -10,9 +10,9 @@ import org.apache.log4j.Logger
  *
  * <!-- required root node -->
  * <config>
- *   <keyValueProperties>
+ *   <keyValues>
  *       <!-- Define optional nodes here -->
- *   </keyValueProperties>
+ *   </keyValues>
  *   <xmlStructure>
  *      <!-- Define optional nodes here -->
  *   </xmlStructure>
@@ -20,7 +20,7 @@ import org.apache.log4j.Logger
  * </pre>
  *
  * Where the root node 'config' is required and one or both
- * of the child nodes 'keyValueProperties' and 'xmlStructure'
+ * of the child nodes 'keyValues' and 'xmlStructure'
  * are required.
  *
  * @author dmillett
@@ -52,14 +52,14 @@ class XmlFlattener {
      * root node: 'config'
      *
      * child node(s):
-     * 'keyValueProperties'
+     * 'keyValues'
      * 'structureXml'
      *
      * @see 'findSimpleKeyValueNodes()'
      * @see 'findXmlStructures()'
      *
      * @param configFile The xml configuration file
-     * @return A Map (hash) of all the config values for 'keyValueProperties' and 'structureXml'
+     * @return A Map (hash) of all the config values for 'keyValue' and 'structureXml'
      */
     def Map<String, String> flatten(String configFile) {
 
@@ -92,11 +92,11 @@ class XmlFlattener {
      *
      * <pre>
      * <config>
-     *   <keyValueProperties>
+     *   <keyValues>
      *     <property name="some.prop" value="1.5" />
      *     <property name="foo" value="bar" />
      *     <property name="active">true</property>
-     *   </keyValueProperties>
+     *   </keyValues>
      * </config>
      * </pre>
      *
@@ -106,13 +106,13 @@ class XmlFlattener {
     def Map<String, String> findSimpleKeyValueNodes(Node baseNode) {
 
         LOG.info("Loading Simple Key Values")
-        def keyValues = new HashMap<String, String>()
+        def properties = new HashMap<String, String>()
 
-        baseNode.keyValueProperties.property.each { entry ->
-            keyValues.put(entry.@name.toLowerCase(), checkNodeForValue(entry))
+        baseNode.keyValues.property.each { entry ->
+            properties.put(entry.@name.toLowerCase(), checkNodeForValue(entry))
         }
 
-        keyValues
+        properties
     }
 
     /**
@@ -217,7 +217,7 @@ class XmlFlattener {
 
     /**
      * A valid jConfigMap file must have a "config" root node
-     * and either/both of "keyValueProperties" or "xmlStructure" child
+     * and either/both of "keyValue" or "xmlStructure" child
      * nodes.
      *
      * @param configBaseNode
@@ -231,7 +231,7 @@ class XmlFlattener {
             return false
         }
 
-        if ( configBaseNode.keyValueProperties[0] == null && configBaseNode.xmlStructure[0] == null )
+        if ( configBaseNode.keyValues[0] == null && configBaseNode.xmlStructure[0] == null )
         {
             LOG.info("Skipping: Missing 'keyValuesProperties' Or 'xmlStructure' Node(s)")
             return false
