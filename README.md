@@ -50,10 +50,10 @@ Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
 Pattern bars = Pattern.compile(".*bars.*);
 
 // 4 results (values: Sheffields, Map Room, Redmonds, Grizzly Peak)
-Map<String, String> allBars = configHelper.get(bars) --> 4 results
+Map<String, String> allBars = configHelper.get(bars);
 
 // 3 results (values: Sheffields, Map Room, Redmongds)
-Map<String, String> chicagoBars = configHelper.get(bars, "Chicago") --> 3 results
+Map<String, String> chicagoBars = configHelper.get(bars, "Chicago");
 ```
 
 Configuration:
