@@ -9,7 +9,7 @@
     <property name="key.five.list" value="AMD, INTC, WFMI, SCCO" />
   </keyValues>
 
-  <xmlStructure>
+  <structures>
     <!-- flattened:
     stocks.stock.AMD.sell-high, 25.00
     stocks.stock.AMD.sell-low, 6.50
@@ -51,6 +51,6 @@
       </commission>
     </commissions>
 
-  </xmlStructure>
+  </structures>
 
 </config>

@@ -13,14 +13,14 @@ import org.apache.log4j.Logger
  *   <keyValues>
  *       <!-- Define optional nodes here -->
  *   </keyValues>
- *   <xmlStructure>
+ *   <structures>
  *      <!-- Define optional nodes here -->
- *   </xmlStructure>
+ *   </structures>
  * </config>
  * </pre>
  *
  * Where the root node 'config' is required and one or both
- * of the child nodes 'keyValues' and 'xmlStructure'
+ * of the child nodes 'keyValues' and 'structures'
  * are required.
  *
  * @author dmillett
@@ -53,13 +53,13 @@ class XmlFlattener {
      *
      * child node(s):
      * 'keyValues'
-     * 'structureXml'
+     * 'structures'
      *
      * @see 'findSimpleKeyValueNodes()'
      * @see 'findXmlStructures()'
      *
      * @param configFile The xml configuration file
-     * @return A Map (hash) of all the config values for 'keyValue' and 'structureXml'
+     * @return A Map (hash) of all the config values for 'keyValues' and 'structures'
      */
     def Map<String, String> flatten(String configFile) {
 
@@ -76,7 +76,7 @@ class XmlFlattener {
             }
 
             keyValues = findSimpleKeyValueNodes(configNode)
-            keyValues.putAll(findXmlStructures(configNode.xmlStructure[0], ""))
+            keyValues.putAll(findXmlStructures(configNode.structures[0], ""))
         }
         catch ( Throwable t )
         {
@@ -164,7 +164,7 @@ class XmlFlattener {
      * stock.AMD.sell-low, 6.50
      * stock.AMD.shares, 200
      * <config>
-     *   <xmlStructure>
+     *   <structures>
      *     <pre>
      *      <stock name="AMD">
      *        <sell-high>25.00</sell-high>
@@ -173,7 +173,7 @@ class XmlFlattener {
      *      </stock>
      *     </pre>
      *
-     *   </xmlStructure>
+     *   </structures>
      * </config>
      *
      * @param baseNode
@@ -217,7 +217,7 @@ class XmlFlattener {
 
     /**
      * A valid jConfigMap file must have a "config" root node
-     * and either/both of "keyValue" or "xmlStructure" child
+     * and either/both of "keyValue" or "structures" child
      * nodes.
      *
      * @param configBaseNode
@@ -231,9 +231,9 @@ class XmlFlattener {
             return false
         }
 
-        if ( configBaseNode.keyValues[0] == null && configBaseNode.xmlStructure[0] == null )
+        if ( configBaseNode.keyValues[0] == null && configBaseNode.structures[0] == null )
         {
-            LOG.info("Skipping: Missing 'keyValuesProperties' Or 'xmlStructure' Node(s)")
+            LOG.info("Skipping: Missing 'keyValues' Or 'structures' Node(s)")
             return false
         }
 
@@ -246,11 +246,11 @@ class XmlFlattener {
      *
      * <pre>
      * <config>
-     *   <xmlStructure>
+     *   <structures>
      *     <node name="foo" description="bar>
      *       <subNode key="really" value="no shite"/>
      *     </node>
-     *   </xmlStructure>
+     *   </structures>
      * </config>
      * </pre>
      *

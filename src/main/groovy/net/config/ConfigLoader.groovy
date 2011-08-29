@@ -19,8 +19,8 @@ import java.util.regex.Pattern
  *       structured xml
  *   -->
  *
- *   <xmlStructure>
- *   </xmlStructure>
+ *   <structures>
+ *   </structures>
  * </config>
  * </pre>
  *

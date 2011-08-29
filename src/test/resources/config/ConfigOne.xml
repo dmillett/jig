@@ -23,7 +23,7 @@ See the License for the specific language governing permissions and
     <property name="key.five.list" value="AMD, INTC, WFMI, SCCO" />
   </keyValues>
 
-  <xmlStructure>
+  <structures>
     <!-- flattened:
     // Group and Lookup by AMD
     stock.AMD.sell-high, 25.00
@@ -87,6 +87,6 @@ See the License for the specific language governing permissions and
       </Chicago>
     </cities>
 
-  </xmlStructure>
+  </structures>
 
 </config>

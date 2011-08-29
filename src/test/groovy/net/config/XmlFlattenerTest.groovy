@@ -31,7 +31,7 @@ class XmlFlattenerTest
         String validXmlOne = '''<config><keyValues></keyValues></config>'''
         assertTrue(flattener.isValidConfigFile(new XmlParser().parseText(validXmlOne)))
 
-        String validXmlTwo = '''<config><xmlStructure></xmlStructure></config>'''
+        String validXmlTwo = '''<config><structures></structures></config>'''
         assertTrue(flattener.isValidConfigFile(new XmlParser().parseText(validXmlTwo)))
     }
 
@@ -67,12 +67,12 @@ class XmlFlattenerTest
         def baseNode = new XmlParser().parse(testConfigFile)
         def xmlFlatten = new XmlFlattener()
 
-        def structureNode = baseNode.xmlStructure[0]
+        def structureNode = baseNode.structures[0]
         def keyValues = xmlFlatten.findXmlStructures(structureNode, "")
 
         assertNotNull(keyValues)
         assertEquals(14, keyValues.size())
 
-        assertEquals("8.00", keyValues.get("xmlstructure.commission.type.stocks.ticker.intc.category.market"))
+        assertEquals("8.00", keyValues.get("structures.commission.type.stocks.ticker.intc.category.market"))
     }
 }

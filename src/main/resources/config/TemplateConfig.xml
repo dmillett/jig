@@ -5,7 +5,7 @@
     <!-- todo: enter any key value direct lookup properties here -->
   </keyValues>
 
-  <xmlStructure>
+  <structures>
     <!-- todo: entry and structured xml configs here  -->
-  </xmlStructure>
+  </structures>
 </config>
