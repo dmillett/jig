@@ -10,8 +10,6 @@ Or, if it is a simple key value property, then only the matching value is return
 Currently jConfigMap supports XML and JSON configuration files during startup. A global config
 map (see java ConfigMap), can then be used statically for config access.
 
-* A Test implementation  with 2600 line XML file was ported to
-
 Usage:
 ------
 * Each config file has a 'config' root node and either/both 'keyValues' and 'structures'
