@@ -10,14 +10,15 @@ Or, if it is a simple key value property, then only the matching value is return
 Currently jConfigMap supports XML and JSON configuration files during startup. A global config
 map (see java ConfigMap), can then be used statically for config access.
 
+* A Test implementation  with 2600 line XML file was ported to
+
 Usage:
 ------
-* Each config file has a 'config' root node and either/both 'keyValueProperties' and 'xmlStructure'
+* Each config file has a 'config' root node and either/both 'keyValues' and 'structures'
 * 'structures' nodes always return a Map<String,String>
-* 'keyValue' nodes return a String, List, or primitive wrapped object
+* 'keyValues' nodes return a String, List, or primitive wrapped object
 * 'value' attribute key stores the corresponding value in the config map
 * 'structures' config map results support comparators
-
 * Configuration File(s) Config Map entry order (reverse priority - see JConfigProperties):
     1) Default config location is "classpath/config" directory
     2) Remote URL file location
@@ -25,11 +26,14 @@ Usage:
     4) Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
     5) Environment specific config file loading. Ex "SomeConfig_dev.xml"
 
+Easy to use:
+------------
+* It took approximately 10 minutes to port a 2600 line XML file into the test directory
+  and add a handful of unit tests.
+
 Examples (additional examples in test directory):
 -------------------------------------------------
 
-Usage:
------
 ```java
 // See XML configuration files below (ConfigLookup has a number of client utility methods)
 ConfigLookup configHelper = new ConfigLookup()
@@ -39,10 +43,14 @@ Pattern keyOne = Pattern.compile("key.one.string");
 assertEquals("first value", configHelper.getByKey(keyOne));
 
 Pattern keyTwo = Pattern.compile("key.two.int");
-assertEquals(1, configHelper.getByKey(keyTwo));
+assertEquals(1, configHelper.getByKey(keyTwo, Integer.class));
 
 Pattern keyThree = Pattern.compile("key.three.double");
-assertEquals(2.0, configHelper.getByKey(keyThree));
+assertEquals(2.0, configHelper.getByKey(keyThree, Double.class));
+
+// Produces a List<String> result
+Pattern keyFour = Pattern.compile("key.four.list");
+assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
 
 // Structured XML configs (something more complex than 1:1)
 Pattern stocks = Pattern.compile(".*stocks.*");
@@ -68,6 +76,7 @@ Configuration:
     <property name="key.one.string" value="first value" />
     <property name="key.two.int">1</property>
     <property name="key.three.double" value="2.0" />
+    <property name="key.four.list" value="AMD, INTC, WFMI, SCCO" />
   </keyValues>
   <structures>
     <stocks>
@@ -103,6 +112,7 @@ stocks.stock.name.foo.high, 8.32
 stocks.stock.name.bar.low, 4.50
 stocks.stock.name.bar.high, 4.65
 
+// Note the version for Chicago Bars
 cities.chicago.bars.bar, Sheffields
 cities.chicago.bars.bar.1, Map Room
 cities.chicago.bars.bar.2, Redmonds

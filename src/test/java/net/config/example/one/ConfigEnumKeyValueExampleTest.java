@@ -1,6 +1,7 @@
 package net.config.example.one;
 
 import junit.framework.TestCase;
+import net.client.ConfigLookup;
 import net.config.example.JavaTestConfigHelper;
 import net.config.example.one.ConfigEnumExample;
 
@@ -51,7 +52,14 @@ public class ConfigEnumKeyValueExampleTest
 
     public void test__THREE() {
 
-        assertEquals((Double)2.0, ConfigEnumExample.THREE.get((Double.class)));
+        assertEquals(2.0, ConfigEnumExample.THREE.get((Double.class)));
+    }
+
+    public void test__THREE_with_ConfigHelper() {
+
+        ConfigLookup configLookup = new ConfigLookup();
+        double value = configLookup.getByKey(ConfigEnumExample.THREE.getPattern().toString(), Double.class);
+        assertEquals(2.0, value);
     }
 
     public void test__FOUR() {
