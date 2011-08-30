@@ -25,11 +25,6 @@ Usage:
     4. Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
     5. Environment specific config file loading. Ex "SomeConfig_dev.xml"
 
-Future:
------
-1. Support encrypted values
-2. Key access frequency (which keys get accessed the most)
-
 Easy to use:
 ------------
 * It took approximately 10 minutes to port a 2600 line XML file into the test directory
@@ -122,6 +117,11 @@ cities.chicago.bars.bar.1, Map Room
 cities.chicago.bars.bar.2, Redmonds
 cities.ann arbor.bars.bar, Grizzly Peak
 ```
+
+Future:
+-----
+1. Support encrypted values
+2. Key access frequency (which keys get accessed the most)
 
 Requirements:
 -------------
