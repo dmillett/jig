@@ -20,11 +20,11 @@ Usage:
 * 'value' attribute key stores the corresponding value in the config map
 * 'structures' config map results support comparators
 * Configuration File(s) Config Map entry order (reverse priority - see JConfigProperties):
-    1) Default config location is "classpath/config" directory
-    2) Remote URL file location
-    3) System properties override location "jConfigMap.location"
-    4) Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
-    5) Environment specific config file loading. Ex "SomeConfig_dev.xml"
+    1. Default config location is "classpath/config" directory
+    2. Remote URL file location
+    3. System properties override location "jConfigMap.location"
+    4. Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
+    5. Environment specific config file loading. Ex "SomeConfig_dev.xml"
 
 Easy to use:
 ------------
