@@ -48,7 +48,7 @@ class ConfigLoaderTest
         def configFileNames = configLoader.loadConfigFilesFromOverride()
 
         assertNotNull(configFileNames)
-        assertEquals(9, configFileNames.size())
+        assertEquals(10, configFileNames.size())
     }
 
     // Load all the test configs into a single depth map

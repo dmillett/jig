@@ -1,22 +1,26 @@
 {
-  "countries": "USA USA USA",
-  "cities": {
-    "Chicago": {
-        "bars": [
-          {"bar" : "Sheffields"},
-          {"bar" : "Matilda"},
-          {"bar" : "Map Room"},
-          {"bar" : "The Local Option"}
-        ]
-    },
+  "config" : {
 
-    "Ann Arbor": {
-        "bars": [
-          {"bar" : "Arbor Brewing Company"},
-          {"bar" : "Rick's"},
-          {"bar" : "Full Moon (redux)"},
-          {"bar" : "Frasier's Pub"}
-        ]
+    "countries": "USA USA USA",
+
+    "cities": {
+      "Chicago": {
+          "bars": [
+            {"bar" : "Sheffields"},
+            {"bar" : "Matilda"},
+            {"bar" : "Map Room"},
+            {"bar" : "The Local Option"}
+          ]
+      },
+
+      "Ann Arbor": {
+          "bars": [
+            {"bar" : "Arbor Brewing Company"},
+            {"bar" : "Rick's"},
+            {"bar" : "Full Moon (redux)"},
+            {"bar" : "Frasier's Pub"}
+          ]
+      }
     }
   }
 }

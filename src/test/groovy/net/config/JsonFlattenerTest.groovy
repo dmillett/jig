@@ -49,4 +49,14 @@ class JsonFlattenerTest
         assertNotNull(simpleJsonThree)
         assertEquals(18, simpleJsonThree.size())
     }
+
+    void test__flattenJsonFile_ignored() {
+
+        def fileUrl = "file://" + GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "JsonIgnoredFile.json"
+        def jsonFlattener = new JsonFlattener()
+
+        def emptyMap = jsonFlattener.flatten(fileUrl)
+        assertNotNull(emptyMap)
+        assertEquals(0, emptyMap.size())
+    }
 }

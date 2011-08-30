@@ -45,30 +45,22 @@ class JsonFlattener {
             def jsSlurper = new JsonSlurper()
             def urlFile = correctToValidUrlFile(jsonFileName)
             def parsedFile = jsSlurper.parseText(urlFile.text)
+
+            if ( !validateIsValidConfig(parsedFile) )
+            {
+                LOG.info("Skipping Invalid JSON Config File $jsonFileName ($urlFile)")
+                return new HashMap<String, String>(0);
+            }
+
             flattenedKeyValues = flattenGroovyJsonObject(parsedFile)
         }
         catch ( Exception e )
         {
-            LOG.error("Could Not Load JSON Configuration File")
+            LOG.error("Could Not Load JSON Configuration File", e)
             flattenedKeyValues = new HashMap<String,String>()
         }
 
         return flattenedKeyValues
-    }
-
-    private def correctToValidUrlFile(urlFileName) {
-
-        try
-        {
-            def urlFile = new URL(urlFileName)
-            return urlFile
-        }
-        catch ( Exception e )
-        {
-            LOG.error("JSON Config Is Not A URL File", e)
-        }
-
-        return "file://${urlFileName}".toURL();
     }
 
     /**
@@ -103,6 +95,8 @@ class JsonFlattener {
     }
 
     /**
+     * Iterates through each Map entry and transforms any sub-maps or sub-arrays
+     * therein. Otherwise, it is just a string "key" and "value".
      *
      * @param jsonMap
      * @param currentName
@@ -189,5 +183,44 @@ class JsonFlattener {
         }
 
         return keyValues
+    }
+
+    private def correctToValidUrlFile(urlFileName) {
+
+        try
+        {
+            def urlFile = new URL(urlFileName)
+            return urlFile
+        }
+        catch ( Exception e )
+        {
+            LOG.error("JSON Config Is Not A URL File", e)
+        }
+
+        return "file://${urlFileName}".toURL();
+    }
+
+    /**
+     * The outer JSON value should be 'config' and it should be
+     * the only key in the outer Map.
+     *
+     * @param groovyJsonMap
+     * @return false if null or size != 1, otherwise true
+     */
+    private def validateIsValidConfig(groovyJsonMap) {
+
+        if ( groovyJsonMap == null || groovyJsonMap.size() != 1 )
+        {
+            return false
+        }
+
+        groovyJsonMap.each { entry ->
+            if ( !"config".equalsIgnoreCase(entry.key) )
+            {
+                return false
+            }
+        }
+
+        return true
     }
 }

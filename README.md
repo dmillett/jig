@@ -15,16 +15,22 @@ map (see java ConfigMap), can then be used statically for config access.
 Usage:
 ------
 * Each config file has a 'config' root node and either/both 'keyValues' and 'structures'
-* 'structures' nodes always return a Map<String,String>
 * 'keyValues' nodes return a String, List, or primitive wrapped object
-* 'value' attribute key stores the corresponding value in the config map
+* XML attribute 'value' stores the corresponding value
+* 'structures' nodes always return a Map<String,String>
 * 'structures' config map results support comparators
+* 'structures' can have ~versioned key-value pairs (see "Bar" example below)
 * Configuration File(s) Config Map entry order (reverse priority - see JConfigProperties):
     1. Default config location is "classpath/config" directory
     2. Remote URL file location
     3. System properties override location "jConfigMap.location"
     4. Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
     5. Environment specific config file loading. Ex "SomeConfig_dev.xml"
+
+Future:
+-----
+1. Support encrypted values
+2. Key access frequency (which keys get accessed the most)
 
 Easy to use:
 ------------
