@@ -12,12 +12,9 @@ map (see java ConfigMap), can then be used statically for config access.
 
 Usage:
 ------
-* Each config file has a 'config' root node and either/both 'keyValues' and 'structures'
-* 'keyValues' nodes return a String, List, or primitive wrapped object
-* XML attribute 'value' stores the corresponding value
-* 'structures' nodes always return a Map<String,String>
-* 'structures' config map results support comparators
-* 'structures' can have ~versioned key-value pairs (see "Bar" example below)
+* Supports XML/JSON property style key-value pairs (see 'keyValues')
+* Supports XML/JSON object/config structure (see 'structures')
+* Supports versioning for certain XML/JSON config structures
 * Configuration File(s) Config Map entry order (reverse priority - see JConfigProperties):
     1. Default config location is "classpath/config" directory
     2. Remote URL file location
@@ -104,19 +101,28 @@ Configuration:
     </cities>
   </structures>
 </config>
-
-generates:
-stocks.stock.name.foo.low, 8.00
-stocks.stock.name.foo.high, 8.32
-stocks.stock.name.bar.low, 4.50
-stocks.stock.name.bar.high, 4.65
-
-// Note the version for Chicago Bars
-cities.chicago.bars.bar, Sheffields
-cities.chicago.bars.bar.1, Map Room
-cities.chicago.bars.bar.2, Redmonds
-cities.ann arbor.bars.bar, Grizzly Peak
 ```
+*generates*
+-----------
+  1. stocks.stock.name.foo.low, 8.00
+  2. stocks.stock.name.foo.high, 8.32
+  3. stocks.stock.name.bar.low, 4.50
+  4. stocks.stock.name.bar.high, 4.65
+
+  // Note the version for Chicago Bars
+  5. cities.chicago.bars.bar, Sheffields
+  6. cities.chicago.bars.bar.1, Map Room
+  7. cities.chicago.bars.bar.2, Redmonds
+  8. cities.ann arbor.bars.bar, Grizzly Peak
+
+*notes*
+-------
+* Each config file has a 'config' root node and either/both 'keyValues' and 'structures'
+* 'keyValues' nodes return a String, List, or primitive wrapped object
+* XML attribute 'value' stores the corresponding value
+* 'structures' nodes always return a Map<String,String>
+* 'structures' config map results support comparators
+* 'structures' can have ~versioned key-value pairs (see "Bar" example below)
 
 Future:
 -----
