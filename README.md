@@ -109,7 +109,6 @@ Configuration:
   3. stocks.stock.name.bar.low, 4.50
   4. stocks.stock.name.bar.high, 4.65
 
-  // Note the version for Chicago Bars
   5. cities.chicago.bars.bar, Sheffields
   6. cities.chicago.bars.bar.1, Map Room
   7. cities.chicago.bars.bar.2, Redmonds
