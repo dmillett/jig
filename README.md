@@ -1,5 +1,4 @@
-jConfigMap (See LICENSE AND NOTICE):
-====================================
+#jConfigMap (See LICENSE AND NOTICE):#
 
 Is a Java client configuration tool that uses Groovy (for now), to flatten
 XML and JSON configuration files into a key-value Map structure. Each key
@@ -10,8 +9,7 @@ Or, if it is a simple key value property, then only the matching value is return
 Currently jConfigMap supports XML and JSON configuration files during startup. A global config
 map (see java ConfigMap), can then be used statically for config access.
 
-Usage:
-------
+##Features##
 * Supports XML/JSON property style key-value pairs (see 'keyValues')
 * Supports XML/JSON object/config structure (see 'structures')
 * Supports versioning for certain XML/JSON config structures
@@ -22,14 +20,16 @@ Usage:
     4. Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
     5. Environment specific config file loading. Ex "SomeConfig_dev.xml"
 
-Easy to use:
-------------
+####*easy to use*####
 * It took approximately 10 minutes to port a 2600 line XML file into the test directory
   and add a handful of unit tests.
 
-Examples (additional examples in test directory):
--------------------------------------------------
+* Wrap your XML file with <config><structures> your xml here </structures></config> and put in
+  the "test/resources" directory. Add your test class and methods (see PojoConfigExampleTest or
+  ConfigEnumStructuredXmlTest)
 
+##Usage (additional examples in test directory)##
+####*code sample*####
 ```java
 // See XML configuration files below (ConfigLookup has a number of client utility methods)
 ConfigLookup configHelper = new ConfigLookup()
@@ -63,9 +63,7 @@ Map<String, String> lowStocks = configHelper.get(stocks, "low");
 // 1 result (values: 8.00)
 Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
 ```
-
-Configuration:
--------------
+####*config sample*####
 ```
 <config>
   <keyValues>
@@ -102,8 +100,7 @@ Configuration:
   </structures>
 </config>
 ```
-*generates*
------------
+####*generates*####
   1. stocks.stock.name.foo.low, 8.00
   2. stocks.stock.name.foo.high, 8.32
   3. stocks.stock.name.bar.low, 4.50
@@ -113,8 +110,7 @@ Configuration:
   7. cities.chicago.bars.bar.2, Redmonds
   8. cities.ann arbor.bars.bar, Grizzly Peak
 
-*notes*
--------
+####*notes*####
 * Each config file has a 'config' root node and either/both 'keyValues' and 'structures'
 * 'keyValues' nodes return a String, List, or primitive wrapped object
 * XML attribute 'value' stores the corresponding value
@@ -122,13 +118,13 @@ Configuration:
 * 'structures' config map results support comparators
 * 'structures' can have ~versioned key-value pairs (see "Bar" example below)
 
-Future:
------
-1. Support encrypted values
-2. Key access frequency (which keys get accessed the most)
+##Future##
+1. Key access frequency (which keys get accessed the most)
+2. Support encrypted values (not sure its' a good idea yet)
+3. Clojure implementation and client
+4. Scala implementation and client
 
-Requirements:
--------------
+##Requirements##
 jdk 1.6
 groovy 1.8.0
 * built by gradle
