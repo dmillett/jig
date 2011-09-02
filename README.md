@@ -13,17 +13,10 @@ map (see java ConfigMap), can then be used statically for config access.
 * Supports XML/JSON property style key-value pairs (see 'keyValues')
 * Supports XML/JSON object/config structure (see 'structures')
 * Supports versioning for certain XML/JSON config structures
-* Configuration File(s) Config Map entry order (reverse priority - see JConfigProperties):
-    1. Default config location is "classpath/config" directory
-    2. Remote URL file location
-    3. System properties override location "jConfigMap.location"
-    4. Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
-    5. Environment specific config file loading. Ex "SomeConfig_dev.xml"
-* Supports statistic gathering for config access
-    1. Statistics stored by key (flattened from config)
-    2. Configuration access count
-    3. Average latency
-    4. Associated patterns (paths to this key lookup)
+* Multiple config strategies available (see JConfigProperties):
+  * classpath, url, specified location, command line, environmental filters
+* Supports statistic gathering for config access (see ConfigStatistics and StatsValue)
+  * count, average latency, associated patterns
 
 ####*easy to use*####
 * It took approximately 10 minutes to port a 2600 line XML file into the test directory
@@ -56,6 +49,9 @@ assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
 // Structured XML configs (something more complex than 1:1)
 Pattern stocks = Pattern.compile(".*stocks.*");
 
+// Gather statistics (off by default)
+ConfigStatistics.enableStatsCollection();
+
 // 4 results (all stocks)
 Map<String, String> stocksMap = configHelper.get(stocks);
 
@@ -67,6 +63,11 @@ Map<String, String> lowStocks = configHelper.get(stocks, "low");
 
 // 1 result (values: 8.00)
 Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
+ConfigStatistics.disableStatsCollection();
+
+// Examine the stats
+Map<String, StatsValue> stats = ConfigStatistics.getStats();
+assertEquals(4, stats.size());
 ```
 ####*config sample*####
 ```
@@ -116,12 +117,24 @@ Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
   8. cities.ann arbor.bars.bar, Grizzly Peak
 
 ####*notes*####
-* Each config file has a 'config' root node and either/both 'keyValues' and 'structures'
-* 'keyValues' nodes return a String, List, or primitive wrapped object
-* XML attribute 'value' stores the corresponding value
-* 'structures' nodes always return a Map<String,String>
-* 'structures' config map results support comparators
-* 'structures' can have ~versioned key-value pairs (see "Bar" example below)
+* Config format (xml, json)
+  * Each config file has a 'config' root node and either/both 'keyValues' and 'structures'
+  * 'keyValues' nodes return a String, List, or primitive wrapped object
+  * XML attribute 'value' stores the corresponding value
+  * 'structures' nodes always return a Map<String,String>
+  * 'structures' config map results support comparators
+  * 'structures' can have ~versioned key-value pairs (see "Bar" example below)
+* Config loading options
+  1. Default config location is "classpath/config" directory
+  2. Remote URL file location
+  3. System properties override location "jConfigMap.location"
+  4. Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
+  5. Environment specific config file loading. Ex "SomeConfig_dev.xml"
+* Config statistics
+  * Statistics stored by key (flattened from config)
+  * Configuration access count
+  * Average latency
+  * Associated patterns (paths to this key lookup)
 
 ##Future##
 1. Clojure implementation and client
