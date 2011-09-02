@@ -1,5 +1,6 @@
 package net.client;
 
+import net.util.ConfigStatistics;
 import net.util.GenericsHelper;
 import org.apache.log4j.Logger;
 
@@ -13,6 +14,17 @@ import java.util.regex.Pattern;
 
 /**
  * Use this to access the ConfigMap (cache) from Config POJOs or Enums.
+ *
+ * For property style key value pairs where there is a 1:1 match
+ * use this for getting the exact config value.
+ *
+ * getByKey()
+ *
+ * When retrieving a group of config values pending config structure and
+ * desired use:
+ *
+ * get()
+ * getSortedResults()
  *
  * @author dmillett
  *
@@ -33,31 +45,6 @@ public class ConfigLookup {
 
     private static final Logger LOG = Logger.getLogger(ConfigLookup.class);
     private static final ConfigMap CONFIG_MAP = new ConfigMap();
-
-    /**
-     * If it is a simple key-value property style config,then just pull it from
-     * the map.
-     *
-     * @param key An exact key name
-     * @return The stored value for 'key', otherwise null
-     */
-    public String getByKey(String key) {
-
-        if ( key == null )
-        {
-            return null;
-        }
-
-        for ( Map<String, String> configMap : CONFIG_MAP.getConfig().values() )
-        {
-            if ( configMap.containsKey(key) )
-            {
-                return configMap.get(key);
-            }
-        }
-
-        return null;
-    }
 
     /**
      * Use the filename as a namespace to expedite config single value lookup
@@ -114,7 +101,7 @@ public class ConfigLookup {
      * @param key The exact key name
      * @param clazz The desired type to cast to (primitives or List)
      * @param <T> See 'clazz' and GenericsHelper
-     * @return
+     * @return A String or an object of type T
      */
     public <T> T getByKey(String fileName, String key, Class<T> clazz) {
 
@@ -142,7 +129,7 @@ public class ConfigLookup {
      *
      * @param pattern For Map key lookup
      * @param params Any additional portions of the key name to help reduce the Map
-     * @return
+     * @return A map of key-value pairs according to 'pattern' and containing 'params'
      */
     public Map<String, String> get(Pattern pattern, String... params) {
         return getConfigMatches(CONFIG_MAP.getConfig(), pattern, params);
@@ -154,12 +141,12 @@ public class ConfigLookup {
      * @param comparator You call it (natural ordering if null)
      * @param pattern A pattern applied to the key set
      * @param params Any additionals keywords to reduce the keyset
-     * @return A sorted map
+     * @return A sorted map (TreeMap)
      */
-    public Map<String, String> getSortedResults(Comparator comparator, Pattern pattern, String... params) {
+    public Map<String, String> getSortedResults(Comparator<String> comparator, Pattern pattern, String... params) {
 
         Map<String,String> matches = getConfigMatches(CONFIG_MAP.getConfig(), pattern, params);
-        TreeMap treeMap = new TreeMap(comparator);
+        TreeMap<String, String> treeMap = new TreeMap<String, String>(comparator);
         treeMap.putAll(matches);
 
         return treeMap;
@@ -171,7 +158,7 @@ public class ConfigLookup {
      * @param fileName The filename that contains the text config (text, xml, json, etc)
      * @param pattern A pattern to apply to the keys
      * @param params Additional parameters that are part of the key names
-     * @return
+     * @return A map of key-value pairs, for a given file, according to key pattern and containing params
      */
     public Map<String, String> get(String fileName, Pattern pattern, String... params) {
 
@@ -199,6 +186,32 @@ public class ConfigLookup {
         }
 
         return Pattern.compile(text);
+    }
+
+    /**
+     * If null or empty array, then returns the pattern equivalent to ".*".
+     * Otherwise it prefixes each String in 'text' with ".*". Thus
+     *
+     * {"foo", "bar", "cow"} --> ".*foo.*bar.*cow.*"
+     *
+     * @param text An array of items to build with a wild card.
+     * @return A pattern wrapping items with ".*"
+     */
+    public Pattern buildPattern(String... text) {
+
+        if ( text == null || text.length < 1 )
+        {
+            return Pattern.compile(".*");
+        }
+
+        StringBuilder sb = new StringBuilder(".*");
+
+        for ( String s : text )
+        {
+            sb.append(s).append(".*");
+        }
+
+        return Pattern.compile(sb.toString());
     }
 
 
@@ -255,14 +268,31 @@ public class ConfigLookup {
     }
 
     /**
+     * If it is a simple key-value property style config,then just pull it from
+     * the map.
+     *
+     * @param key An exact key name
+     * @return The stored value for 'key', otherwise null
+     */
+    public String getByKey(String key) {
+
+        if ( key == null )
+        {
+            return null;
+        }
+
+        return getConfigValue(key);
+    }
+
+    /**
      * Loop through a Map of Maps to find the config. If you know the outer map
      * key, then it should be faster for larger config files. The outer map
      * key is the config file name.
      *
-     * @param configMaps
-     * @param pattern
-     * @param params
-     * @return
+     * @param configMaps The file specific maps (file 1 --> map 1)
+     * @param pattern A pattern to match against file map keysets
+     * @param params A key must contain all of these params
+     * @return A reduced key-value map
      */
     protected Map<String, String> getConfigMatches(Map<String, Map<String, String>> configMaps, Pattern pattern,
                                                    String... params) {
@@ -292,12 +322,24 @@ public class ConfigLookup {
      */
     protected Map<String, String> findMatches(Map<String, String> configMap, Pattern pattern, String... params) {
 
-        Map<String, String> matches = new HashMap<String, String>();
-
         if ( configMap == null || configMap.isEmpty() )
         {
-            return matches;
+            return new HashMap<String, String>();
         }
+
+        return getConfigValues(configMap, pattern, params);
+    }
+
+
+    private Map<String, String> getConfigValues(Map<String, String> configMap, Pattern pattern, String... params) {
+
+        long start = 0;
+        if ( ConfigStatistics.isEnabled() )
+        {
+            start = System.nanoTime();
+        }
+
+        Map<String, String> matches = new HashMap<String, String>();
 
         for (Map.Entry<String, String> entry : configMap.entrySet())
         {
@@ -308,7 +350,79 @@ public class ConfigLookup {
             }
         }
 
-        return reduce(matches, params);
+        if ( !ConfigStatistics.isEnabled() )
+        {
+            return reduce(matches, params);
+        }
+
+        Map<String, String> reducedMap = reduce(matches, params);
+        long lookupTime = System.nanoTime() - start;
+        String reducePattern = buildReducePatternRepresentation(pattern, params);
+
+        for ( String key : reducedMap.keySet() )
+        {
+            ConfigStatistics.addKeyLookup(key, lookupTime, reducePattern);
+        }
+
+        return reducedMap;
+    }
+
+
+    private String buildReducePatternRepresentation(Pattern pattern, String... reducers) {
+
+        if ( reducers == null )
+        {
+            return pattern.pattern();
+        }
+
+        StringBuilder sb = new StringBuilder(pattern.pattern());
+
+        for ( String reducer : reducers )
+        {
+            sb.append(":").append(reducer);
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Retrieves a single value from the config map, if it exists. This is
+     * used for property style config (1:1) lookups. If Statistics are
+     * enabled (see ConfigStatistics), then it will add some latency, but
+     * it will gather latency and count information for 'key'.
+     *
+     * @param key A property style key that should only be used for 1:1 mapping.
+     * @return A single value or null if the key does not exist.
+     */
+    private String getConfigValue(String key) {
+
+        long startTime = 0;
+
+        if ( ConfigStatistics.isEnabled() )
+        {
+            startTime = System.nanoTime();
+        }
+
+        String result = null;
+        for ( Map<String, String> configMap : CONFIG_MAP.getConfig().values() )
+        {
+            if ( configMap.containsKey(key) )
+            {
+                result = configMap.get(key);
+                break;
+            }
+        }
+
+        if ( !ConfigStatistics.isEnabled() )
+        {
+            return result;
+        }
+
+        // 1:1 lookup, so the key is the pattern
+        long lookupTime = System.nanoTime() - startTime;
+        ConfigStatistics.addKeyLookup(key, lookupTime, key);
+
+        return result;
     }
 
     /**
