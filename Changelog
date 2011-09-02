@@ -5,7 +5,7 @@ Version 0.94 TBD, 2011
 * XML 'keyValues' tag indicator replaces 'keyValueProperties' (see test resources)
 * XML 'structures' tag indicator replaces 'xmlStructure' (see test resources)
 * JSON files require 'config' as the outer Json entry (see test resources)
-
+* Statistics gathering (count, average latency, associated patterns)
 
 Version 0.93 June 9, 2011
 -------------------------

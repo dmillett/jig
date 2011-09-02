@@ -19,6 +19,11 @@ map (see java ConfigMap), can then be used statically for config access.
     3. System properties override location "jConfigMap.location"
     4. Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
     5. Environment specific config file loading. Ex "SomeConfig_dev.xml"
+* Supports statistic gathering for config access
+    1. Statistics stored by key (flattened from config)
+    2. Configuration access count
+    3. Average latency
+    4. Associated patterns (paths to this key lookup)
 
 ####*easy to use*####
 * It took approximately 10 minutes to port a 2600 line XML file into the test directory
@@ -119,10 +124,9 @@ Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
 * 'structures' can have ~versioned key-value pairs (see "Bar" example below)
 
 ##Future##
-1. Key access frequency (which keys get accessed the most)
-2. Support encrypted values (not sure its' a good idea yet)
-3. Clojure implementation and client
-4. Scala implementation and client
+1. Clojure implementation and client
+2. Scala implementation and client
+3. Support encrypted values (not sure its' a good idea yet -- leaning towards not)
 
 ##Requirements##
 jdk 1.6
