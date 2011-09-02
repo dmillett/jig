@@ -95,6 +95,26 @@ public class StatsValue {
         }
     }
 
+    public String getKey() {
+        return _key;
+    }
+
+    public Set<String> getAssociatedPatterns() {
+        return _associatedPatterns;
+    }
+
+    public long getCount() {
+        return _count;
+    }
+
+    public double getAverageLatency() {
+        return _averageLatency;
+    }
+
+    public long getLastAccessed() {
+        return _lastAccessed;
+    }
+
     @Override
     public boolean equals(Object o) {
 
