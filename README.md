@@ -90,6 +90,7 @@ assertEquals(4, stats.size());
 ```
 
 ####*structured config sample*####
+```
 <config>
   <structures>
     <stocks>
