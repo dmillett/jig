@@ -21,18 +21,16 @@ map (see java ConfigMap), can then be used statically for config access.
 ####*easy to use*####
 * It took approximately 10 minutes to port a 2600 line XML file into the test directory
   and add a handful of unit tests.
-
-* Wrap your XML file with <config><structures> your xml here </structures></config> and put in
-  the "test/resources" directory. Add your test class and methods (see PojoConfigExampleTest or
-  ConfigEnumStructuredXmlTest)
+  * Wrap your XML file with <config><structures> your xml here </structures></config> and put in the
+    "test/resources" directory. Add your test class and methods (see PojoConfigExampleTest or
+    ConfigEnumStructuredXmlTest)
 
 ##Usage (additional examples in test directory)##
-####*code sample*####
+####*property style config code sample*####
 ```java
-// See XML configuration files below (ConfigLookup has a number of client utility methods)
+// ConfigLookup has a number of client utility methods
 ConfigLookup configHelper = new ConfigLookup()
 
-// Simple 1:1 config key-value lookup
 Pattern keyOne = Pattern.compile("key.one.string");
 assertEquals("first value", configHelper.getByKey(keyOne));
 
@@ -45,8 +43,29 @@ assertEquals(2.0, configHelper.getByKey(keyThree, Double.class));
 // Produces a List<String> result
 Pattern keyFour = Pattern.compile("key.four.list");
 assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
+```
+####*property style config sample*####
+```
+<config>
+  <keyValues>
+    <property name="key.one.string" value="first value" />
+    <property name="key.two.int">1</property>
+    <property name="key.three.double" value="2.0" />
+    <property name="key.four.list" value="AMD, INTC, WFMI, SCCO" />
+  </keyValues>
+</config>
+```
+####*generates*####
+  1. key.one.string, "first value"
+  2. key.two.int, 1
+  3. key.three.double, 2.0
+  4. key.four.list, "AMD, INTC, WFMI, SCCO"
 
-// Structured XML configs (something more complex than 1:1)
+####*structured config code sample*####
+```java
+ConfigLookup configHelper = new ConfigLookup()
+
+// Retrieve all key-value pairs where the key matches this pattern
 Pattern stocks = Pattern.compile(".*stocks.*");
 
 // Gather statistics (off by default)
@@ -69,15 +88,9 @@ ConfigStatistics.disableStatsCollection();
 Map<String, StatsValue> stats = ConfigStatistics.getStats();
 assertEquals(4, stats.size());
 ```
-####*config sample*####
-```
+
+####*structured config sample*####
 <config>
-  <keyValues>
-    <property name="key.one.string" value="first value" />
-    <property name="key.two.int">1</property>
-    <property name="key.three.double" value="2.0" />
-    <property name="key.four.list" value="AMD, INTC, WFMI, SCCO" />
-  </keyValues>
   <structures>
     <stocks>
         <stock name="FOO">
@@ -117,6 +130,12 @@ assertEquals(4, stats.size());
   8. cities.ann arbor.bars.bar, Grizzly Peak
 
 ####*notes*####
+* Config loading options
+  1. Default config location is "classpath/config" directory
+  2. Remote URL file location
+  3. System properties override location "jConfigMap.location"
+  4. Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
+  5. Environment specific config file loading. Ex "SomeConfig_dev.xml"
 * Config format (xml, json)
   * Each config file has a 'config' root node and either/both 'keyValues' and 'structures'
   * 'keyValues' nodes return a String, List, or primitive wrapped object
@@ -124,12 +143,6 @@ assertEquals(4, stats.size());
   * 'structures' nodes always return a Map<String,String>
   * 'structures' config map results support comparators
   * 'structures' can have ~versioned key-value pairs (see "Bar" example below)
-* Config loading options
-  1. Default config location is "classpath/config" directory
-  2. Remote URL file location
-  3. System properties override location "jConfigMap.location"
-  4. Specify command line configs with "jConfigMap.entry.name.foo=42" (where "name.foo" is the map key)
-  5. Environment specific config file loading. Ex "SomeConfig_dev.xml"
 * Config statistics
   * Statistics stored by key (flattened from config)
   * Configuration access count
