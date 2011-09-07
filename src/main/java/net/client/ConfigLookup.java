@@ -45,6 +45,7 @@ public class ConfigLookup {
 
     private static final Logger LOG = Logger.getLogger(ConfigLookup.class);
     private static final ConfigMap CONFIG_MAP = new ConfigMap();
+    private static final String BASE_PATTERN = "structures\\..*";
 
     /**
      * Use the filename as a namespace to expedite config single value lookup
@@ -172,31 +173,6 @@ public class ConfigLookup {
         return findMatches(configsForFile, pattern, params);
     }
 
-
-    /**
-     * Handles null or empty string regex and replaces with wildcard '.*'
-     * @param text Creates a Java Pattern from this or '.*' if null
-     * @return Java pattern
-     */
-    public Pattern buildPattern(String text) {
-
-        if ( text == null || text.length() < 1 )
-        {
-            return Pattern.compile(".*");
-        }
-
-        return Pattern.compile(text);
-    }
-
-    /**
-     * If null or empty array, then returns the pattern equivalent to ".*".
-     * Otherwise it prefixes each String in 'text' with ".*". Thus
-     *
-     * {"foo", "bar", "cow"} --> ".*foo.*bar.*cow.*"
-     *
-     * @param text An array of items to build with a wild card.
-     * @return A pattern wrapping items with ".*"
-     */
     public Pattern buildPattern(String... text) {
 
         if ( text == null || text.length < 1 )
@@ -205,7 +181,6 @@ public class ConfigLookup {
         }
 
         StringBuilder sb = new StringBuilder(".*");
-
         for ( String s : text )
         {
             sb.append(s).append(".*");
@@ -214,6 +189,31 @@ public class ConfigLookup {
         return Pattern.compile(sb.toString());
     }
 
+    /**
+     * If null or empty array, then returns the pattern equivalent to "structures.*".
+     * Otherwise it prefixes each String in 'text' with ".*". Thus
+     *
+     * {"foo", "bar", "cow"} --> ".*foo.*bar.*cow.*"
+     *
+     * @param text An array of items to build with a wild card.
+     * @return A pattern wrapping items with ".*"
+     */
+    public Pattern buildBasePattern(String... text) {
+
+        if ( text == null || text.length < 1 )
+        {
+            return Pattern.compile(BASE_PATTERN);
+        }
+
+        StringBuilder sb = new StringBuilder(BASE_PATTERN);
+
+        for ( String s : text )
+        {
+            sb.append(s).append(".*");
+        }
+
+        return Pattern.compile(sb.toString());
+    }
 
     /**
      * Reduce the possible number of config matches with 'params' information

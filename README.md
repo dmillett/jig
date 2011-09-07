@@ -56,39 +56,29 @@ assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
 </config>
 ```
 ####*generates*####
-  1. key.one.string, "first value"
-  2. key.two.int, 1
-  3. key.three.double, 2.0
-  4. key.four.list, "AMD, INTC, WFMI, SCCO"
+  1. "key.one.string, "first value"
+  2. "key.two.int, 1
+  3. "key.three.double, 2.0
+  4. "key.four.list, "AMD, INTC, WFMI, SCCO"
 
 ####*structured config code sample*####
 ```java
-ConfigLookup configHelper = new ConfigLookup()
-
 // Retrieve all key-value pairs where the key matches this pattern
-Pattern stocks = Pattern.compile(".*stocks.*");
+ConfigLookup configHelper = new ConfigLookup()
+Pattern stocks = configHelper.buildPattern("stocks");
 
-// Gather statistics (off by default)
-ConfigStatistics.enableStatsCollection();
-
-// 4 results (all stocks)
+// 4 results (all stocks #1 - 4)
 Map<String, String> stocksMap = configHelper.get(stocks);
 
-// 2 results (values: 8.00, 8.32)
+// 2 results (see #1, 2 -> values: 8.00, 8.32)
 Map<String, String> fooStocks = configHelper.get(stocks, "FOO");
 
-// 2 results (values: 8.00, 4.50)
+// 2 results (see #1, 3 -> values: 8.00, 4.50)
 Map<String, String> lowStocks = configHelper.get(stocks, "low");
 
-// 1 result (values: 8.00)
+// 1 result (see #1 -> values: 8.00)
 Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
-ConfigStatistics.disableStatsCollection();
-
-// Examine the stats
-Map<String, StatsValue> stats = ConfigStatistics.getStats();
-assertEquals(4, stats.size());
 ```
-
 ####*structured config sample*####
 ```
 <config>
@@ -103,6 +93,47 @@ assertEquals(4, stats.size());
            <high>4.65</high>
         </stock>
     </stocks>
+  </structures>
+</config>
+```
+####*generates*####
+  1. "structures.stocks.stock.name.foo.low", "8.00"
+  2. "structures.stocks.stock.name.foo.high", "8.32"
+  3. "structures.stocks.stock.name.bar.low", "4.50"
+  4. "structures.stocks.stock.name.bar.high", "4.65"
+
+####*structured config code sample with versions and statistics*####
+```java
+ConfigLookup configHelper = new ConfigLookup()
+Pattern stocks = configHelper.buildPattern("bars");
+
+// Gather statistics (off by default)
+ConfigStatistics.enableStatsCollection();
+
+ConfigLookup configHelper = new ConfigLookup();
+Pattern bars = configHelper.buildPattern("bars");
+
+// All bar key-values (#1 - 4)
+Map<String, String> allBars = configHelper.get(bars);
+
+// Chicago bars (#1, 2, 3) note the versions ("", "1", "2")
+Map<String, String> chicagoBars = configHelper.get(bars, "chicago");
+
+// Examine the stats
+Map<String, StatsValue> stats = ConfigStatistics.getStats();
+assertEquals(4, stats.size());
+
+StatsValue value = stats.get("structures.cities.chicago.bars.bar");
+assertTrue(value.getAverageLatency() > 0.0);
+assertTrue(value.getLastAccessed() > 0);
+assertEquals(2, value.getCount());
+assertEquals(2, value.getAssociatedPatterns().size());
+```
+
+####*structured config sample with versions*####
+```
+<config>
+  <structures>
     <cities>
       <Chicago>
         <bars>
@@ -121,14 +152,10 @@ assertEquals(4, stats.size());
 </config>
 ```
 ####*generates*####
-  1. stocks.stock.name.foo.low, 8.00
-  2. stocks.stock.name.foo.high, 8.32
-  3. stocks.stock.name.bar.low, 4.50
-  4. stocks.stock.name.bar.high, 4.65
-  5. cities.chicago.bars.bar, Sheffields
-  6. cities.chicago.bars.bar.1, Map Room
-  7. cities.chicago.bars.bar.2, Redmonds
-  8. cities.ann arbor.bars.bar, Grizzly Peak
+  1. "structures.cities.chicago.bars.bar", "Sheffields"
+  2. "structures.cities.chicago.bars.bar.1", "Map Room"
+  3. "structures.cities.chicago.bars.bar.2", "Redmonds"
+  4. "structures.cities.ann arbor.bars.bar", "Grizzly Peak"
 
 ####*notes*####
 * Config loading options

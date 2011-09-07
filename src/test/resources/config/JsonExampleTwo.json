@@ -1,29 +1,32 @@
 {
   "config" : {
-    "widget": {
-      "trace": "on",
-      "component": {
-          "title": "Sample Foo component",
-          "name": "foo_component",
-          "width": 100,
-          "height": 100
-      },
-      "image": {
-          "src": "Images/Bar.png",
-          "name": "bar_image",
-          "hOffset": 50,
-          "vOffset": 50,
-          "alignment": "center"
-      },
-      "text": {
-          "data": "Self Destruct",
-          "size": 20,
-          "style": "bold",
-          "name": "AbsoluteLastResort",
-          "hOffset": 200,
-          "vOffset": 100,
-          "alignment": "center",
-      }
+
+    "structures" : {
+        "widget": {
+          "trace": "on",
+          "component": {
+              "title": "Sample Foo component",
+              "name": "foo_component",
+              "width": 100,
+              "height": 100
+          },
+          "image": {
+              "src": "Images/Bar.png",
+              "name": "bar_image",
+              "hOffset": 50,
+              "vOffset": 50,
+              "alignment": "center"
+          },
+          "text": {
+              "data": "Self Destruct",
+              "size": 20,
+              "style": "bold",
+              "name": "AbsoluteLastResort",
+              "hOffset": 200,
+              "vOffset": 100,
+              "alignment": "center",
+          }
+        }
     }
   }
 }

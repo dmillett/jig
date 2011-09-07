@@ -26,7 +26,7 @@ repositories {
 // For compilation
 dependencies {
 
-  groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.0'
+  groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.2'
 
   compile group: 'log4j', name: 'log4j', version: '1.2.16'
 
