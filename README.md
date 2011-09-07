@@ -57,9 +57,9 @@ assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
 ```
 ####*generates*####
   1. "key.one.string, "first value"
-  2. "key.two.int, 1
-  3. "key.three.double, 2.0
-  4. "key.four.list, "AMD, INTC, WFMI, SCCO"
+  2. "key.two.int", "1"
+  3. "key.three.double", "2.0"
+  4. "key.four.list", "AMD, INTC, WFMI, SCCO"
 
 ####*structured config code sample*####
 ```java
@@ -157,7 +157,7 @@ assertEquals(2, value.getAssociatedPatterns().size());
   3. "structures.cities.chicago.bars.bar.2", "Redmonds"
   4. "structures.cities.ann arbor.bars.bar", "Grizzly Peak"
 
-####*notes*####
+###*notes*###
 * Config loading options
   1. Default config location is "classpath/config" directory
   2. Remote URL file location
