@@ -14,19 +14,18 @@ map (see java ConfigMap), can then be used statically for config access.
 * Supports XML/JSON object/config structure (see 'structures')
 * Supports versioning for certain XML/JSON config structures
 * Multiple config strategies available (see JConfigProperties):
-  * classpath, url, specified location, command line, environmental filters
+  + classpath, url, specified location, command line, environmental filters
 * Supports statistic gathering for config access (see ConfigStatistics and StatsValue)
-  * count, average latency, associated patterns
+  + count, average latency, associated patterns
 
+####*installation*####
+See (https://github.com/dmillett/jConfigMap/wiki)
 ####*easy to use*####
 * It took approximately 10 minutes to port a 2600 line XML file into the test directory
-  and add a handful of unit tests.
-  * Wrap your XML file with <config><structures> your xml here </structures></config> and put in the
-    "test/resources" directory. Add your test class and methods (see PojoConfigExampleTest or
-    ConfigEnumStructuredXmlTest)
+  and add a handful of unit tests. See (https://github.com/dmillett/jConfigMap/wiki)
 
 ##Usage (additional examples in test directory)##
-####*property style config code sample*####
+###property style config code sample###
 ```java
 // ConfigLookup has a number of client utility methods
 ConfigLookup configHelper = new ConfigLookup()
@@ -44,7 +43,7 @@ assertEquals(2.0, configHelper.getByKey(keyThree, Double.class));
 Pattern keyFour = Pattern.compile("key.four.list");
 assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
 ```
-####*property style config sample*####
+###property style config sample###
 ```
 <config>
   <keyValues>
@@ -56,12 +55,14 @@ assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
 </config>
 ```
 ####*generates*####
+```
   1. "key.one.string, "first value"
   2. "key.two.int", "1"
   3. "key.three.double", "2.0"
   4. "key.four.list", "AMD, INTC, WFMI, SCCO"
+```
 
-####*structured config code sample*####
+###structured config code sample###
 ```java
 // Retrieve all key-value pairs where the key matches this pattern
 ConfigLookup configHelper = new ConfigLookup()
@@ -97,12 +98,14 @@ Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
 </config>
 ```
 ####*generates*####
+```
   1. "structures.stocks.stock.name.foo.low", "8.00"
   2. "structures.stocks.stock.name.foo.high", "8.32"
   3. "structures.stocks.stock.name.bar.low", "4.50"
   4. "structures.stocks.stock.name.bar.high", "4.65"
+```
 
-####*structured config code sample with versions and statistics*####
+###structured config code sample with lists and statistics###
 ```java
 ConfigLookup configHelper = new ConfigLookup()
 Pattern stocks = configHelper.buildPattern("bars");
@@ -119,6 +122,8 @@ Map<String, String> allBars = configHelper.get(bars);
 // Chicago bars (#1, 2, 3) note the versions ("", "1", "2")
 Map<String, String> chicagoBars = configHelper.get(bars, "chicago");
 
+ConfigStatistics.disableStatsCollection();
+
 // Examine the stats
 Map<String, StatsValue> stats = ConfigStatistics.getStats();
 assertEquals(4, stats.size());
@@ -129,8 +134,7 @@ assertTrue(value.getLastAccessed() > 0);
 assertEquals(2, value.getCount());
 assertEquals(2, value.getAssociatedPatterns().size());
 ```
-
-####*structured config sample with versions*####
+####*structured config sample with list(s)*####
 ```
 <config>
   <structures>
@@ -152,10 +156,12 @@ assertEquals(2, value.getAssociatedPatterns().size());
 </config>
 ```
 ####*generates*####
+```
   1. "structures.cities.chicago.bars.bar", "Sheffields"
   2. "structures.cities.chicago.bars.bar.1", "Map Room"
   3. "structures.cities.chicago.bars.bar.2", "Redmonds"
   4. "structures.cities.ann arbor.bars.bar", "Grizzly Peak"
+```
 
 ###*notes*###
 * Config loading options
@@ -178,11 +184,4 @@ assertEquals(2, value.getAssociatedPatterns().size());
   * Associated patterns (paths to this key lookup)
 
 ##Future##
-1. Clojure implementation and client
-2. Scala implementation and client
-3. Support encrypted values (not sure its' a good idea yet -- leaning towards not)
-
-##Requirements##
-jdk 1.6
-groovy 1.8.0
-* built by gradle
+See (https://github.com/dmillett/jConfigMap/issues)
