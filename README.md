@@ -43,7 +43,7 @@ assertEquals(2.0, configHelper.getByKey(keyThree, Double.class));
 Pattern keyFour = Pattern.compile("key.four.list");
 assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
 ```
-###property style config sample###
+####*property style config sample*####
 ```
 <config>
   <keyValues>
@@ -105,7 +105,7 @@ Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
   4. "structures.stocks.stock.name.bar.high", "4.65"
 ```
 
-###structured config code sample with lists and statistics###
+###structured config code sample with lists/sorts and statistics###
 ```java
 ConfigLookup configHelper = new ConfigLookup()
 Pattern stocks = configHelper.buildPattern("bars");
@@ -118,6 +118,9 @@ Pattern bars = configHelper.buildPattern("bars");
 
 // All bar key-values (#1 - 4)
 Map<String, String> allBars = configHelper.get(bars);
+
+// Sorted bar key-values(#1-4)
+Map<String, String sortedBars = configHelper.getSortedResults(someComparator, bars);
 
 // Chicago bars (#1, 2, 3) note the versions ("", "1", "2")
 Map<String, String> chicagoBars = configHelper.get(bars, "chicago");
@@ -163,7 +166,7 @@ assertEquals(2, value.getAssociatedPatterns().size());
   4. "structures.cities.ann arbor.bars.bar", "Grizzly Peak"
 ```
 
-###*notes*###
+###notes###
 * Config loading options
   1. Default config location is "classpath/config" directory
   2. Remote URL file location

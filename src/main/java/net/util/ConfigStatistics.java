@@ -69,17 +69,17 @@ public class ConfigStatistics {
             LOCK.lock();
             try
             {
-                StatsValue value = STATS.get(key);
+                storedValue = STATS.get(key);
 
-                if ( value == null )
+                if ( storedValue == null )
                 {
-                    value = new StatsValue(key);
-                    value.updateStats(latency, pattern);
-                    STATS.put(key, value);
+                    storedValue = new StatsValue(key);
+                    storedValue.updateStats(latency, pattern);
+                    STATS.put(key, storedValue);
                 }
                 else
                 {
-                    STATS.get(key).updateStats(latency, pattern);
+                    storedValue.updateStats(latency, pattern);
                 }
             }
             finally
