@@ -7,6 +7,7 @@ Version 0.94 TBD, 2011
 * JSON files require 'config' as the outer Json entry (see test resources)
 * Statistics gathering (count, average latency, associated patterns)
 * Removed ConfigLookup.buildBasePattern()
+* Added PatternHelper, tweaked ConfigLookup to favor "matcher.find()" when possible.
 
 Version 0.93 June 9, 2011
 -------------------------
