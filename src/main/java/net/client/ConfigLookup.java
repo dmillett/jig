@@ -2,6 +2,7 @@ package net.client;
 
 import net.util.ConfigStatistics;
 import net.util.GenericsHelper;
+import net.util.PatternHelper;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -45,7 +46,19 @@ public class ConfigLookup {
 
     private static final Logger LOG = Logger.getLogger(ConfigLookup.class);
     private static final ConfigMap CONFIG_MAP = new ConfigMap();
-    private static final String BASE_PATTERN = "structures\\..*";
+
+    /**
+     * Build a pattern to apply across the keys in a Map. Matches
+     * will be retrieved.
+     *
+     * @param text
+     * @return
+     * @deprecated See PatternHelper.buildPattern();
+     */
+    @Deprecated
+    public Pattern buildPattern(String... text) {
+        return PatternHelper.buildPattern(text);
+    }
 
     /**
      * Use the filename as a namespace to expedite config single value lookup
@@ -173,48 +186,6 @@ public class ConfigLookup {
         return findMatches(configsForFile, pattern, params);
     }
 
-    public Pattern buildPattern(String... text) {
-
-        if ( text == null || text.length < 1 )
-        {
-            return Pattern.compile(".*");
-        }
-
-        StringBuilder sb = new StringBuilder(".*");
-        for ( String s : text )
-        {
-            sb.append(s).append(".*");
-        }
-
-        return Pattern.compile(sb.toString());
-    }
-
-    /**
-     * If null or empty array, then returns the pattern equivalent to "structures.*".
-     * Otherwise it prefixes each String in 'text' with ".*". Thus
-     *
-     * {"foo", "bar", "cow"} --> ".*foo.*bar.*cow.*"
-     *
-     * @param text An array of items to build with a wild card.
-     * @return A pattern wrapping items with ".*"
-     */
-    public Pattern buildBasePattern(String... text) {
-
-        if ( text == null || text.length < 1 )
-        {
-            return Pattern.compile(BASE_PATTERN);
-        }
-
-        StringBuilder sb = new StringBuilder(BASE_PATTERN);
-
-        for ( String s : text )
-        {
-            sb.append(s).append(".*");
-        }
-
-        return Pattern.compile(sb.toString());
-    }
-
     /**
      * Reduce the possible number of config matches with 'params' information
      * as it relates to the Config Map Key. For example, if the whole config
@@ -330,7 +301,7 @@ public class ConfigLookup {
         return getConfigValues(configMap, pattern, params);
     }
 
-
+    /** Experiment with find() vs matches() */
     private Map<String, String> getConfigValues(Map<String, String> configMap, Pattern pattern, String... params) {
 
         long start = 0;
@@ -339,12 +310,18 @@ public class ConfigLookup {
             start = System.nanoTime();
         }
 
+        boolean useMatcher = PatternHelper.useMatcherOverFind(pattern);
         Map<String, String> matches = new HashMap<String, String>();
 
         for ( Map.Entry<String, String> entry : configMap.entrySet() )
         {
             String lowerCaseKey = entry.getKey().toLowerCase();
-            if ( pattern.matcher(lowerCaseKey).matches() )
+
+            if ( !useMatcher && pattern.matcher(lowerCaseKey).find() )
+            {
+                matches.put(entry.getKey(), entry.getValue());
+            }
+            else if ( pattern.matcher(lowerCaseKey).matches() )
             {
                 matches.put(entry.getKey(), entry.getValue());
             }
@@ -357,17 +334,23 @@ public class ConfigLookup {
 
         Map<String, String> reducedMap = reduce(matches, params);
         long lookupTime = System.nanoTime() - start;
+        updateStats(reducedMap, pattern, lookupTime, params);
+
+        return reducedMap;
+    }
+
+    /** Update the stats for each key match */
+    private void updateStats(Map<String, String> reducedMap, Pattern pattern, long lookupTime, String... params) {
+
         String reducePattern = buildReducePatternRepresentation(pattern, params);
 
         for ( String key : reducedMap.keySet() )
         {
             ConfigStatistics.addKeyLookup(key, lookupTime, reducePattern);
         }
-
-        return reducedMap;
     }
 
-
+    /** Generate a text representation of matching key items */
     private String buildReducePatternRepresentation(Pattern pattern, String... reducers) {
 
         if ( reducers == null )
