@@ -30,17 +30,17 @@ See (https://github.com/dmillett/jConfigMap/wiki)
 // ConfigLookup has a number of client utility methods
 ConfigLookup configHelper = new ConfigLookup()
 
-Pattern keyOne = Pattern.compile("key.one.string");
+String keyOne = "key.one.string";
 assertEquals("first value", configHelper.getByKey(keyOne));
 
-Pattern keyTwo = Pattern.compile("key.two.int");
+String keyTwo = "key.two.int";
 assertEquals(1, configHelper.getByKey(keyTwo, Integer.class));
 
-Pattern keyThree = Pattern.compile("key.three.double");
+String keyThree = "key.three.double";
 assertEquals(2.0, configHelper.getByKey(keyThree, Double.class));
 
 // Produces a List<String> result
-Pattern keyFour = Pattern.compile("key.four.list");
+String keyFour = "key.four.list";
 assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
 ```
 ####*property style config sample*####
@@ -66,7 +66,7 @@ assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
 ```java
 // Retrieve all key-value pairs where the key matches this pattern
 ConfigLookup configHelper = new ConfigLookup()
-Pattern stocks = configHelper.buildPattern("stocks");
+Pattern stocks = PatternHelper.buildPattern("stocks");
 
 // 4 results (all stocks #1 - 4)
 Map<String, String> stocksMap = configHelper.get(stocks);
@@ -108,19 +108,19 @@ Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
 ###structured config code sample with lists/sorts and statistics###
 ```java
 ConfigLookup configHelper = new ConfigLookup()
-Pattern stocks = configHelper.buildPattern("bars");
+Pattern stocks = PatternHelper.buildPattern("bars");
 
 // Gather statistics (off by default)
 ConfigStatistics.enableStatsCollection();
 
 ConfigLookup configHelper = new ConfigLookup();
-Pattern bars = configHelper.buildPattern("bars");
+Pattern bars = PatternHelper.buildPattern("bars");
 
 // All bar key-values (#1 - 4)
 Map<String, String> allBars = configHelper.get(bars);
 
 // Sorted bar key-values(#1-4)
-Map<String, String sortedBars = configHelper.getSortedResults(someComparator, bars);
+Map<String, String> sortedBars = configHelper.getSortedResults(someComparator, bars);
 
 // Chicago bars (#1, 2, 3) note the versions ("", "1", "2")
 Map<String, String> chicagoBars = configHelper.get(bars, "chicago");
@@ -146,7 +146,7 @@ assertEquals(2, value.getAssociatedPatterns().size());
         <bars>
           <bar>Sheffields</bar>
           <bar>Map Room</bar>
-          <bar>Redmonds</bar>
+          <bar>Matilda</bar>
         </bars>
       </Chicago>
       <Ann Arbor>
@@ -162,7 +162,7 @@ assertEquals(2, value.getAssociatedPatterns().size());
 ```
   1. "structures.cities.chicago.bars.bar", "Sheffields"
   2. "structures.cities.chicago.bars.bar.1", "Map Room"
-  3. "structures.cities.chicago.bars.bar.2", "Redmonds"
+  3. "structures.cities.chicago.bars.bar.2", "Matilda"
   4. "structures.cities.ann arbor.bars.bar", "Grizzly Peak"
 ```
 
