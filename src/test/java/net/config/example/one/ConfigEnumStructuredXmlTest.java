@@ -77,6 +77,5 @@ public class ConfigEnumStructuredXmlTest
 
         Map<String, String> stocksFileTwo = ConfigEnumExample.STOCK_TWO.get();
         assertEquals(12, stocksFileTwo.size());
-
     }
 }
