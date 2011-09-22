@@ -36,14 +36,14 @@ See the License for the specific language governing permissions and
     -->
 
     <stock name="AMD">
-      <sell-high>25.00</sell-high>
-      <sell-low>6.50</sell-low>
-      <shares>200</shares>
+      <sell-high>20.00</sell-high>
+      <sell-low>6.00</sell-low>
+      <shares>300</shares>
     </stock>
     <stock name="INTC">
-      <sell-high>60.00</sell-high>
-      <sell-low>40.00</sell-low>
-      <shares>50</shares>
+      <sell-high>50.00</sell-high>
+      <sell-low>30.00</sell-low>
+      <shares>100</shares>
     </stock>
 
     <!-- flattened:
@@ -81,8 +81,8 @@ See the License for the specific language governing permissions and
         <bars>
           <bar>Sheffields</bar>
           <bar>Nissei</bar>
-          <bar>Redmonds</bar>
-          <bar>Cubby Bear</bar>
+          <bar>Matilda</bar>
+          <bar>Wills Northwood Inn</bar>
         </bars>
       </Chicago>
     </cities>
