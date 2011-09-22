@@ -6,6 +6,7 @@ Version 0.94 TBD, 2011
 * XML 'structures' tag indicator replaces 'xmlStructure' (see test resources)
 * JSON files require 'config' as the outer Json entry (see test resources)
 * Statistics gathering (count, average latency, associated patterns)
+* Removed ConfigLookup.buildBasePattern()
 
 Version 0.93 June 9, 2011
 -------------------------
