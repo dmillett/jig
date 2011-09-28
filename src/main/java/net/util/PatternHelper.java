@@ -66,7 +66,7 @@ public class PatternHelper {
      *
      * Note that preceding wildcard characters will result in
      * using "match()" instead of "find()". This increases
-     * retrieval latency. See 'useMatcherOverFind()'.
+     * retrieval latency. See 'useFind()'.
      *
      * @param text
      * @return
@@ -83,7 +83,7 @@ public class PatternHelper {
      * @param pattern A pattern to apply across a Map key set
      * @return true if wildcard ".*" prefixes the pattern, otherwise false.
      */
-    public static boolean useMatcherOverFind(Pattern pattern) {
+    public static boolean useFind(Pattern pattern) {
 
         if ( pattern == null || pattern.pattern() == null )
         {
@@ -92,9 +92,41 @@ public class PatternHelper {
 
         if ( pattern.pattern().startsWith(".*") )
         {
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
+    }
+
+    /**
+     * Using String.contains("nonRegexPattern") is usually faster since it's
+     * a char comparison and lacks the overhead of a Matcher. It is not
+     * applicable for any 'pattern' that contains:
+     *
+     * '*'
+     * '\\'
+     * '+'
+     *
+     * More to add later. This should cover most cases for the key sets after
+     * they've been flattened. It depends on the underlying format (xml, json, yaml, db)
+     * and the allowable character sets therein.
+     *
+     * @param pattern A pattern for a regular expression
+     * @return true for non-null 'pattern' that does not contain regex wildcard/escapes
+     */
+    public static boolean useContains(Pattern pattern) {
+
+        if ( pattern == null || pattern.pattern() == null )
+        {
+            return false;
+        }
+
+        String patternText = pattern.pattern();
+        if ( patternText.contains("*") || patternText.contains("+") || patternText.contains("\\") )
+        {
+            return false;
+        }
+
+        return true;
     }
 }

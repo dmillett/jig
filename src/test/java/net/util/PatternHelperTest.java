@@ -39,6 +39,9 @@ public class PatternHelperTest
         
         Pattern p5 = PatternHelper.buildPattern(true, "stock.amd");
         assertEquals(".*stock\\.amd.*", p5.pattern());
+
+        Pattern p6 = PatternHelper.buildPattern(true, "stock", "amd");
+        assertEquals(".*stock.*amd.*", p6.pattern());
     }
 
     public void test_buildPattern_null() {
@@ -51,15 +54,43 @@ public class PatternHelperTest
         assertEquals(".*", p2.pattern());
     }
 
-    public void test__useMatcherOverFind() {
+    public void test__useFind_not() {
+
+        assertFalse(PatternHelper.useFind(null));
+
+        Pattern p1 = PatternHelper.buildPattern(true, "foo");
+        assertFalse(PatternHelper.useFind(p1));
+    }
+
+    public void test__useFind() {
 
         Pattern p1 = PatternHelper.buildPattern("foo");
-        assertFalse(PatternHelper.useMatcherOverFind(p1));
+        assertTrue(PatternHelper.useFind(p1));
 
         Pattern p2 = PatternHelper.buildPattern("foo.*");
-        assertFalse(PatternHelper.useMatcherOverFind(p2));
+        assertTrue(PatternHelper.useFind(p2));
+    }
 
-        Pattern p3 = PatternHelper.buildPattern(true, "foo");
-        assertTrue(PatternHelper.useMatcherOverFind(p3));
+    public void test__useContains_not() {
+
+        assertFalse(PatternHelper.useContains(null));
+
+        Pattern p1 = PatternHelper.buildPattern("foo");
+        assertFalse(PatternHelper.useContains(p1));
+
+        Pattern p2 = PatternHelper.buildPattern("foo", "bar");
+        assertFalse(PatternHelper.useContains(p2));
+
+        Pattern p3 = Pattern.compile("foo+");
+        assertFalse(PatternHelper.useContains(p3));
+
+        Pattern p4 = PatternHelper.buildPattern("stock.amd");
+        assertFalse(PatternHelper.useContains(p4));
+    }
+
+    public void test__useContains() {
+
+        Pattern p1 = Pattern.compile("foo");
+        assertTrue(PatternHelper.useContains(p1));
     }
 }
