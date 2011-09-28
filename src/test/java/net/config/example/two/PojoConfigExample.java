@@ -31,7 +31,7 @@ public class PojoConfigExample {
     private static final ConfigLookup _configLookup = new ConfigLookup();
 
 
-    private static final Pattern STOCKS = Pattern.compile(".*.stocks.stock.*");
+    private static final Pattern STOCKS = Pattern.compile("stocks.stock.*");
 
     public Map<String, String> findAllStocks() {
         return _configLookup.get(STOCKS);
