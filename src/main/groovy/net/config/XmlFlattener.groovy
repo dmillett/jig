@@ -7,7 +7,6 @@ import org.apache.log4j.Logger
  * a HashMap. Each config file must have the following form:
  *
  * <pre>
- *
  * <!-- required root node -->
  * <config>
  *   <keyValues>
@@ -153,28 +152,32 @@ class XmlFlattener {
      * below. If there are any identical key node names, then the 2 - N identical
      * keys encountered will automatically append the count in the load order.
      *
+     * <pre>
      * some.not.so.unique.key,0 "foo"
      * some.not.so.unique.key.1, "bar"
      * some.not.so.unique.key.2, "sh!t"
+     * </pre>
      *
      * The config retrieval already returns a Map, this forces the user to
      * deal with the possible results instead of overwriting them.
      *
-     * stock.AMD.sell-high, 25.00
-     * stock.AMD.sell-low, 6.50
-     * stock.AMD.shares, 200
+     * <pre>
+     *
+     * structures.stock.AMD.sell-high, 25.00
+     * structures.stock.AMD.sell-low, 6.50
+     * structures.stock.AMD.shares, 200
+     *
      * <config>
      *   <structures>
-     *     <pre>
      *      <stock name="AMD">
      *        <sell-high>25.00</sell-high>
      *        <sell-low>6.50</sell-low>
      *        <shares>200</shares>
      *      </stock>
-     *     </pre>
-     *
      *   </structures>
      * </config>
+     *
+     * </pre>
      *
      * @param baseNode
      * @return
