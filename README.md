@@ -1,4 +1,4 @@
-#jConfigMap (See LICENSE AND NOTICE):#
+#jConfigMap (See LICENSE AND NOTICE):
 
 Is a Java client configuration tool that uses Groovy (for now), to flatten
 XML and JSON configuration files into a key-value Map structure. Each key
@@ -9,7 +9,7 @@ Or, if it is a simple key value property, then only the matching value is return
 Currently jConfigMap supports XML and JSON configuration files during startup. A global config
 map (see java ConfigMap), can then be used statically for config access.
 
-##Features##
+##Features
 * Supports XML/JSON property style key-value pairs (see 'keyValues')
 * Supports XML/JSON object/config structure (see 'structures')
 * Supports versioning for certain XML/JSON config structures
@@ -18,14 +18,14 @@ map (see java ConfigMap), can then be used statically for config access.
 * Supports statistic gathering for config access (see ConfigStatistics and StatsValue)
   + count, average latency, associated patterns
 
-####*installation*####
+####*installation*
 See (https://github.com/dmillett/jConfigMap/wiki)
-####*easy to use*####
+####*easy to use*
 * It took approximately 10 minutes to port a 2600 line XML file into the test directory
   and add a handful of unit tests. See (https://github.com/dmillett/jConfigMap/wiki)
 
-##Usage (additional examples in test directory)##
-###property style config code sample###
+##Usage (additional examples in test directory)
+###property style config code sample
 ```java
 // ConfigLookup has a number of client utility methods
 ConfigLookup configHelper = new ConfigLookup()
@@ -43,8 +43,8 @@ assertEquals(2.0, configHelper.getByKey(keyThree, Double.class));
 String keyFour = "key.four.list";
 assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
 ```
-####*property style config sample*####
-```
+####*property style config sample*
+```xml
 <config>
   <keyValues>
     <property name="key.one.string" value="first value" />
@@ -54,7 +54,7 @@ assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
   </keyValues>
 </config>
 ```
-####*generates*####
+####*generates*
 ```
   1. "key.one.string, "first value"
   2. "key.two.int", "1"
@@ -62,7 +62,7 @@ assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
   4. "key.four.list", "AMD, INTC, WFMI, SCCO"
 ```
 
-###structured config code sample###
+###structured config code sample
 ```java
 // Retrieve all key-value pairs where the key matches this pattern
 ConfigLookup configHelper = new ConfigLookup()
@@ -80,8 +80,8 @@ Map<String, String> lowStocks = configHelper.get(stocks, "low");
 // 1 result (see #1 -> values: 8.00)
 Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
 ```
-####*structured config sample*####
-```
+####*structured config sample*
+```xml
 <config>
   <structures>
     <stocks>
@@ -97,7 +97,7 @@ Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
   </structures>
 </config>
 ```
-####*generates*####
+####*generates*
 ```
   1. "structures.stocks.stock.name.foo.low", "8.00"
   2. "structures.stocks.stock.name.foo.high", "8.32"
@@ -105,7 +105,7 @@ Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
   4. "structures.stocks.stock.name.bar.high", "4.65"
 ```
 
-###structured config code sample with lists/sorts and statistics###
+###structured config code sample with lists/sorts and statistics
 ```java
 ConfigLookup configHelper = new ConfigLookup()
 Pattern stocks = PatternHelper.buildPattern("bars");
@@ -137,8 +137,8 @@ assertTrue(value.getLastAccessed() > 0);
 assertEquals(2, value.getCount());
 assertEquals(2, value.getAssociatedPatterns().size());
 ```
-####*structured config sample with list(s)*####
-```
+####*structured config sample with list(s)*
+```xml
 <config>
   <structures>
     <cities>
@@ -158,7 +158,7 @@ assertEquals(2, value.getAssociatedPatterns().size());
   </structures>
 </config>
 ```
-####*generates*####
+####*generates*
 ```
   1. "structures.cities.chicago.bars.bar", "Sheffields"
   2. "structures.cities.chicago.bars.bar.1", "Map Room"
@@ -166,7 +166,7 @@ assertEquals(2, value.getAssociatedPatterns().size());
   4. "structures.cities.ann arbor.bars.bar", "Grizzly Peak"
 ```
 
-###notes###
+###notes
 * Config loading options
   1. Default config location is "classpath/config" directory
   2. Remote URL file location
@@ -186,5 +186,5 @@ assertEquals(2, value.getAssociatedPatterns().size());
   * Average latency
   * Associated patterns (paths to this key lookup)
 
-##Future##
+##Future
 See (https://github.com/dmillett/jConfigMap/issues)
