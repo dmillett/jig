@@ -301,7 +301,7 @@ public class ConfigLookup {
         return getConfigValues(configMap, pattern, params);
     }
 
-    /** Experiment with find() vs matches() */
+    /** Find matches and potentially collect statistics */
     private Map<String, String> getConfigValues(Map<String, String> configMap, Pattern pattern, String... params) {
 
         long start = 0;
@@ -310,22 +310,7 @@ public class ConfigLookup {
             start = System.nanoTime();
         }
 
-        boolean useMatcher = PatternHelper.useMatcherOverFind(pattern);
-        Map<String, String> matches = new HashMap<String, String>();
-
-        for ( Map.Entry<String, String> entry : configMap.entrySet() )
-        {
-            String lowerCaseKey = entry.getKey().toLowerCase();
-
-            if ( !useMatcher && pattern.matcher(lowerCaseKey).find() )
-            {
-                matches.put(entry.getKey(), entry.getValue());
-            }
-            else if ( pattern.matcher(lowerCaseKey).matches() )
-            {
-                matches.put(entry.getKey(), entry.getValue());
-            }
-        }
+        Map<String, String> matches = findMatchesFromKeyset(configMap, pattern);
 
         if ( !ConfigStatistics.isEnabled() )
         {
@@ -337,6 +322,35 @@ public class ConfigLookup {
         updateStats(reducedMap, pattern, lookupTime, params);
 
         return reducedMap;
+    }
+
+    /** Examine keyset for contains/finds/matches */
+    private Map<String, String> findMatchesFromKeyset(Map<String, String> configMap, Pattern pattern) {
+
+        boolean useFind = PatternHelper.useFind(pattern);
+        boolean useContains = PatternHelper.useContains(pattern);
+
+        Map<String, String> matches = new HashMap<String, String>();
+
+        for ( Map.Entry<String, String> entry : configMap.entrySet() )
+        {
+            String lowerCaseKey = entry.getKey().toLowerCase();
+
+            if ( useContains && lowerCaseKey.contains(pattern.pattern()) )
+            {
+                matches.put(entry.getKey(), entry.getValue());
+            }
+            else if ( useFind && pattern.matcher(lowerCaseKey).find() )
+            {
+                matches.put(entry.getKey(), entry.getValue());
+            }
+            else if ( pattern.matcher(lowerCaseKey).matches() )
+            {
+                matches.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return matches;
     }
 
     /** Update the stats for each key match */
