@@ -46,8 +46,11 @@ public class ConfigStatisticsTest
 
     public void test__getAllStocks_without_statistics() {
 
+        if ( ConfigStatistics.isEnabled() )
+        {
+            ConfigStatistics.disableStatsCollection();
+        }
 
-        ConfigStatistics.disableStatsCollection();
         PojoConfigExample pojo = new PojoConfigExample();
         Map<String, String> allStocks = pojo.findAllStocks();
 
@@ -61,7 +64,10 @@ public class ConfigStatisticsTest
 
         PojoConfigExample pojo = new PojoConfigExample();
         Map<String, String> allStocks = pojo.findAllStocks();
+        // Sometimes a multi-threaded test seems to throw this count off (bad gradle)
         assertEquals(12, allStocks.size());
+
+        ConfigStatistics.disableStatsCollection();
 
         Map<String, StatsValue> stats = ConfigStatistics.getStats();
         assertEquals(12, stats.size());
@@ -74,8 +80,6 @@ public class ConfigStatisticsTest
             assertEquals(1, value.getCount());
             assertEquals(1, value.getAssociatedPatterns().size());
         }
-
-        ConfigStatistics.disableStatsCollection();
     }
 
     public void test_getAllStocks_with_statistics_multiple_passes() {
