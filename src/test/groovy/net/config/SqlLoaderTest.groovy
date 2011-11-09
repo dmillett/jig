@@ -102,12 +102,12 @@ class SqlLoaderTest
 
     void test__groupDbConfigParamsByTable_mocked() {
 
-        def dbParams = buildValidDbConfigParams2()
-        def sqlLoader = new SqlLoader()
-
-        // todo: mock sqlLoader.loadFromDatabase
-        sqlLoader.metaClass.loadFromDatabase = ["mock.db.config":"mocked value"]
-        def dbConfigs = sqlLoader.groupDbConfigParamsByTable(dbParams)
+//        def dbParams = buildValidDbConfigParams2()
+//        def sqlLoader = new SqlLoader()
+//
+//        // todo: mock sqlLoader.loadFromDatabase
+//        sqlLoader.metaClass.loadFromDatabase = ["mock.db.config":"mocked value"]
+//        def dbConfigs = sqlLoader.groupDbConfigParamsByTable(dbParams)
 
     }
 
