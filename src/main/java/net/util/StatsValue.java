@@ -2,16 +2,22 @@ package net.util;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Tracking the following stats each time a Key is accessed:
  * 1) count
- * 2) average latency
- * 3) last accessed
- * 4) associated patterns
+ * 2) total latency
+ * 3) average latency
+ * 4) last accessed
+ * 5) associated patterns
  *
- * A ReentrantLock is used to ensure thread safe updates for _count and _averageLatency.
+ * A ReentrantReadWriteLock is used to ensure thread safe updates for:
+ * write lock: _count and _totalLatency
+ * read lock:  _averageLatency
  *
  * If there is a single associated pattern and it is equal() to the _key, then this is a 1:1
  * property style lookup.
@@ -34,9 +40,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class StatsValue {
 
     /**
-     * Used to protect updates for _count and _averageLatency;
+     * Used to protect updates for _count(write), _totalLatency(write), and _averageLatency (read)
      */
-    private final ReentrantLock _lock = new ReentrantLock();
+    private final ReentrantReadWriteLock _readWriteLock = new ReentrantReadWriteLock();
 
     /**
      * The key for a specific value in the config map
@@ -52,6 +58,8 @@ public class StatsValue {
     private long _count;
     /** Average execution time to retrieve in nano seconds */
     private double _averageLatency;
+    /** The total time for '_count' executions */
+    private long _totalLatency;
     /** Last time key was accessed in nano seconds */
     private long _lastAccessed;
 
@@ -62,28 +70,24 @@ public class StatsValue {
     }
 
     /**
-     * Updates with a ReentrantLock:
+     * Updates with a ReentrantReadWriteLock.writeLock:
      * _count
-     * _averageLatency
-     *
-     * Updates with the current thread (is never locked)
-     * _lastAccessed
-     * _associatedPatterns
+     * _totalLatency
      *
      * @param latency The execution time for this key lookup.
      * @param pattern The associated pattern for this lookup.
      */
     public void updateStats(long latency, String pattern) {
 
-        _lock.lock();
+        _readWriteLock.writeLock().lock();
         try
         {
             _count++;
-            _averageLatency = ((latency - _averageLatency) / _count) + _averageLatency;
+            _totalLatency += latency;
         }
         finally
         {
-            _lock.unlock();
+            _readWriteLock.writeLock().unlock();
         }
 
         // Just concerned with tracking the latest access -- stepping on it is not a big deal.
@@ -107,7 +111,19 @@ public class StatsValue {
         return _count;
     }
 
+    /** Read Lock access */
     public double getAverageLatency() {
+
+        try
+        {
+            _readWriteLock.readLock().lock();
+            _averageLatency = _totalLatency / _count;
+        }
+        finally
+        {
+            _readWriteLock.readLock().unlock();
+        }
+
         return _averageLatency;
     }
 
