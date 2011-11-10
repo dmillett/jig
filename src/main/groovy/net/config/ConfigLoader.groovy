@@ -41,7 +41,7 @@ import java.util.regex.Pattern
  */
 class ConfigLoader {
 
-    private static def LOG = Logger.getLogger(ConfigLoader.class)
+    private static def final LOG = Logger.getLogger(ConfigLoader.class)
     //private final def _supportedFiles = /.*\.xml/ //|json)/
 
 
@@ -129,6 +129,11 @@ class ConfigLoader {
         {
             return loadFromJsonFile(fileName)
         }
+        else if ( fileName.endsWith("class") || fileName.endsWith("jar") )
+        {
+            // todo
+
+        }
 
         return new HashMap<String,String>()
     }
@@ -199,6 +204,46 @@ class ConfigLoader {
         return keyValuesMap
     }
 
+
+    private def updateConfigMapWithClasspathConfigs(Map<String, Map<String,String>> configMap,
+                                                    List<String> classpathFileNames) {
+
+        if ( classpathFileNames.isEmpty() )
+        {
+            return
+        }
+
+        LOG.info("Loading Configs From Default Location: classpath/config")
+        classpathFileNames.each { classpathFile ->
+
+            def classpathKeyValues = loadKeyValuesFromFile(classpathFile)
+            if ( !classpathKeyValues.isEmpty() )
+            {
+                def shortName = shortenFileName(classpathFile)
+                configMap.put(shortName, classpathKeyValues)
+            }
+        }
+    }
+
+    private def updateConfigMapWithUrlConfigs(Map<String, Map<String,String>> configMap,
+                                              List<String> urlFiles) {
+
+        if ( urlFiles.isEmpty() )
+        {
+            return;
+        }
+
+        LOG.info("Loading Configs From Remote URL(s)")
+        urlFiles.each { urlFile ->
+            def urlKeyValues = loadKeyValuesFromFile(urlFile)
+            if ( !urlKeyValues.isEmpty() )
+            {
+                def shortName = shortenFileName(urlFile)
+                configMap.put(urlFile, urlKeyValues)
+            }
+        }
+    }
+
     /**
      * Include the file name, that has the config entries, as the outer map key.
      * For example:
@@ -209,36 +254,13 @@ class ConfigLoader {
      */
     def Map<String, Map<String, String>> loadMapsFromFiles() {
 
-        def filesKeyValueMap = new HashMap<String, Map<String,String>>();
+        def configMap = new HashMap<String, Map<String,String>>();
 
         def classpathFiles = loadConfigFilesFromClasspath()
-        if ( !classpathFiles.isEmpty() )
-        {
-            LOG.info("Loading Configs From Default Location: classpath/config")
-            classpathFiles.each { classpathFile ->
-
-                def classpathKeyValues = loadKeyValuesFromFile(classpathFile)
-                if ( !classpathKeyValues.isEmpty() )
-                {
-                    def shortName = shortenFileName(classpathFile)
-                    filesKeyValueMap.put(shortName, classpathKeyValues)
-                }
-            }
-        }
+        updateConfigMapWithClasspathConfigs(configMap, classpathFiles)
 
         def urlFiles = loadConfigsFromUrls()
-        if ( !urlFiles.isEmpty() )
-        {
-            LOG.info("Loading Configs From Remote URL(s)")
-            urlFiles.each { urlFile ->
-                def urlKeyValues = loadKeyValuesFromFile(urlFile)
-                if ( !urlKeyValues.isEmpty() )
-                {
-                    def shortName = shortenFileName(urlFile)
-                    filesKeyValueMap.put(urlFile, urlKeyValues)
-                }
-            }
-        }
+        updateConfigMapWithUrlConfigs(configMap, urlFiles)
 
         def overrideFiles = loadConfigFilesFromOverride()
         if ( !overrideFiles.isEmpty() )
@@ -250,10 +272,10 @@ class ConfigLoader {
                 if ( !overrideLocationKeyValues.isEmpty() )
                 {
                     def shortName = shortenFileName(overrideFile)
-                    filesKeyValueMap.put(shortName, overrideLocationKeyValues)
+                    configMap.put(shortName, overrideLocationKeyValues)
 
                     LOG.info("Updating All File Maps From Override Config Location")
-                    updateAllMapsWithOverrides(filesKeyValueMap, overrideLocationKeyValues)
+                    updateAllMapsWithOverrides(configMap, overrideLocationKeyValues)
                 }
             }
         }
@@ -262,10 +284,10 @@ class ConfigLoader {
         if ( !commandLineOverrides.isEmpty() )
         {
             LOG.info("Updating All File Maps From Command Line Overrides")
-            updateAllMapsWithOverrides(filesKeyValueMap, commandLineOverrides)
+            updateAllMapsWithOverrides(configMap, commandLineOverrides)
         }
 
-        return filesKeyValueMap
+        return configMap
     }
 
     /**
@@ -388,6 +410,10 @@ class ConfigLoader {
      * XML
      * JSON
      *
+     * todo: configure which file types get loaded
+     * class
+     * jar
+     *
      * Supports case insensitive environment indicators. For example:
      * SomeConfig_dev.xml or SomeConfig_Dev.xml
      *
@@ -420,7 +446,7 @@ class ConfigLoader {
         def filePattern = findFileNamePattern()
         def classpathConfigs = new ArrayList<String>()
 
-        new File(codePath).eachDirRecurse {subDirectory ->
+        new File(codePath).eachDirRecurse { subDirectory ->
 
             def absPath = subDirectory.getAbsolutePath()
             if ( absPath.endsWith("config") && !absPath.contains("test") )

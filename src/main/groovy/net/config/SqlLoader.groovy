@@ -77,7 +77,12 @@ class SqlLoader {
         return dbTableConfigs
     }
 
-    def Map<String, Map<String, String>> groupDbConfigParamsByTable(Map<String, String> dbConfigParams) {
+    /**
+     *
+     * @param dbConfigParams
+     * @return
+     */
+    protected def Map<String, Map<String, String>> groupDbConfigParamsByTable(Map<String, String> dbConfigParams) {
 
         // Sorting on natural order should be enough
         def groupedMap = new TreeMap(dbConfigParams)
@@ -116,7 +121,14 @@ class SqlLoader {
         return allDbConfigs
     }
 
-    def Map<String, String> extractSubGroup(Set<Entry> entries, int currentIndex, int increment) {
+    /**
+     *
+     * @param entries
+     * @param currentIndex
+     * @param increment
+     * @return
+     */
+    protected def Map<String, String> extractSubGroup(Set<Entry> entries, int currentIndex, int increment) {
 
         def subMap = new HashMap<String, String>(increment)
         def i = 0
@@ -170,7 +182,7 @@ class SqlLoader {
         return tableMap
     }
 
-    def Sql createSqlReader(Map<String, String> sqlTableInfos) {
+    protected def Sql createSqlReader(Map<String, String> sqlTableInfos) {
 
         def user = extractValue(sqlTableInfos, USER)
         def password = extractValue(sqlTableInfos, PASSWORD)
@@ -180,7 +192,6 @@ class SqlLoader {
         return Sql.newInstance(url, user, password, driver)
     }
 
-
     /**
      * Pull a specific value for a dbconfig param from a sub-group table.
      * A subgroup consists of 5 values. See "loadFromDatabase()"
@@ -189,7 +200,7 @@ class SqlLoader {
      * @param target The value to retrieve (url, user, etc)
      * @return The corresponding value for 'target' or 'null'
      */
-    def String extractValue(Map<String, String> subMap, String target) {
+    protected def String extractValue(Map<String, String> subMap, String target) {
 
         if ( subMap == null || target == null || target.empty )
         {
@@ -223,7 +234,7 @@ class SqlLoader {
      * @param dbConfigParams
      * @return true if the modulus of 'dbConfigParams % 5' is 0, otherwise false
      */
-    def boolean validDbConfigParams(Map<String, String> dbConfigParams) {
+    protected def boolean validDbConfigParams(Map<String, String> dbConfigParams) {
 
         if ( dbConfigParams == null || dbConfigParams.empty )
         {

@@ -111,6 +111,22 @@ class SqlLoaderTest
 
     }
 
+    void test__extractSubGroup() {
+
+        def map = new TreeMap(buildValidDbConfigParams2())
+        def sqlLoader = new SqlLoader()
+
+        def subMap = sqlLoader.extractSubGroup(map.entrySet(), 0, 5)
+
+        assertTrue(subMap.containsKey("dbconfigtable.name.bar.tablename"))
+        assertTrue(subMap.containsKey("dbconfigtable.name.bar.username"))
+        assertTrue(subMap.containsKey("dbconfigtable.name.bar.userpassword"))
+        assertTrue(subMap.containsKey("dbconfigtable.name.bar.url"))
+        assertTrue(subMap.containsKey("dbconfigtable.name.bar.driver"))
+    }
+
+
+
     private def Map<String, String> buildInvalidDbConfigParams() {
 
         def dbParams = buildValidDbConfigParams()
