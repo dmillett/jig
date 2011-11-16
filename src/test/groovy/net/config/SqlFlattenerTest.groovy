@@ -1,14 +1,29 @@
 package net.config
 
 import groovy.sql.Sql
+import groovy.mock.interceptor.MockFor
+import groovy.mock.interceptor.StubFor
 
 /**
+ * @author dmillett
  *
+ * Copyright 2011 David Millett
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
-class SqlLoaderTest
+class SqlFlattenerTest
     extends GroovyTestCase {
 
-    def sql
+    def static sql
 
     @Override
     protected void setUp() {
@@ -33,7 +48,7 @@ class SqlLoaderTest
         def configFileMap = new HashMap<String, Map<String,String>>();
         configFileMap.put("Test-File.tst", dbParams)
 
-        def sqlLoader = new SqlLoader()
+        def sqlLoader = new SqlFlattener()
         def dbConfigParams = sqlLoader.findDbConfigParams(configFileMap)
 
         assertEquals(4, dbConfigParams.size())
@@ -45,7 +60,7 @@ class SqlLoaderTest
         def configFileMap = new HashMap<String, Map<String,String>>();
         configFileMap.put("Test-File.tst", dbParams)
 
-        def sqlLoader = new SqlLoader()
+        def sqlLoader = new SqlFlattener()
         def dbConfigParams = sqlLoader.findDbConfigParams(configFileMap)
 
         assertEquals(5, dbConfigParams.size())
@@ -54,7 +69,7 @@ class SqlLoaderTest
     void test__validDbConfigParams_invalid() {
 
         def dbParms = buildInvalidDbConfigParams()
-        def sqlLoader = new SqlLoader()
+        def sqlLoader = new SqlFlattener()
 
         assertFalse(sqlLoader.validDbConfigParams(dbParms))
     }
@@ -63,7 +78,7 @@ class SqlLoaderTest
 
         def dbParams = buildValidDbConfigParams()
 
-        def sqlLoader = new SqlLoader()
+        def sqlLoader = new SqlFlattener()
         def isValid = sqlLoader.validDbConfigParams(dbParams)
         assertTrue(isValid)
     }
@@ -71,50 +86,36 @@ class SqlLoaderTest
     void test__extractValue() {
 
         def valid = buildValidDbConfigParams()
-        def sqlLoader = new SqlLoader()
+        def sqlLoader = new SqlFlattener()
 
         assertNull(sqlLoader.extractValue(valid, "Fail"))
 
-        assertEquals("Foo", sqlLoader.extractValue(valid, SqlLoader.TABLE))
-        assertEquals("someUser", sqlLoader.extractValue(valid, SqlLoader.USER))
-        assertEquals("unencryptedPassword", sqlLoader.extractValue(valid, SqlLoader.PASSWORD))
-        assertEquals("some://url/with/db/driver", sqlLoader.extractValue(valid, SqlLoader.DB_URL))
-        assertEquals("someJdbcDriver", sqlLoader.extractValue(valid, SqlLoader.DRIVER))
+        assertEquals("Foo", sqlLoader.extractValue(valid, SqlFlattener.TABLE))
+        assertEquals("someUser", sqlLoader.extractValue(valid, SqlFlattener.USER))
+        assertEquals("unencryptedPassword", sqlLoader.extractValue(valid, SqlFlattener.PASSWORD))
+        assertEquals("some://url/with/db/driver", sqlLoader.extractValue(valid, SqlFlattener.DB_URL))
+        assertEquals("someJdbcDriver", sqlLoader.extractValue(valid, SqlFlattener.DRIVER))
     }
-
-    void test__loadFromDatabase() {
-
-        def dbParams = new HashMap<String, String>()
-        dbParams.put("dbconfigtable.name.bar.tablename", "config")
-        dbParams.put("dbconfigtable.name.bar.username", "test")
-        dbParams.put("dbconfigtable.name.bar.userpassword", "")
-        dbParams.put("dbconfigtable.name.bar.url", "jdbc:h2:mem:")
-        dbParams.put("dbconfigtable.name.bar.driver", "org.h2.Driver")
-
-        def sqlLoader = new SqlLoader()
-        def result = sqlLoader.loadFromDatabase("config", sql)
-
-        // 3 config key:values for 1 table
-        assertEquals(1, result.size())
-        assertEquals(3, result.entrySet().iterator().next().value.size())
-    }
-
 
     void test__groupDbConfigParamsByTable_mocked() {
 
-//        def dbParams = buildValidDbConfigParams2()
-//        def sqlLoader = new SqlLoader()
+        // todo fix
+//        def mock = new StubFor(SqlRetriever)
+//        mock.demand.loadFromDatabase { ["config" : ["property.one": "one"]] }
 //
-//        // todo: mock sqlLoader.loadFromDatabase
-//        sqlLoader.metaClass.loadFromDatabase = ["mock.db.config":"mocked value"]
-//        def dbConfigs = sqlLoader.groupDbConfigParamsByTable(dbParams)
-
+//        mock.use {
+//
+//            def dbParams = buildInMemoryDbParams()
+//            def sqlLoader = new SqlFlattener()
+//            def Map<String, Map<String, String>> groupedMap = sqlLoader.groupDbConfigParamsByTable(dbParams)
+//            assertEquals(1, groupedMap.size())
+//        }
     }
 
     void test__extractSubGroup() {
 
         def map = new TreeMap(buildValidDbConfigParams2())
-        def sqlLoader = new SqlLoader()
+        def sqlLoader = new SqlFlattener()
 
         def subMap = sqlLoader.extractSubGroup(map.entrySet(), 0, 5)
 
@@ -127,6 +128,18 @@ class SqlLoaderTest
 
 
 
+    private def Map<String, String> buildInMemoryDbParams() {
+
+        def dbParams = new HashMap<String, String>()
+        dbParams.put("dbconfigtable.name.bar.tablename", "config")
+        dbParams.put("dbconfigtable.name.bar.username", "test")
+        dbParams.put("dbconfigtable.name.bar.userpassword", "")
+        dbParams.put("dbconfigtable.name.bar.url", "jdbc:h2:mem:")
+        dbParams.put("dbconfigtable.name.bar.driver", "org.h2.Driver")
+
+        return dbParams
+    }
+
     private def Map<String, String> buildInvalidDbConfigParams() {
 
         def dbParams = buildValidDbConfigParams()
@@ -134,6 +147,10 @@ class SqlLoaderTest
         dbParams.put("foo.bar", "zoo")
 
         return dbParams
+    }
+
+    private def Map<String, String> buildOrderedValidDbConfigParams() {
+        return new TreeMap<String, String>(buildValidDbConfigParams())
     }
 
     private def Map<String, String> buildValidDbConfigParams() {

@@ -4,7 +4,6 @@ import groovy.sql.Sql
 import net.config.client.ConfigLookup
 import org.apache.log4j.Logger
 import java.util.Map.Entry
-import groovy.sql.GroovyRowResult
 
 /**
  * Loads from multiple configuration only databases given the following:
@@ -47,10 +46,24 @@ import groovy.sql.GroovyRowResult
  *
  * Removes values from config map after generating key-value pairs
  *
+ * @author dmillett
+ *
+ * Copyright 2011 David Millett
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
-class SqlLoader {
+class SqlFlattener {
 
-    private static final def LOG = Logger.getLogger(SqlLoader.class)
+    private static final def LOG = Logger.getLogger(SqlFlattener.class)
 
     public static final def DB_TABLE_PARAMS = ~/dbconfigtable.*/
     public static final def TABLE = "tablename"
@@ -68,8 +81,6 @@ class SqlLoader {
      */
     def Map<String, Map<String, String>> buildMapFromDatabaseTables(Map<String, Map<String, String>> configs) {
 
-        def dbConfigs = new HashMap<String, Map<String, String>>()
-
         // Config map with all db config table params
         def dbParams = findDbConfigParams(configs)
         def dbTableConfigs = groupDbConfigParamsByTable(dbParams)
@@ -78,6 +89,7 @@ class SqlLoader {
     }
 
     /**
+     * Not sure I like the code herein that groups -- sigh
      *
      * @param dbConfigParams
      * @return
@@ -98,16 +110,16 @@ class SqlLoader {
         def index = 0
         def increment = 5
         def size = groupedMap.size();
+        def sqlRetriever = new SqlRetriever()
 
         while ( index < size )
         {
             def end = index + increment
-            // todo fix -- should not use indices with submap
-
             def subMap = extractSubGroup(groupedMap.entrySet(), index, increment)
             def tableName = extractValue(subMap, TABLE)
+
             def sql = createSqlReader(subMap)
-            def dbConfigs = loadFromDatabase(sql, tableName)
+            def dbConfigs = sqlRetriever.loadFromDatabase(tableName, sql)
             if ( sql != null ) { sql.close() }
 
             for ( entry in dbConfigs )
@@ -147,40 +159,40 @@ class SqlLoader {
         return subMap
     }
 
-    /**
-     * Look up all the key-value property style configs for each row in the
-     * database listed above and load into a map.
-     *
-     * @param sqlTableInfos Ordered submap of 5 key-value pairs
-     * @return
-     */
-    def Map<String, Map<String, String>> loadFromDatabase(String tableName, Sql sql) {
-
-        def tableMap = new HashMap<String, Map<String, String>>()
-
-        try
-        {
-            // GString here causes SQL prepared statement path and error with ?
-            // instead of the actual table name. Use java.lang.String instead
-            def select = "SELECT * FROM " + tableName.toUpperCase()
-            def dbConfigs = new HashMap<String, String>()
-            def result = sql.rows(select)
-
-            for ( rowResult in result )
-            {
-                // skip the identity column @ 0
-                dbConfigs.put(rowResult.getAt(1), rowResult.getAt(2))
-            }
-
-            tableMap.put(tableName, dbConfigs)
-        }
-        catch ( Exception e )
-        {
-            LOG.error("Problem Loading Database Configurations For: $sql", e)
-        }
-
-        return tableMap
-    }
+//    /**
+//     * Look up all the key-value property style configs for each row in the
+//     * database listed above and load into a map.
+//     *
+//     * @param sqlTableInfos Ordered submap of 5 key-value pairs
+//     * @return
+//     */
+//    def Map<String, Map<String, String>> loadFromDatabase(String tableName, Sql sql) {
+//
+//        def tableMap = new HashMap<String, Map<String, String>>()
+//
+//        try
+//        {
+//            // GString here causes SQL prepared statement path and error with ?
+//            // instead of the actual table name. Use java.lang.String instead
+//            def select = "SELECT * FROM " + tableName.toUpperCase()
+//            def dbConfigs = new HashMap<String, String>()
+//            def result = sql.rows(select)
+//
+//            for ( rowResult in result )
+//            {
+//                // skip the identity column @ 0
+//                dbConfigs.put(rowResult.getAt(1), rowResult.getAt(2))
+//            }
+//
+//            tableMap.put(tableName, dbConfigs)
+//        }
+//        catch ( Exception e )
+//        {
+//            LOG.error("Problem Loading Database Configurations For: $sql", e)
+//        }
+//
+//        return tableMap
+//    }
 
     protected def Sql createSqlReader(Map<String, String> sqlTableInfos) {
 
