@@ -1,6 +1,7 @@
 package net.config
 
 import groovy.sql.Sql
+import org.apache.log4j.Logger
 
 /**
  * In order to isolate config retrieval from the database. It performs
@@ -26,6 +27,8 @@ import groovy.sql.Sql
  */
 class SqlRetriever {
 
+    private static final def LOG = Logger.getLogger(SqlRetriever.class)
+
     /**
      * Look up all the key-value property style configs for each row in the
      * database listed above and load into a map.
@@ -33,7 +36,7 @@ class SqlRetriever {
      * @param sqlTableInfos Ordered submap of 5 key-value pairs
      * @return A map of maps where each table name has a corresponding map with key:value pair(s)
      */
-    def Map<String, Map<String, String>> loadFromDatabase(String tableName, Sql sql) {
+    def Map<String, Map<String, String>> loadFromDatabaseWithSelect(String tableName, Sql sql) {
 
         def tableMap = new HashMap<String, Map<String, String>>()
 

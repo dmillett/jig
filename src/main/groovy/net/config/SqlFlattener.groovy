@@ -119,7 +119,7 @@ class SqlFlattener {
             def tableName = extractValue(subMap, TABLE)
 
             def sql = createSqlReader(subMap)
-            def dbConfigs = sqlRetriever.loadFromDatabase(tableName, sql)
+            def dbConfigs = sqlRetriever.loadFromDatabaseWithSelect(tableName, sql)
             if ( sql != null ) { sql.close() }
 
             for ( entry in dbConfigs )
@@ -159,41 +159,6 @@ class SqlFlattener {
         return subMap
     }
 
-//    /**
-//     * Look up all the key-value property style configs for each row in the
-//     * database listed above and load into a map.
-//     *
-//     * @param sqlTableInfos Ordered submap of 5 key-value pairs
-//     * @return
-//     */
-//    def Map<String, Map<String, String>> loadFromDatabase(String tableName, Sql sql) {
-//
-//        def tableMap = new HashMap<String, Map<String, String>>()
-//
-//        try
-//        {
-//            // GString here causes SQL prepared statement path and error with ?
-//            // instead of the actual table name. Use java.lang.String instead
-//            def select = "SELECT * FROM " + tableName.toUpperCase()
-//            def dbConfigs = new HashMap<String, String>()
-//            def result = sql.rows(select)
-//
-//            for ( rowResult in result )
-//            {
-//                // skip the identity column @ 0
-//                dbConfigs.put(rowResult.getAt(1), rowResult.getAt(2))
-//            }
-//
-//            tableMap.put(tableName, dbConfigs)
-//        }
-//        catch ( Exception e )
-//        {
-//            LOG.error("Problem Loading Database Configurations For: $sql", e)
-//        }
-//
-//        return tableMap
-//    }
-
     protected def Sql createSqlReader(Map<String, String> sqlTableInfos) {
 
         def user = extractValue(sqlTableInfos, USER)
@@ -206,7 +171,7 @@ class SqlFlattener {
 
     /**
      * Pull a specific value for a dbconfig param from a sub-group table.
-     * A subgroup consists of 5 values. See "loadFromDatabase()"
+     * A subgroup consists of 5 values. See "loadFromDatabaseWithSelect()"
      *
      * @param subMap The five db config params needed to read a sql DB table
      * @param target The value to retrieve (url, user, etc)

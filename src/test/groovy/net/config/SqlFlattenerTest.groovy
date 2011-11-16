@@ -1,8 +1,6 @@
 package net.config
 
-import groovy.sql.Sql
 import groovy.mock.interceptor.MockFor
-import groovy.mock.interceptor.StubFor
 
 /**
  * @author dmillett
@@ -22,24 +20,6 @@ import groovy.mock.interceptor.StubFor
  */
 class SqlFlattenerTest
     extends GroovyTestCase {
-
-    def static sql
-
-    @Override
-    protected void setUp() {
-
-        sql = Sql.newInstance("jdbc:h2:mem:", "test", "", "org.h2.Driver")
-        sql.execute("create table CONFIG (id int primary key, key varchar(50), value varchar(50))")
-        sql.execute("insert into CONFIG values (1, 'db.one', '1'), (2, 'db.two', 'two'), (3, 'db.three', 'false')")
-
-        def insertedRows = sql.rows("SELECT * FROM CONFIG")
-        assertEquals(3, insertedRows.size())
-    }
-
-    @Override
-    protected void tearDown() {
-        sql.close()
-    }
 
     void test__findDbConfigParams_fails() {
 
@@ -99,17 +79,22 @@ class SqlFlattenerTest
 
     void test__groupDbConfigParamsByTable_mocked() {
 
-        // todo fix
-//        def mock = new StubFor(SqlRetriever)
-//        mock.demand.loadFromDatabase { ["config" : ["property.one": "one"]] }
-//
-//        mock.use {
-//
-//            def dbParams = buildInMemoryDbParams()
-//            def sqlLoader = new SqlFlattener()
-//            def Map<String, Map<String, String>> groupedMap = sqlLoader.groupDbConfigParamsByTable(dbParams)
-//            assertEquals(1, groupedMap.size())
-//        }
+        def tableName = "mock-table"
+        def mockData = mockData(tableName)
+        def mock = new MockFor(SqlRetriever)
+
+        // Ignore the two parameters (a, b)
+        mock.demand.loadFromDatabaseWithSelect(1) { a, b -> return mockData }
+
+        mock.use {
+            def dbParams = buildInMemoryDbParams()
+            def sqlFlattener = new SqlFlattener()
+            def Map<String, Map<String, String>> groupedMap = sqlFlattener.groupDbConfigParamsByTable(dbParams)
+
+            assertEquals(1, groupedMap.size())
+            assertTrue(groupedMap.containsKey(tableName))
+            assertEquals(2, groupedMap.get(tableName).size())
+        }
     }
 
     void test__extractSubGroup() {
@@ -127,6 +112,17 @@ class SqlFlattenerTest
     }
 
 
+    private def Map<String, Map<String, String>> mockData(String tableName) {
+
+        def tableData = new HashMap<String, String>()
+        tableData.put("property.one", "one")
+        tableData.put("property.two", "two")
+
+        def tableConfigData = new HashMap<String, Map<String, String>>()
+        tableConfigData.put(tableName, tableData)
+
+        return tableConfigData
+    }
 
     private def Map<String, String> buildInMemoryDbParams() {
 

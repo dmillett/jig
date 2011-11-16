@@ -21,30 +21,32 @@ import groovy.sql.Sql
 class SqlRetrieverTest
     extends GroovyTestCase {
 
-    def static sql
-
-    @Override
-    protected void setUp() {
-
-        sql = Sql.newInstance("jdbc:h2:mem:", "test", "", "org.h2.Driver")
-        sql.execute("create table CONFIG (id int primary key, key varchar(50), value varchar(50))")
-        sql.execute("insert into CONFIG values (1, 'db.one', '1'), (2, 'db.two', 'two'), (3, 'db.three', 'false')")
-
-        def insertedRows = sql.rows("SELECT * FROM CONFIG")
-        assertEquals(3, insertedRows.size())
-    }
 
     void test__loadFromDatabase() {
 
-        //def dbParams = buildInMemoryDbParams()
-
+        def sql2 = buildAndPopulateDatabase()
         def sqlRetriever = new SqlRetriever()
-        def result = sqlRetriever.loadFromDatabase("config", sql)
+        def result = sqlRetriever.loadFromDatabaseWithSelect("config", sql2)
 
         // 3 config key:values for 1 table
         assertEquals(1, result.size())
         assertEquals(3, result.entrySet().iterator().next().value.size())
+
+        if ( sql2 != null ) { sql2.close() }
     }
+
+    def Sql buildAndPopulateDatabase() {
+
+        def sql2 = Sql.newInstance("jdbc:h2:mem:", "test", "", "org.h2.Driver")
+        sql2.execute("create table CONFIG (id int primary key, key varchar(50), value varchar(50))")
+        sql2.execute("insert into CONFIG values (1, 'db.one', '1'), (2, 'db.two', 'two'), (3, 'db.three', 'false')")
+
+        def insertedRows = sql2.rows("SELECT * FROM CONFIG")
+        assertEquals(3, insertedRows.size())
+
+        return sql2
+    }
+
 
     private def Map<String, String> buildInMemoryDbParams() {
 
