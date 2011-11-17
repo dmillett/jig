@@ -48,7 +48,7 @@ class ConfigLoaderTest
         def configFileNames = configLoader.loadConfigFilesFromOverride()
 
         assertNotNull(configFileNames)
-        assertEquals(10, configFileNames.size())
+        assertEquals(11, configFileNames.size())
     }
 
     // Load all the test configs into a single depth map
@@ -59,7 +59,7 @@ class ConfigLoaderTest
 
         assertNotNull(configMap)
         assertFalse(configMap.isEmpty())
-        assertEquals(85, configMap.size())
+        assertEquals(90, configMap.size())
     }
 
     // Load a two deep map with filename as the first level
@@ -70,7 +70,7 @@ class ConfigLoaderTest
 
         assertNotNull(configMaps)
         assertFalse(configMaps.isEmpty())
-        assertEquals(7, configMaps.size())
+        assertEquals(8, configMaps.size())
     }
 
     void test__loadConfigFilesFromClasspath() {
@@ -107,7 +107,7 @@ class ConfigLoaderTest
         def configMap = configLoader.loadFromFiles()
 
         assertNotNull(configMap)
-        assertEquals(85, configMap.size())
+        assertEquals(90, configMap.size())
         assertEquals("42", configMap.get(testKey))
 
         // Cleanup

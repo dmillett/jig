@@ -26,11 +26,11 @@ import java.util.Map.Entry
  *
  * Already parsed and flattened into something like this:
  *
- * dbconfigtable.name.bar.tablename : Foo
- * dbconfigtable.name.bar.username : someUser
- * dbconfigtable.name.bar.userpassword : unecryptedPassword
- * dbconfigtable.name.bar.url : some://url/with/db/driver
- * dbconfigtable.name.bar.driver : someJdbcDriver
+ * structures.dbconfigtable.name.bar.tablename : Foo
+ * structures.dbconfigtable.name.bar.username : someUser
+ * structures.dbconfigtable.name.bar.userpassword : unecryptedPassword
+ * structures.dbconfigtable.name.bar.url : some://url/with/db/driver
+ * structures.dbconfigtable.name.bar.driver : someJdbcDriver
  *
  * Notes:
  * These databases should be stand alone configuration databases that do not
@@ -90,6 +90,9 @@ class SqlFlattener {
 
     /**
      * Not sure I like the code herein that groups -- sigh
+     *
+     * Responsible for looking up database configuration key:values and storing all
+     * those key:values per table in resulting Map.
      *
      * @param dbConfigParams
      * @return
