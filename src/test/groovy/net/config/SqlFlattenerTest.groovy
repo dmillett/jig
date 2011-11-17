@@ -111,6 +111,25 @@ class SqlFlattenerTest
         assertTrue(subMap.containsKey("dbconfigtable.name.bar.driver"))
     }
 
+    void test__purgeDbConfigParameters() {
+
+        def config = new HashMap<String, String>()
+        config.put("property.one", "one")
+        config.put("property.two", "2")
+
+        def dbConfigParams = buildValidDbConfigParams2()
+        config.putAll(dbConfigParams)
+
+        assertTrue(config.containsKey("dbconfigtable.name.bar.tablename"))
+
+        def sqlFlattener = new SqlFlattener()
+        def purged = sqlFlattener.purgeDbConfigParameters(config, dbConfigParams)
+
+        assertEquals(2, purged.size())
+        assertTrue(purged.containsKey("property.one"))
+        assertTrue(purged.containsKey("property.two"))
+    }
+
 
     private def Map<String, Map<String, String>> mockData(String tableName) {
 
