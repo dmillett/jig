@@ -155,66 +155,101 @@ class ConfigLoader {
         def keyValuesMap = new HashMap<String, String>()
 
         LOG.info("Loading Files From 'classpath/config' Location")
-        def classpathConfigs = loadConfigFilesFromClasspath()
-        if ( !classpathConfigs.isEmpty() )
-        {
-            classpathConfigs.each { classpathFile ->
-                keyValuesMap.putAll(loadKeyValuesFromFile(classpathFile))
-            }
-            LOG.info("Loaded ${keyValuesMap.size()} Classpath Config Key-Values")
-        }
+        updateWithClasspathConfigs(keyValuesMap)
 
         LOG.info("Loading Files From URL Location(s)")
-        def urlConfigs = loadConfigsFromUrls()
-
-        if ( !urlConfigs.isEmpty() )
-        {
-            def urlConfigMap = new HashMap<String,String>()
-            urlConfigs.each { urlFile ->
-                urlConfigMap.putAll(loadKeyValuesFromFile(urlFile))
-            }
-
-            LOG.info("Loaded ${urlConfigMap.size()} From URL Location(s)")
-            updateWithOverrides(keyValuesMap, urlConfigMap)
-        }
+        updateWithUrlConfigs(keyValuesMap)
 
         LOG.info("Loading Files From Override Location")
-        def overrideConfigs = loadConfigFilesFromOverride()
-
-        if ( !overrideConfigs.isEmpty() )
-        {
-            def overrideKeyValues = new HashMap<String, String>()
-            overrideConfigs.each { overrideFile ->
-                overrideKeyValues.putAll(loadKeyValuesFromFile(overrideFile))
-            }
-
-            LOG.info("Loaded ${overrideConfigs.size()} Override Config Key-Values")
-            updateWithOverrides(keyValuesMap, overrideKeyValues)
-        }
+        updateWithOverrideConfigs(keyValuesMap)
 
         LOG.info("Loading Command Line Overrides")
-        def commandLineConfig = loadFromCommandLineSystemProperties()
-
-        if ( !commandLineConfig.isEmpty() )
-        {
-            LOG.info("Loaded ${commandLineConfig.size()} Config Command Line Overrides")
-            updateWithOverrides(keyValuesMap, commandLineConfig)
-        }
+        updateWithCommandLineOverrides(keyValuesMap)
 
         return keyValuesMap
     }
 
 
-    private def updateConfigMapWithClasspathConfigs(Map<String, Map<String,String>> configMap,
-                                                    List<String> classpathFileNames) {
+    private def updateWithCommandLineOverrides(Map<String, String> keyValuesMap) {
 
-        if ( classpathFileNames.isEmpty() )
+        def commandLineConfig = loadFromCommandLineSystemProperties()
+
+        if ( commandLineConfig.isEmpty() )
+        {
+            return
+        }
+
+        LOG.info("Loaded ${commandLineConfig.size()} Config Command Line Overrides")
+        updateWithOverrides(keyValuesMap, commandLineConfig)
+    }
+
+
+    private def updateWithOverrideConfigs(Map<String, String> keyValuesMap) {
+
+        def overrideConfigs = loadConfigFilesFromOverride()
+
+        if ( overrideConfigs.isEmpty())
+        {
+            return
+        }
+
+        def overrideKeyValues = new HashMap<String, String>()
+        overrideConfigs.each { overrideFile ->
+            overrideKeyValues.putAll(loadKeyValuesFromFile(overrideFile))
+        }
+
+        LOG.info("Loaded ${overrideConfigs.size()} Override Config Key-Values")
+        updateWithOverrides(keyValuesMap, overrideKeyValues)
+    }
+
+
+    private def updateWithUrlConfigs(Map<String, String> keyValuesMap) {
+
+        def urlConfigs = loadConfigsFromUrls()
+
+        if ( urlConfigs.isEmpty() )
+        {
+            return
+        }
+
+        def urlConfigMap = new HashMap<String, String>()
+        urlConfigs.each { urlFile ->
+            urlConfigMap.putAll(loadKeyValuesFromFile(urlFile))
+        }
+
+        LOG.info("Loaded ${urlConfigMap.size()} From URL Location(s)")
+        updateWithOverrides(keyValuesMap, urlConfigMap)
+    }
+
+
+    private def updateWithClasspathConfigs(Map<String,String>  keyValuesMap) {
+
+        def classpathConfigs = loadConfigFilesFromClasspath()
+
+        if ( classpathConfigs.isEmpty() )
+        {
+            return
+        }
+
+        classpathConfigs.each { classpathFile ->
+            keyValuesMap.putAll(loadKeyValuesFromFile(classpathFile))
+        }
+
+        LOG.info("Loaded ${keyValuesMap.size()} Classpath Config Key-Values")
+    }
+
+
+    private def updateFilesMapConfigMapWithClasspathConfigs(Map<String, Map<String,String>> configMap) {
+
+        def classpathFiles = loadConfigFilesFromClasspath()
+
+        if ( classpathFiles.isEmpty() )
         {
             return
         }
 
         LOG.info("Loading Configs From Default Location: classpath/config")
-        classpathFileNames.each { classpathFile ->
+        classpathFiles.each { classpathFile ->
 
             def classpathKeyValues = loadKeyValuesFromFile(classpathFile)
             if ( !classpathKeyValues.isEmpty() )
@@ -225,8 +260,9 @@ class ConfigLoader {
         }
     }
 
-    private def updateConfigMapWithUrlConfigs(Map<String, Map<String,String>> configMap,
-                                              List<String> urlFiles) {
+    private def updateFilesMapConfigMapWithUrlConfigs(Map<String, Map<String,String>> configMap) {
+
+        def urlFiles = loadConfigsFromUrls()
 
         if ( urlFiles.isEmpty() )
         {
@@ -256,38 +292,54 @@ class ConfigLoader {
 
         def configMap = new HashMap<String, Map<String,String>>();
 
-        def classpathFiles = loadConfigFilesFromClasspath()
-        updateConfigMapWithClasspathConfigs(configMap, classpathFiles)
+        updateFilesMapConfigMapWithClasspathConfigs(configMap)
 
-        def urlFiles = loadConfigsFromUrls()
-        updateConfigMapWithUrlConfigs(configMap, urlFiles)
+        // todo
+        def loadFromDatabase = null;
 
-        def overrideFiles = loadConfigFilesFromOverride()
-        if ( !overrideFiles.isEmpty() )
-        {
-            LOG.info("Loading Configs From Override Location")
-            overrideFiles.each { overrideFile ->
+        updateFilesMapConfigMapWithUrlConfigs(configMap)
 
-                def overrideLocationKeyValues = loadKeyValuesFromFile(overrideFile)
-                if ( !overrideLocationKeyValues.isEmpty() )
-                {
-                    def shortName = shortenFileName(overrideFile)
-                    configMap.put(shortName, overrideLocationKeyValues)
+        updateFilesMapWithFileOverrides(configMap)
 
-                    LOG.info("Updating All File Maps From Override Config Location")
-                    updateAllMapsWithOverrides(configMap, overrideLocationKeyValues)
-                }
-            }
-        }
+        updateFilesMapWithCommandLineOverrides(configMap)
+
+        return configMap
+    }
+
+    private def updateFilesMapWithCommandLineOverrides(Map<String, Map<String, String>> configMap) {
 
         def commandLineOverrides = loadFromCommandLineSystemProperties()
-        if ( !commandLineOverrides.isEmpty() )
+
+        if (!commandLineOverrides.isEmpty())
         {
             LOG.info("Updating All File Maps From Command Line Overrides")
             updateAllMapsWithOverrides(configMap, commandLineOverrides)
         }
+    }
 
-        return configMap
+    // Load from files in override location -- treat as override configs
+    private def updateFilesMapWithFileOverrides(configMap) {
+
+        def overrideFiles = loadConfigFilesFromOverride()
+
+        if ( overrideFiles.isEmpty() )
+        {
+            return
+        }
+
+        LOG.info("Loading Configs From Override Location")
+        overrideFiles.each { overrideFile ->
+
+            def overrideLocationKeyValues = loadKeyValuesFromFile(overrideFile)
+            if (!overrideLocationKeyValues.isEmpty())
+            {
+                def shortName = shortenFileName(overrideFile)
+                configMap.put(shortName, overrideLocationKeyValues)
+
+                LOG.info("Updating All File Maps From Override Config Location")
+                updateAllMapsWithOverrides(configMap, overrideLocationKeyValues)
+            }
+        }
     }
 
     /**
@@ -458,5 +510,9 @@ class ConfigLoader {
         }
 
         return classpathConfigs
+    }
+
+    def Map<String, Map<String, String>> loadFromDatabase(Map<String, Map<String, String>> loadedConfigs) {
+
     }
 }
