@@ -148,7 +148,7 @@ class ConfigLoader {
      * 4) command line entries (startup)
      *
      * @return
-     * todo: refactor this into smaller parts
+     * todo: immutable maps instead of updates
      */
     def Map<String, String> loadFromFiles() {
 
@@ -165,6 +165,10 @@ class ConfigLoader {
 
         LOG.info("Loading Command Line Overrides")
         updateWithCommandLineOverrides(keyValuesMap)
+
+        LOG.info("Loading Database Configs And Purging Config Database Connection Parameters")
+
+        // todo: databse configs -- for now prefer 'loadMapsFromFiles()'
 
         return keyValuesMap
     }
@@ -286,7 +290,7 @@ class ConfigLoader {
      * file1 -> Map<String,String> file1 config map
      * file2 -> Map<String,String> file2 config map
      * @return A Map with shortened file name for the key and that files key-values
-     * todo: refactor into smaller parts
+     * todo: make immutable instead of updating
      */
     def Map<String, Map<String, String>> loadMapsFromFiles() {
 
@@ -294,16 +298,36 @@ class ConfigLoader {
 
         updateFilesMapConfigMapWithClasspathConfigs(configMap)
 
-        // todo
-        def loadFromDatabase = null;
-
         updateFilesMapConfigMapWithUrlConfigs(configMap)
 
         updateFilesMapWithFileOverrides(configMap)
 
         updateFilesMapWithCommandLineOverrides(configMap)
 
+        configMap = loadDatabaseConfigs(configMap)
+
         return configMap
+    }
+
+    /**
+     * Creates a new config map without any db config params (config used to connect to
+     * a configuration database).
+     *
+     * @param configMap
+     * @return
+     */
+    private def loadDatabaseConfigs(Map<String, Map<String, String>> configMap) {
+
+        SqlFlattener sqlFlattener = new SqlFlattener()
+        Map<String, Map<String, String>> dbConfigs = sqlFlattener.buildMapFromDatabaseTables(configMap)
+
+        dbConfigs.each { entry ->
+
+            LOG.info("Adding Configuration Values Retrieved From Database")
+            configMap.put(entry.key, entry.value)
+        }
+
+        return  sqlFlattener.purgeAllDbConfigParams(configMap)
     }
 
     private def updateFilesMapWithCommandLineOverrides(Map<String, Map<String, String>> configMap) {

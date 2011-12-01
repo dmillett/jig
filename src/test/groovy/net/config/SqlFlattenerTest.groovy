@@ -111,7 +111,7 @@ class SqlFlattenerTest
         assertTrue(subMap.containsKey("dbconfigtable.name.bar.driver"))
     }
 
-    void test__purgeDbConfigParameters() {
+    void test__findNonDbConfigs() {
 
         def config = new HashMap<String, String>()
         config.put("property.one", "one")
@@ -123,11 +123,33 @@ class SqlFlattenerTest
         assertTrue(config.containsKey("dbconfigtable.name.bar.tablename"))
 
         def sqlFlattener = new SqlFlattener()
-        def purged = sqlFlattener.purgeDbConfigParameters(config, dbConfigParams)
+        def purged = sqlFlattener.findNonDbConfigs(config, dbConfigParams)
 
         assertEquals(2, purged.size())
         assertTrue(purged.containsKey("property.one"))
         assertTrue(purged.containsKey("property.two"))
+    }
+
+    void test__purgeAllDbConfigParams() {
+
+        def config = new HashMap<String, String>()
+        config.put("property.one", "one")
+        config.put("property.two", "2")
+
+        def dbConfigParams = buildValidDbConfigParams2()
+        config.putAll(dbConfigParams)
+        assertEquals(12, config.size())
+
+        def allConfigs = new HashMap<String, Map<String, String>>()
+        allConfigs.put("Foo", config)
+
+        def sqlFlattener = new SqlFlattener()
+        def purgedMap = sqlFlattener.purgeAllDbConfigParams(allConfigs)
+
+        assertEquals(1, purgedMap.size())
+
+        def innerMap = purgedMap.entrySet().iterator().next().value
+        assertEquals(2, innerMap.size())
     }
 
 

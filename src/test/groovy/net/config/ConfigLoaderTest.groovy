@@ -1,5 +1,7 @@
 package net.config
 
+import groovy.sql.Sql
+
 /**
  * Intellij and possibly Eclipse do not compile and move
  * directories in the same manner as Gradle. Intellij will dump all the
@@ -65,12 +67,17 @@ class ConfigLoaderTest
     // Load a two deep map with filename as the first level
     void test__loadMapsFromFiles() {
 
+        // Have to mock this out to some extent. The DB retrieval is tested in SqlRetrieverTest
+        //buildAndPopulateDatabase()
+
         def configLoader = new ConfigLoader()
         def configMaps = configLoader.loadMapsFromFiles()
 
         assertNotNull(configMaps)
         assertFalse(configMaps.isEmpty())
-        assertEquals(8, configMaps.size())
+
+        // Note that the entry and values for DatabaseConfig.xml were removed
+        assertEquals(7, configMaps.size())
     }
 
     void test__loadConfigFilesFromClasspath() {
@@ -126,5 +133,24 @@ class ConfigLoaderTest
         assertEquals(2, configMap.size())
 
         GroovyTestConfigHelper.updateSystemPropertiesWithConfigEnv("")
+    }
+
+    def Sql buildAndPopulateDatabase() {
+
+        // See DatabaseConfig.xml in test (it should correspond to these values.
+        def driver = "org.h2.Driver"
+        def url = "jdbc:h2:mem:"
+        def user = "testUser"
+        def password = "password"
+        def table = "SQLDBEXAMPLE"
+
+        def sql2 = Sql.newInstance(url, user, password, driver)
+        sql2.execute("create table SQLDBEXAMPLE (id int primary key, key varchar(50), value varchar(50))")
+        sql2.execute("insert into SQLDBEXAMPLE values (1, 'db.one', '1'), (2, 'db.two', 'two'), (3, 'db.three', 'false')")
+
+        def insertedRows = sql2.rows("SELECT * FROM SQLDBEXAMPLE")
+        assertEquals(3, insertedRows.size())
+
+        return sql2
     }
 }

@@ -260,7 +260,7 @@ class SqlFlattener {
      * @param dbParams
      * @return
      */
-    def Map<String, String> purgeDbConfigParameters(Map<String, String> allConfigs, Map<String,String> dbParams) {
+    def Map<String, String> findNonDbConfigs(Map<String, String> allConfigs, Map<String,String> dbParams) {
 
         def dbcleanedConfig = new HashMap<String, String>()
 
@@ -273,6 +273,30 @@ class SqlFlattener {
         }
 
         return dbcleanedConfig
+    }
+
+    /**
+     * Identify all of the database configs from the config map and then create a new
+     * config map from the original config map without the database config parameters.
+     *
+     * @param allConfigEntries The config map
+     * @return A new map based on 'allConfigEntries' but without any db config parameters
+     */
+    def Map<String, Map<String, String>> purgeAllDbConfigParams(Map<String, Map<String, String>> allConfigEntries) {
+
+        def dbConfigParams = findDbConfigParams(allConfigEntries)
+        def purgedMap = new HashMap<String, Map<String,String>>()
+
+        for ( entry in allConfigEntries.entrySet() )
+        {
+            def nonDbConfigs = findNonDbConfigs(entry.value, dbConfigParams)
+            if ( !nonDbConfigs.isEmpty() )
+            {
+                purgedMap.put(entry.key, nonDbConfigs)
+            }
+        }
+
+        return purgedMap
     }
 
     /**
