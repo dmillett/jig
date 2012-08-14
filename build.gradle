@@ -1,3 +1,5 @@
+//import groovy.sql.Sql
+
 /**
  * Copyright 2011 David Millett
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +18,7 @@ apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'idea'
 
-sourceCompatibility = 1.5
+sourceCompatibility = 1.6
 version=0.93
 
 repositories {
@@ -25,23 +27,38 @@ repositories {
 
 dependencies {
 
-  groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.4'
+  groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.6'
 
   compile group: 'log4j', name: 'log4j', version: '1.2.16'
   compile group: 'org.jyaml', name: 'jyaml', version: '1.3'
 
   testCompile group: 'junit', name: 'junit', version: '4.8.1'
   testCompile group: 'com.h2database', name: 'h2', version: '1.3.161'
+
+  //classpath 'com.h2database:h2:1.3.161'
 }
 
 
-test {
+test  {
 
+    //test.testLogging.showStandardStreams = true
     def basePath = new File('').absolutePath
     def testConfigPath = basePath + "/src/test/resources/config/"
     println "Setting Test Config Path To: ${testConfigPath}"
 
     systemProperties ['jConfigMap.location'] = "$testConfigPath"
+
+
 }
+
+//task h2_databaseSetup {
+//
+//    def sql2 = Sql.newInstance("jdbc:h2:mem:", "test", "", "org.h2.Driver")
+//    sql2.execute("create table CONFIG (id int primary key, key varchar(50), value varchar(50))")
+//    sql2.execute("insert into CONFIG values (1, 'db.one', '1'), (2, 'db.two', 'two'), (3, 'db.three', 'false')")
+//
+//    def insertedRows = sql2.rows("SELECT * FROM CONFIG")
+//    assertEquals(3, insertedRows.size())
+//}
 
 

@@ -6,12 +6,14 @@ and value are stored as String values. Value retrieval is based upon applying re
 expressions across the Map key set. The matching values are then returned in a new map.
 Or, if it is a simple key value property, then only the matching value is returned.
 
-Currently jConfigMap supports XML and JSON configuration files during startup. A global config
+Currently jConfigMap supports XML and JSON configuration files during startup. Database
+connections maybe specified in XML/JSON files and retrieved in key-value form. A global config
 map (see java ConfigMap), can then be used statically for config access.
 
 ##Features
 * Supports XML/JSON property style key-value pairs (see 'keyValues')
 * Supports XML/JSON object/config structure (see 'structures')
+* Supports config retrieval from a database
 * Supports versioning for certain XML/JSON config structures
 * Multiple config strategies available (see JConfigProperties):
   + classpath, url, specified location, command line, environmental filters
