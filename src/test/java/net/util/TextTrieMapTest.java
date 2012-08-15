@@ -88,18 +88,6 @@ public class TextTrieMapTest
         assertEquals(6, trieMap.getAllNodes().size());
     }
 
-    // ************ test Map ********************************************
-
-    public void test__map_size() {
-
-        TextTrieMap trieMap5 = buildTrieMapOne();
-        assertEquals(5, trieMap5.size());
-
-        TextTrieMap trieMap6 = buildTextTrieMap2();
-        assertEquals(6, trieMap6.size());
-    }
-
-
     private TextTrieMap buildTrieMapOne() {
 
         String one = "a";

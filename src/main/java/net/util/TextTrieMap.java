@@ -23,8 +23,7 @@ import java.util.Set;
  * c
  *
  */
-public class TextTrieMap
-    implements Map<String, String> {
+public class TextTrieMap {
 
     /** Store all of the nodes here */
     private final Set<TextNode> _nodes;
@@ -218,85 +217,11 @@ public class TextTrieMap
         return allNodes;
     }
 
-    // *************************** Map Implementations ********************
-    public int size() {
-        return _size;
-    }
-
-    public boolean isEmpty() {
-        return _size < 1;
-    }
-
-    /** Uses getNode(String) and returns true if 'not-null' */
-    public boolean containsKey(Object key) {
-
-        if ( key == null ) { return false; }
-
-        return getNode((String)key) != null;
-    }
-
-    /** Difficult, maybe multiple identical values, requires potentially full traversal  */
-    public boolean containsValue(Object value) {
-
-        String textValue = (String)value;
-
-        for ( TextNode node : getAllNodes() )
-        {
-            if ( node._value != null && node._value.equals(textValue) )
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public String get(Object key) {
-
-        TextNode node = getNode((String)key);
-        if ( node != null )
-        {
-            return node.getKey();
-        }
-
-        return null;
-    }
-
-    public String put(String key, String value) {
-
-        return null;
-    }
-
-    public String remove(Object key) {
-        return null;
-    }
-
-    public void putAll(Map<? extends String, ? extends String> m) {
-    }
-
-    public void clear() {
-        _nodes.clear();
-        _allNodes.clear();
-    }
-
-    public Set<String> keySet() {
-
-        return null;
-    }
-
-    public Collection<String> values() {
-        return null;
-    }
-
-    public Set<Entry<String, String>> entrySet() {
-        return null;
-    }
 
     /**
      * A simple key value store. Null keys are not allowed.
      */
-    public static class TextNode
-        implements Entry<String, String> {
+    public static final class TextNode {
 
         private final String _key;
         private final String _value;
@@ -314,17 +239,24 @@ public class TextTrieMap
             _childNodes = new HashSet<TextNode>();
         }
 
+        public TextNode(TextNode textNode) {
+
+            if ( textNode == null || textNode._key == null )
+            {
+                throw new NullPointerException("TextNode Key Cannot Be Null");
+            }
+
+            _key = textNode._key;
+            _value = textNode._value;
+            _childNodes = new HashSet<TextNode>(textNode._childNodes);
+        }
+
         public String getKey() {
             return _key;
         }
 
         public String getValue() {
             return _value;
-        }
-
-        @Override
-        public String setValue(String value) {
-            return null;
         }
 
         public Set<TextNode> getChildNodes() {
@@ -357,6 +289,16 @@ public class TextTrieMap
             }
 
             return _key.startsWith(keyPrefix);
+        }
+
+        public boolean isSameKey(TextNode node) {
+
+            if ( node == null )
+            {
+                return false;
+            }
+
+            return _key.equals(node._key);
         }
 
         /**
