@@ -27,7 +27,7 @@ See (https://github.com/dmillett/jConfigMap/wiki)
   and add a handful of unit tests. See (https://github.com/dmillett/jConfigMap/wiki)
 
 ##Usage (additional examples in test directory)
-###property style config code sample
+###property style code sample
 ```java
 // ConfigLookup has a number of client utility methods
 ConfigLookup configHelper = new ConfigLookup()
@@ -45,7 +45,7 @@ assertEquals(2.0, configHelper.getByKey(keyThree, Double.class));
 String keyFour = "key.four.list";
 assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
 ```
-####*property style config sample*
+#####*property style config sample*
 ```xml
 <config>
   <keyValues>
@@ -56,7 +56,7 @@ assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
   </keyValues>
 </config>
 ```
-####*generates*
+#####*generates*
 ```
   1. "key.one.string, "first value"
   2. "key.two.int", "1"
@@ -64,7 +64,7 @@ assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
   4. "key.four.list", "AMD, INTC, WFMI, SCCO"
 ```
 
-###structured config code sample
+###structured code sample
 ```java
 // Retrieve all key-value pairs where the key matches this pattern
 ConfigLookup configHelper = new ConfigLookup()
@@ -82,7 +82,7 @@ Map<String, String> lowStocks = configHelper.get(stocks, "low");
 // 1 result (see #1 -> values: 8.00)
 Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
 ```
-####*structured config sample*
+#####*structured config sample*
 ```xml
 <config>
   <structures>
@@ -99,7 +99,7 @@ Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
   </structures>
 </config>
 ```
-####*generates*
+#####*generates*
 ```
   1. "structures.stocks.stock.name.foo.low", "8.00"
   2. "structures.stocks.stock.name.foo.high", "8.32"
@@ -139,7 +139,7 @@ assertTrue(value.getLastAccessed() > 0);
 assertEquals(2, value.getCount());
 assertEquals(2, value.getAssociatedPatterns().size());
 ```
-####*structured config sample with list(s)*
+#####*structured config sample with list(s)*
 ```xml
 <config>
   <structures>
@@ -160,7 +160,7 @@ assertEquals(2, value.getAssociatedPatterns().size());
   </structures>
 </config>
 ```
-####*generates*
+#####*generates*
 ```
   1. "structures.cities.chicago.bars.bar", "Sheffields"
   2. "structures.cities.chicago.bars.bar.1", "Map Room"
