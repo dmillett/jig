@@ -1,10 +1,11 @@
 #jConfigMap (See LICENSE AND NOTICE):
 
-Is a Java client configuration tool that uses Groovy (for now), to flatten
-XML and JSON configuration files into a key-value Map structure. Each key
-and value are stored as String values. Value retrieval is based upon applying regular
-expressions across the Map key set. The matching values are then returned in a new map.
-Or, if it is a simple key value property, then only the matching value is returned.
+Is a Java client configuration tool that uses Groovy (for now), to separate client
+configuration access from underlying config storage implementations. For example, it flattens
+XML and JSON configuration files into a key-value Map structure. Each key and value are stored 
+as String values. Value retrieval is based upon applying regular expressions across the Map 
+key set. The matching values are then returned in a new map. Or, if it is a simple key value 
+property, then only the matching value is returned.
 
 Currently jConfigMap supports XML and JSON configuration files during startup. Database
 connections maybe specified in XML/JSON files and retrieved in key-value form. A global config
@@ -27,43 +28,31 @@ See (https://github.com/dmillett/jConfigMap/wiki)
   and add a handful of unit tests. See (https://github.com/dmillett/jConfigMap/wiki)
 
 ##Usage (additional examples in test directory)
-###property style code sample
+###Simple key-value pairs
 ```java
-// ConfigLookup has a number of client utility methods
-ConfigLookup configHelper = new ConfigLookup()
+public enum ConfigEnumExample {
 
-String keyOne = "key.one.string";
-assertEquals("first value", configHelper.getByKey(keyOne));
-
-String keyTwo = "key.two.int";
-assertEquals(1, configHelper.getByKey(keyTwo, Integer.class));
-
-String keyThree = "key.three.double";
-assertEquals(2.0, configHelper.getByKey(keyThree, Double.class));
-
-// Produces a List<String> result
-String keyFour = "key.four.list";
-assertEquals(4, configHelper.getByKey(keyFour, List.class).size());
-```
-#####*property style config sample*
-```xml
-<config>
-  <keyValues>
-    <property name="key.one.string" value="first value" />
-    <property name="key.two.int">1</property>
-    <property name="key.three.double" value="2.0" />
-    <property name="key.four.list" value="AMD, INTC, WFMI, SCCO" />
-  </keyValues>
-</config>
-```
-#####*generates*
-```
-  1. "key.one.string, "first value"
-  2. "key.two.int", "1"
-  3. "key.three.double", "2.0"
-  4. "key.four.list", "AMD, INTC, WFMI, SCCO"
+    // key:value pairs
+    ONE("key.one.string", String.class),
+    TWO("key.two.int", Integer.class),
+    THREE("key.three.double", Double.class),
+    FOUR("key.four.boolean", Boolean.class),
+    FIVE("key.five.list", List.class),
+} 
 ```
 
+```java
+ConfigEnumExample.FOUR.get(Boolean.class));
+
+// As a String or int
+int test1 = Integer.parseInt(ConfigEnumExample.TWO.get(String.class));
+int test2 = ConfigEnumExample.TWO.get(Integer.class);
+assertTrue(test == test2);
+
+// Values as a String or List<String>
+String testList = ConfigEnumExample.FIVE.get(String.class);
+List<String> testValues = ConfigEnumExample.FIVE.get(List.class);
+```
 ###structured code sample
 ```java
 // Retrieve all key-value pairs where the key matches this pattern
@@ -82,31 +71,6 @@ Map<String, String> lowStocks = configHelper.get(stocks, "low");
 // 1 result (see #1 -> values: 8.00)
 Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
 ```
-#####*structured config sample*
-```xml
-<config>
-  <structures>
-    <stocks>
-        <stock name="FOO">
-           <low>8.00</low>
-           <high>8.32</high>
-        </stock>
-        <stock name="BAR">
-           <low>4.50</low>
-           <high>4.65</high>
-        </stock>
-    </stocks>
-  </structures>
-</config>
-```
-#####*generates*
-```
-  1. "structures.stocks.stock.name.foo.low", "8.00"
-  2. "structures.stocks.stock.name.foo.high", "8.32"
-  3. "structures.stocks.stock.name.bar.low", "4.50"
-  4. "structures.stocks.stock.name.bar.high", "4.65"
-```
-
 ###structured config code sample with lists/sorts and statistics
 ```java
 ConfigLookup configHelper = new ConfigLookup()
@@ -139,6 +103,51 @@ assertTrue(value.getLastAccessed() > 0);
 assertEquals(2, value.getCount());
 assertEquals(2, value.getAssociatedPatterns().size());
 ```
+
+#####*simple key-value config sample in XML*
+```xml
+<config>
+  <keyValues>
+    <property name="key.one.string" value="first value" />
+    <property name="key.two.int">1</property>
+    <property name="key.three.double" value="2.0" />
+    <property name="key.four.list" value="AMD, INTC, WFMI, SCCO" />
+  </keyValues>
+</config>
+```
+#####*generates Map.Entry*
+```
+  1. "key.one.string, "first value"
+  2. "key.two.int", "1"
+  3. "key.three.double", "2.0"
+  4. "key.four.list", "AMD, INTC, WFMI, SCCO"
+```
+
+#####*structured config sample*
+```xml
+<config>
+  <structures>
+    <stocks>
+        <stock name="FOO">
+           <low>8.00</low>
+           <high>8.32</high>
+        </stock>
+        <stock name="BAR">
+           <low>4.50</low>
+           <high>4.65</high>
+        </stock>
+    </stocks>
+  </structures>
+</config>
+```
+#####*generates*
+```
+  1. "structures.stocks.stock.name.foo.low", "8.00"
+  2. "structures.stocks.stock.name.foo.high", "8.32"
+  3. "structures.stocks.stock.name.bar.low", "4.50"
+  4. "structures.stocks.stock.name.bar.high", "4.65"
+```
+
 #####*structured config sample with list(s)*
 ```xml
 <config>
