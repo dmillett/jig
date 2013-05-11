@@ -63,15 +63,15 @@ public class ConfigLookupTest
     public void test_get_with_pattern_performance() {
 
         Pattern pattern = PatternHelper.buildPattern("amd");
+        ConfigLookup configLookup = new ConfigLookup();
         int iterations = 100;
         long startTime = System.nanoTime();
 
-        retrievalPerformanceLoop(iterations, pattern);
+        retrievalPerformanceLoop(configLookup, iterations, pattern);
 
         long executionTime = System.nanoTime() - startTime;
         double milis = executionTime * Math.pow(10.0, -6.0);
         String output = String.format("Peformance For: %1d Iterations Is: %2f (ms)", iterations, milis);
-        //System.out.println(output);
     }
 
     // Single threaded performance -- should be on ~par.
@@ -79,29 +79,30 @@ public class ConfigLookupTest
 
         Pattern pattern = PatternHelper.buildPattern("amd");
 
+        ConfigLookup configLookup1 = new ConfigLookup();
         int iterations = 100;
         long startTime = System.nanoTime();
 
-        retrievalPerformanceLoop(iterations, pattern);
+        retrievalPerformanceLoop(configLookup1, iterations, pattern);
 
         long executionTime = System.nanoTime() - startTime;
         double milis = executionTime * Math.pow(10.0, -6.0);
-        String output = String.format("Peformance For: %1d Iterations Is: %2f (ms)", iterations, milis);
-        //System.out.println(output);
+        String output1 = String.format("Peformance For: %1d Iterations Is: %2f (ms)", iterations, milis);
 
-        ConfigStatistics.enableStatsCollection();
+        configLookup1.getConfigStatistics().enableStatsCollection();
+
+        ConfigLookup configLookup2 = new ConfigLookup();
 
         startTime = System.nanoTime();
-        retrievalPerformanceLoop(iterations, pattern);
+        retrievalPerformanceLoop(configLookup2, iterations, pattern);
         executionTime = System.nanoTime() - startTime;
 
-        ConfigStatistics.disableStatsCollection();
+        configLookup2.getConfigStatistics().disableStatsCollection();
 
         milis = executionTime * Math.pow(10.0, -6.0);
-        output = String.format("Peformance With Stats For: %1d Iterations Is: %2f (ms)", iterations, milis);
+        String output2 = String.format("Peformance With Stats For: %1d Iterations Is: %2f (ms)", iterations, milis);
 
-        ConfigStatistics.clearStatistics();
-        //System.out.println(output);
+        configLookup2.getConfigStatistics().clearStatistics();
     }
 
     public void test__getByKey() {
@@ -126,14 +127,13 @@ public class ConfigLookupTest
     }
 
 
-    private void retrievalPerformanceLoop(int iterations, Pattern pattern) {
+    private void retrievalPerformanceLoop(ConfigLookup configLookup, int iterations, Pattern pattern) {
 
-        ConfigLookup lookup = new ConfigLookup();
         int count = 0;
 
         while ( count < iterations )
         {
-            lookup.get(pattern);
+            configLookup.get(pattern);
             count++;
         }
     }

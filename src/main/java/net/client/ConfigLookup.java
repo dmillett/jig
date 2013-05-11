@@ -27,6 +27,12 @@ import java.util.regex.Pattern;
  * get()
  * getSortedResults()
  *
+ * Given that ConfigMap and ConfigStatistics are both static instances, they can
+ * be exported to the MBean whenever the class is first created. For example, create
+ * a ConfigLookup bean in Spring, wait for startup, then export it as an MBean. All sub
+ * sequent interactions. Alternatively, ConfigMap and ConfigStatistic beans could be
+ * injected (as static) to ConfigLookup and then exported as MBeans.
+ *
  * @author dmillett
  *
  * Copyright 2011 David Millett
@@ -45,7 +51,13 @@ import java.util.regex.Pattern;
 public class ConfigLookup {
 
     private static final Logger LOG = Logger.getLogger(ConfigLookup.class);
+    // Loads during class initialization on startup.
     private static final ConfigMap CONFIG_MAP = new ConfigMap();
+    private static final ConfigStatistics CONFIG_STATISTICS = new ConfigStatistics();
+
+    public ConfigStatistics getConfigStatistics() {
+        return CONFIG_STATISTICS;
+    }
 
     /**
      * Build a pattern to apply across the keys in a Map. Matches
@@ -77,7 +89,7 @@ public class ConfigLookup {
 
         if ( fileName == null )
         {
-            LOG.info("Invalid File Name, Using Slower 'getByKey(key)'");
+            LOG.debug("Invalid File Name, Using Slower 'getByKey(key)'");
             return getByKey(key);
         }
 
@@ -305,14 +317,14 @@ public class ConfigLookup {
     private Map<String, String> getConfigValues(Map<String, String> configMap, Pattern pattern, String... params) {
 
         long start = 0;
-        if ( ConfigStatistics.isEnabled() )
+        if ( CONFIG_STATISTICS.isEnabled() )
         {
             start = System.nanoTime();
         }
 
         Map<String, String> matches = findMatchesFromKeyset(configMap, pattern);
 
-        if ( !ConfigStatistics.isEnabled() )
+        if ( !CONFIG_STATISTICS.isEnabled() )
         {
             return reduce(matches, params);
         }
@@ -360,7 +372,7 @@ public class ConfigLookup {
 
         for ( String key : reducedMap.keySet() )
         {
-            ConfigStatistics.addKeyLookup(key, lookupTime, reducePattern);
+            CONFIG_STATISTICS.addKeyLookup(key, lookupTime, reducePattern);
         }
     }
 
@@ -395,7 +407,7 @@ public class ConfigLookup {
 
         long startTime = 0;
 
-        if ( ConfigStatistics.isEnabled() )
+        if ( CONFIG_STATISTICS.isEnabled() )
         {
             startTime = System.nanoTime();
         }
@@ -410,14 +422,14 @@ public class ConfigLookup {
             }
         }
 
-        if ( !ConfigStatistics.isEnabled() )
+        if ( !CONFIG_STATISTICS.isEnabled() )
         {
             return result;
         }
 
         // 1:1 lookup, so the key is the pattern
         long lookupTime = System.nanoTime() - startTime;
-        ConfigStatistics.addKeyLookup(key, lookupTime, key);
+        CONFIG_STATISTICS.addKeyLookup(key, lookupTime, key);
 
         return result;
     }

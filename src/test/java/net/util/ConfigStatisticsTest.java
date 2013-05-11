@@ -35,41 +35,40 @@ public class ConfigStatisticsTest
 
     public void test__enable_disable_statistics() {
 
-        assertFalse(ConfigStatistics.isEnabled());
+        ConfigStatistics statistics = new ConfigStatistics();
+        assertFalse(statistics.isEnabled());
 
-        ConfigStatistics.enableStatsCollection();
-        assertTrue(ConfigStatistics.isEnabled());
+        statistics.enableStatsCollection();
+        assertTrue(statistics.isEnabled());
 
-        ConfigStatistics.disableStatsCollection();
-        assertFalse(ConfigStatistics.isEnabled());
+        statistics.disableStatsCollection();
+        assertFalse(statistics.isEnabled());
     }
 
     public void test__getAllStocks_without_statistics() {
 
-        if ( ConfigStatistics.isEnabled() )
-        {
-            ConfigStatistics.disableStatsCollection();
-        }
-
         PojoConfigExample pojo = new PojoConfigExample();
+        pojo.getConfigLookup().getConfigStatistics().disableStatsCollection();
+        pojo.getConfigLookup().getConfigStatistics().clearStatistics();
+
         Map<String, String> allStocks = pojo.findAllStocks();
 
         assertEquals(12, allStocks.size());
-        assertEquals(0, ConfigStatistics.getStats().size());
+        assertEquals(0, pojo.getConfigLookup().getConfigStatistics().getStats().size());
     }
 
     public void test__getAllStocks_with_statistics_single_pass() {
 
-        ConfigStatistics.enableStatsCollection();
-
         PojoConfigExample pojo = new PojoConfigExample();
+        pojo.getConfigLookup().getConfigStatistics().enableStatsCollection();
+
         Map<String, String> allStocks = pojo.findAllStocks();
         // Sometimes a multi-threaded test seems to throw this count off (bad gradle)
         assertEquals(12, allStocks.size());
 
-        ConfigStatistics.disableStatsCollection();
+        pojo.getConfigLookup().getConfigStatistics().disableStatsCollection();
 
-        Map<String, StatsValue> stats = ConfigStatistics.getStats();
+        Map<String, StatsValue> stats = pojo.getConfigLookup().getConfigStatistics().getStats();
         assertEquals(12, stats.size());
 
         for ( Map.Entry<String, StatsValue> entry : stats.entrySet() )
@@ -84,7 +83,7 @@ public class ConfigStatisticsTest
 
     public void test_getAllStocks_with_statistics_multiple_passes() {
 
-        ConfigStatistics.enableStatsCollection();
+        ConfigEnumExample.getConfigStatistics().enableStatsCollection();
 
         Map<String, String> amdTickers = ConfigEnumExample.COMMISSION_TICKERS.get("AMD");
         assertEquals(2, amdTickers.size());
@@ -96,9 +95,9 @@ public class ConfigStatisticsTest
         Map<String, String> allStocks = pojo.findAllStocks();
         assertEquals(12, allStocks.size());
 
-        ConfigStatistics.disableStatsCollection();
+        pojo.getConfigLookup().getConfigStatistics().disableStatsCollection();
 
-        Map<String, StatsValue> stats = ConfigStatistics.getStats();
+        Map<String, StatsValue> stats = pojo.getConfigLookup().getConfigStatistics().getStats();
         assertEquals(15, stats.size());
 
         boolean countGreaterThanOne = false;

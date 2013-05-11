@@ -29,9 +29,11 @@ public class PojoConfigExample {
 
     private static final Logger LOG = Logger.getLogger(PojoConfigExample.class);
     private static final ConfigLookup _configLookup = new ConfigLookup();
-
-
     private static final Pattern STOCKS = Pattern.compile("stocks.stock.*");
+
+    public ConfigLookup getConfigLookup() {
+        return _configLookup;
+    }
 
     public Map<String, String> findAllStocks() {
         return _configLookup.get(STOCKS);

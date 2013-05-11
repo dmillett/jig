@@ -13,7 +13,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * 3) last accessed
  *
  * Statistic collection is optional, since collecting data will adversely
- * affect performance.
+ * affect performance. It is currently set a static variable in ConfigLookup
+ * and
  *
  * Using this for now
  * Approach 1: use a HashMap with thread locking on specific StatsValue when updating.
@@ -56,7 +57,7 @@ public class ConfigStatistics {
      * @param latency How long to retrieve the result
      * @param pattern The pattern the resulted in this 'key' lookup
      */
-    public static void addKeyLookup(String key, long latency, String pattern) {
+    public void addKeyLookup(String key, long latency, String pattern) {
 
         StatsValue storedValue = STATS.get(key);
 
@@ -89,15 +90,15 @@ public class ConfigStatistics {
         }
     }
 
-    public static Map<String, StatsValue> getStats() {
+    public Map<String, StatsValue> getStats() {
         return new HashMap<String, StatsValue>(STATS);
     }
 
-    public static boolean isEnabled() {
+    public boolean isEnabled() {
         return _statsCaptureEnabled;
     }
 
-    public static void dumpOutput() {
+    public void dumpOutput() {
 
         StringBuilder sb = new StringBuilder();
 
@@ -109,15 +110,15 @@ public class ConfigStatistics {
         LOG.info(sb.toString());
     }
 
-    public static synchronized void clearStatistics() {
+    public synchronized void clearStatistics() {
         STATS.clear();
     }
 
-    public static synchronized void disableStatsCollection() {
+    public synchronized void disableStatsCollection() {
         _statsCaptureEnabled = false;
     }
 
-    public static synchronized void enableStatsCollection() {
+    public synchronized void enableStatsCollection() {
         _statsCaptureEnabled = true;
     }
 }

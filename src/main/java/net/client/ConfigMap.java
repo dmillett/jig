@@ -12,6 +12,8 @@ import java.util.Map;
  * for providing them to the ConfigLookup utility class. The ConfigLookup can
  * then be used by any POJO or Enum config class.
  *
+ * todo: expose some operations via JMX
+ *
  * @author dmillett
  *
  * Copyright 2011 David Millett

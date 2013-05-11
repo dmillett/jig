@@ -1,6 +1,7 @@
 package net.config.example.one;
 
 import net.client.ConfigLookup;
+import net.util.ConfigStatistics;
 import net.util.GenericsHelper;
 import org.apache.log4j.Logger;
 
@@ -131,5 +132,9 @@ public enum ConfigEnumExample {
 
     public Map<String, String> getByFile(String... params) {
         return  _configLookup.get(getConfigFileName(), getPattern(), params);
+    }
+
+    public static ConfigStatistics getConfigStatistics() {
+        return _configLookup.getConfigStatistics();
     }
 }

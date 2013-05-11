@@ -44,10 +44,10 @@ public class ConfigEnumKeyValueExampleTest
 
     public void test__TWO() {
 
-        int test = Integer.parseInt(ConfigEnumExample.TWO.get(String.class));
-        assertEquals(1, test);
-
-        assertEquals((Integer)1, ConfigEnumExample.TWO.get(Integer.class));
+        // test1 = 1
+        int test1 = Integer.parseInt(ConfigEnumExample.TWO.get(String.class));
+        int test2 = ConfigEnumExample.TWO.get(Integer.class);
+        assertTrue(test1 == test2);
     }
 
     public void test__THREE() {
