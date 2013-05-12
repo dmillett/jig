@@ -20,6 +20,7 @@ map (see java ConfigMap), can then be used statically for config access.
   + classpath, url, specified location, command line, environmental filters
 * Supports statistic gathering for config access (see ConfigStatistics and StatsValue)
   + count, average latency, associated patterns
+* JMX MBean 
 
 ####*installation*
 See (https://github.com/dmillett/jConfigMap/wiki)
@@ -47,7 +48,7 @@ ConfigEnumExample.FOUR.get(Boolean.class));
 // As a String or int
 int test1 = Integer.parseInt(ConfigEnumExample.TWO.get(String.class));
 int test2 = ConfigEnumExample.TWO.get(Integer.class);
-assertTrue(test == test2);
+assertTrue(test1 == test2);
 
 // Values as a String or List<String>
 String testList = ConfigEnumExample.FIVE.get(String.class);
@@ -77,7 +78,7 @@ ConfigLookup configHelper = new ConfigLookup()
 Pattern stocks = PatternHelper.buildPattern("bars");
 
 // Gather statistics (off by default)
-ConfigStatistics.enableStatsCollection();
+configHelper.getConfigStatistics().enableStatsCollection();
 
 ConfigLookup configHelper = new ConfigLookup();
 Pattern bars = PatternHelper.buildPattern("bars");
@@ -91,7 +92,7 @@ Map<String, String> sortedBars = configHelper.getSortedResults(someComparator, b
 // Chicago bars (#1, 2, 3) note the versions ("", "1", "2")
 Map<String, String> chicagoBars = configHelper.get(bars, "chicago");
 
-ConfigStatistics.disableStatsCollection();
+configHelper.getConfigStatistics().disableStatsCollection();
 
 // Examine the stats
 Map<String, StatsValue> stats = ConfigStatistics.getStats();
