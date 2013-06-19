@@ -29,35 +29,15 @@ See (https://github.com/dmillett/jConfigMap/wiki)
   and add a handful of unit tests. See (https://github.com/dmillett/jConfigMap/wiki)
 
 ##Usage (additional examples in test directory)
-###Simple key-value pairs
+
+###pojo examples
 ```java
-public enum ConfigEnumExample {
+// Retrieve an exact value
+ConfigLookup lookup = new ConfigLookup();
+int value1 = lookup.getByKey("key.two.int", Integer.class);
 
-    // key:value pairs
-    ONE("key.one.string", String.class),
-    TWO("key.two.int", Integer.class),
-    THREE("key.three.double", Double.class),
-    FOUR("key.four.boolean", Boolean.class),
-    FIVE("key.five.list", List.class),
-} 
-```
-
-```java
-ConfigEnumExample.FOUR.get(Boolean.class));
-
-// As a String or int
-int test1 = Integer.parseInt(ConfigEnumExample.TWO.get(String.class));
-int test2 = ConfigEnumExample.TWO.get(Integer.class);
-assertTrue(test1 == test2);
-
-// Values as a String or List<String>
-String testList = ConfigEnumExample.FIVE.get(String.class);
-List<String> testValues = ConfigEnumExample.FIVE.get(List.class);
-```
-###structured code sample
-```java
-// Retrieve all key-value pairs where the key matches this pattern
-ConfigLookup configHelper = new ConfigLookup()
+// Retrieve a group where all key-value pairs where the key matches this pattern
+ConfigLookup configHelper = new ConfigLookup();
 Pattern stocks = PatternHelper.buildPattern("stocks");
 
 // 4 results (all stocks #1 - 4)
@@ -72,6 +52,33 @@ Map<String, String> lowStocks = configHelper.get(stocks, "low");
 // 1 result (see #1 -> values: 8.00)
 Map<String, String> lowFooStocks = configHelper.get(stocks, "FOO", "low");
 ```
+
+###static access with enum (see test example package)
+```java
+
+// A sample enum
+public enum ConfigEnumExample {
+
+    // key:value pairs
+    ONE("key.one.string", String.class),
+    TWO("key.two.int", Integer.class),
+    THREE("key.three.double", Double.class),
+    FOUR("key.four.boolean", Boolean.class),
+    FIVE("key.five.list", List.class),
+} 
+
+ConfigEnumExample.FOUR.get(Boolean.class));
+
+// As a String or int
+int test1 = Integer.parseInt(ConfigEnumExample.TWO.get(String.class));
+int test2 = ConfigEnumExample.TWO.get(Integer.class);
+assertTrue(test1 == test2);
+
+// Values as a String or List<String>
+String testList = ConfigEnumExample.FIVE.get(String.class);
+List<String> testValues = ConfigEnumExample.FIVE.get(List.class);
+```
+
 ###structured config code sample with lists/sorts and statistics
 ```java
 ConfigLookup configHelper = new ConfigLookup()
