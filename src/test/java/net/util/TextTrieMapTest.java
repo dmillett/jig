@@ -2,6 +2,9 @@ package net.util;
 
 
 import junit.framework.TestCase;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -125,4 +128,64 @@ public class TextTrieMapTest
 
         return trieMap;
     }
+
+    public void test__isSibling() {
+
+        TextTrieMap.TextNode tn = new TextTrieMap.TextNode("foo.bar", "foo bar");
+        TextTrieMap.TextNode tn1 = new TextTrieMap.TextNode("foo.bar.zoo.x", "foo bar zoo x");
+        TextTrieMap.TextNode tn2 = new TextTrieMap.TextNode("foo.bar.zoo.y", "foo bar zoo y");
+
+        assertFalse(tn.isSibling(tn1));
+        assertTrue(tn1.isSibling(tn2));
+    }
+
+    public void test__isChild() {
+
+        TextTrieMap.TextNode tn = new TextTrieMap.TextNode("how.do.you.do", "how do you do");
+        TextTrieMap.TextNode tn1 = new TextTrieMap.TextNode("how.do.you", "how do you");
+        TextTrieMap.TextNode tn2 = new TextTrieMap.TextNode("how.do.i.know.you", "how do i know you");
+
+        assertFalse(tn1.isChild(tn));
+        assertFalse(tn1.isChild(tn2));
+
+        assertTrue(tn.isChild(tn1));
+    }
+
+    public void test__put_moderately_complex() {
+
+        Map<String, String> original = buildModeratelyComplexMap();
+        TextTrieMap textTrie = new TextTrieMap();
+
+        for ( Map.Entry<String, String> entry : original.entrySet() )
+        {
+            textTrie.put(entry.getKey(), entry.getValue());
+        }
+
+        assertEquals(6, textTrie.size());
+
+        TextTrieMap.TextNode node = textTrie.getNode("structures.foo.some.other.value");
+
+        assertNotNull(node);
+        assertTrue(node.hasChildren());
+        assertEquals(2, node.getChildNodes().size());
+    }
+
+    private Map<String, String> buildModeratelyComplexMap() {
+
+        String base1 = "structures.foo";
+        String base2 = "structures.bar";
+
+        Map<String, String> m = new HashMap<String, String>();
+
+        m.put(base1 + ".some.single.value", "foo some single value");
+        m.put(base1 + ".some.other.value", "foo some other value");
+        m.put(base1 + ".other.value", "foo other value");
+        m.put(base1 + ".some.other.value.named.x", "foo some other value named x");
+        m.put(base1 + ".some.other.value.named.y", "foo some other value named y");
+
+        m.put(base2 + ".some.random.value", "bar some random value");
+
+        return m;
+    }
+
 }
