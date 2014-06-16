@@ -19,7 +19,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 
-sourceCompatibility = 1.6
+sourceCompatibility = 1.7
 version=0.94
 
 repositories {
@@ -47,6 +47,10 @@ test  {
     systemProperties ['jConfigMap.location'] = "$testConfigPath"
 
 
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
 }
 
 //task h2_databaseSetup {
