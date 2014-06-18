@@ -79,11 +79,10 @@ public class ConfigMap {
 
     private void dumpConfigMap(Map<String, Map<String,String>> map, String text) {
 
-        LOG.info("Dumping Config For: " + text)
-        ;
-        for ( String configFile : map.keySet() )
+        LOG.info("Dumping Config For: " + text);
+        for ( Map.Entry<String, Map<String, String>> fileEntry : map.entrySet() )
         {
-            for ( Map.Entry<String, String> entry : map.get(configFile).entrySet() )
+            for ( Map.Entry<String, String> entry : map.get(fileEntry.getKey()).entrySet() )
             {
                 LOG.info(entry.getKey() + ":" + entry.getValue());
             }
