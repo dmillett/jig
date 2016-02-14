@@ -18,16 +18,19 @@ apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'findbugs'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
+group = 'com.github.dmillett'
+archivesBaseName = 'jig'
+version = '0.95'
 sourceCompatibility = 1.8
-version=0.95
 
 repositories {
   mavenCentral()
 }
 
 dependencies {
-
     /*
     Groovy changed XmlParsing in 2.3.0+, node.text() has a bug and returns all
     of the nested node text() as one value
@@ -42,37 +45,54 @@ dependencies {
     Even though the Javadoc doesn't change, the functionality is very different (in a
     non backward compatible way).
     */
-    //compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.5'
-    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.2.2'
-    compile group: 'org.jyaml', name: 'jyaml', version: '1.3'
-    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.13'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.0.2'
+  //compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.5'
+  compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.2.2'
+  compile group: 'org.jyaml', name: 'jyaml', version: '1.3'
+  compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.13'
+  compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.0.2'
 
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
-    testCompile group: 'com.h2database', name: 'h2', version: '1.3.171'
+  testCompile group: 'junit', name: 'junit', version: '4.11'
+  testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+  testCompile group: 'com.h2database', name: 'h2', version: '1.3.171'
 }
 
 
 test  {
-    //test.testLogging.showStandardStreams = true
-    def basePath = new File('').absolutePath
-    def testConfigPath = basePath + "/src/test/resources/config/"
-    println "Setting Test Config Path To: ${testConfigPath}"
+  //test.testLogging.showStandardStreams = true
+  def basePath = new File('').absolutePath
+  def testConfigPath = basePath + "/src/test/resources/config/"
+  println "Setting Test Config Path To: ${testConfigPath}"
 
-    systemProperties ['jConfigMap.location'] = "$testConfigPath"
+  systemProperties ['jConfigMap.location'] = "$testConfigPath"
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
+  gradleVersion = '2.10'
 }
 
 tasks.withType(FindBugs) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
- }
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+}
+
+task jigJar(type: Jar)
+
+task jigSourcesJar(type: Jar) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+artifacts {
+  archives jigJar
+  archives jigSourcesJar
+}
+
+task javadocJar(type: Jar) {
+  classifier = 'javadoc'
+  from javadoc
+}
 
 //task h2_databaseSetup {
 //
@@ -84,4 +104,51 @@ tasks.withType(FindBugs) {
 //    assertEquals(3, insertedRows.size())
 //}
 
+signing {
+  sign configurations.archives
+}
 
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'jig'
+        packaging 'jar'
+        // optionally artifactId can be defined here
+        description 'A Java and Groovy configuration library.'
+        url 'https://github.com/dmillett/jig'
+
+        scm {
+          connection 'https://github.com/dmillett/prank.git'
+          developerConnection 'https://github.com/dmillett/jig.git'
+          url 'https://github.com/dmillett/jig'
+        }
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+
+        developers {
+          developer {
+            id 'dmillett'
+            name 'dmillett'
+            email 'd_millett@hotmail.com'
+          }
+        }
+      }
+    }
+  }
+}
