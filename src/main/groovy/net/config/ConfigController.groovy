@@ -1,7 +1,8 @@
 package net.config
 
 import groovy.transform.Synchronized
-import org.apache.log4j.Logger
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple cache map implementation for Groovy config lookups. Note that
@@ -27,7 +28,7 @@ import org.apache.log4j.Logger
  */
 class ConfigController {
 
-    private static final def Logger LOG = Logger.getLogger("ConfigController")
+    private static final def Logger LOG = LoggerFactory.getLogger("ConfigController")
     private final static def CONFIG_CURRENT = new HashMap<String, String>();
     private final static def CONFIG_PREVIOUS = new HashMap<String, String>();
 

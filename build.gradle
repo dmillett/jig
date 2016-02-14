@@ -17,11 +17,10 @@
 apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'idea'
-apply plugin: 'eclipse'
 apply plugin: 'findbugs'
 
-sourceCompatibility = 1.7
-version=0.94
+sourceCompatibility = 1.8
+version=0.95
 
 repositories {
   mavenCentral()
@@ -29,29 +28,43 @@ repositories {
 
 dependencies {
 
-    compile 'org.codehaus.groovy:groovy-all:2.1.3'
-    compile 'log4j:log4j:1.2.17'
-    compile 'org.jyaml:jyaml:1.3'
+    /*
+    Groovy changed XmlParsing in 2.3.0+, node.text() has a bug and returns all
+    of the nested node text() as one value
+     <foo>
+         <one>"a"</one>
+         <two>"b"</two>
+     </foo>
 
-    testCompile 'junit:junit:4.11'
-    testCompile 'com.h2database:h2:1.3.171'
+    foo.text() --> "ab"
+
+    Previous versions, foo.text() --> ""
+    Even though the Javadoc doesn't change, the functionality is very different (in a
+    non backward compatible way).
+    */
+    //compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.5'
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.2.2'
+    compile group: 'org.jyaml', name: 'jyaml', version: '1.3'
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.13'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.0.2'
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+    testCompile group: 'com.h2database', name: 'h2', version: '1.3.171'
 }
 
 
 test  {
-
     //test.testLogging.showStandardStreams = true
     def basePath = new File('').absolutePath
     def testConfigPath = basePath + "/src/test/resources/config/"
     println "Setting Test Config Path To: ${testConfigPath}"
 
     systemProperties ['jConfigMap.location'] = "$testConfigPath"
-
-
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
+    gradleVersion = '2.10'
 }
 
 tasks.withType(FindBugs) {

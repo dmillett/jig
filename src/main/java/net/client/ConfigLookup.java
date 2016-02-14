@@ -3,7 +3,8 @@ package net.client;
 import net.util.ConfigStatistics;
 import net.util.GenericsHelper;
 import net.util.PatternHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -50,7 +51,7 @@ import java.util.regex.Pattern;
  */
 public class ConfigLookup {
 
-    private static final Logger LOG = Logger.getLogger(ConfigLookup.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigLookup.class);
     // Loads during class initialization on startup.
     private static final ConfigMap CONFIG_MAP = new ConfigMap();
     private static final ConfigStatistics CONFIG_STATISTICS = new ConfigStatistics();

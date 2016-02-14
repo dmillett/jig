@@ -65,9 +65,9 @@ class XmlFlattenerTest
 
         def testConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "ConfigOne.xml"
         def baseNode = new XmlParser().parse(testConfigFile)
-        def xmlFlatten = new XmlFlattener()
 
         def structureNode = baseNode.structures[0]
+        def xmlFlatten = new XmlFlattener()
         def keyValues = xmlFlatten.findXmlStructures(structureNode, "")
 
         assertNotNull(keyValues)

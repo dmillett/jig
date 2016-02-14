@@ -1,6 +1,7 @@
 package net.config
 
-import org.apache.log4j.Logger
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class flattens xml structures and their values into
@@ -39,7 +40,7 @@ import org.apache.log4j.Logger
  */
 class XmlFlattener {
 
-    private static final def Logger LOG = Logger.getLogger(XmlFlattener.class)
+    private static final def Logger LOG = LoggerFactory.getLogger(XmlFlattener.class)
     private static final def String DELIM = "."
 
     /**

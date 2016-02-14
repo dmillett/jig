@@ -19,7 +19,7 @@ package net.common;
  * See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-public enum JConfigProperties {
+public enum JigProperties {
 
     /** System Property for local configuration file(s) location outside of 'classpath/config' */
     JCONFIG_LOCATION("jConfigMap.location"),
@@ -33,7 +33,7 @@ public enum JConfigProperties {
 
     private final String _systemPropertyName;
 
-    JConfigProperties(String systemPropertyName) {
+    JigProperties(String systemPropertyName) {
         _systemPropertyName = systemPropertyName;
     }
 

@@ -2,7 +2,9 @@ package net.config
 
 import groovy.sql.Sql
 import net.config.client.ConfigLookup
-import org.apache.log4j.Logger
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map.Entry
 
 /**
@@ -63,7 +65,7 @@ import java.util.Map.Entry
  */
 class SqlFlattener {
 
-    private static final def LOG = Logger.getLogger(SqlFlattener.class)
+    private static final def LOG = LoggerFactory.getLogger(SqlFlattener.class)
 
     public static final def DB_TABLE_PARAMS = ~/dbconfigtable.*/
     public static final def TABLE = "tablename"

@@ -53,7 +53,7 @@ import java.util.Set;
  *  limitations under the License.
  */
 public class TextTrieMap
-        implements Map<String,String> {
+    implements Map<String,String> {
 
     /** Store all of the nodes here */
     private final Set<TextNode> _nodes;

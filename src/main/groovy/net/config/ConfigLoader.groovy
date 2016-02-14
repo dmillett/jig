@@ -1,7 +1,7 @@
 package net.config
 
-import org.apache.log4j.Logger
-import net.common.JConfigProperties
+import org.slf4j.LoggerFactory;
+import net.common.JigProperties
 import java.util.regex.Pattern
 
 /**
@@ -41,7 +41,7 @@ import java.util.regex.Pattern
  */
 class ConfigLoader {
 
-    private static def final LOG = Logger.getLogger(ConfigLoader.class)
+    private static def final LOG = LoggerFactory.getLogger(ConfigLoader.class)
     //private final def _supportedFiles = /.*\.xml/ //|json)/
 
 
@@ -426,12 +426,12 @@ class ConfigLoader {
         def commandLineOverrides = new HashMap<String,String>()
         System.getProperties().entrySet().each { entry ->
 
-            if ( !entry.getKey().startsWith(JConfigProperties.JCONFIG_COMMAND_LINE_PROP.getName()) )
+            if ( !entry.getKey().startsWith(JigProperties.JCONFIG_COMMAND_LINE_PROP.getName()) )
             {
                 return
             }
 
-            def remove = JConfigProperties.JCONFIG_COMMAND_LINE_PROP.getName() + "."
+            def remove = JigProperties.JCONFIG_COMMAND_LINE_PROP.getName() + "."
             def overrideKey = "${entry.getKey()}".replace(remove, "")
             LOG.info("Overriding $overrideKey")
             commandLineOverrides.put(overrideKey, entry.getValue())
@@ -453,7 +453,7 @@ class ConfigLoader {
         def urlConfigs = new ArrayList<String>()
         System.getProperties().entrySet().each { entry ->
 
-            if ( entry.getKey().startsWith(JConfigProperties.JCONFIG_URL_LOCATION.getName()) )
+            if ( entry.getKey().startsWith(JigProperties.JCONFIG_URL_LOCATION.getName()) )
             {
                 urlConfigs.add(entry.getValue())
             }
@@ -470,7 +470,7 @@ class ConfigLoader {
      */
     def List<String> loadConfigFilesFromOverride() {
 
-        def location = System.getProperty(JConfigProperties.JCONFIG_LOCATION.getName()) + File.separator
+        def location = System.getProperty(JigProperties.JCONFIG_LOCATION.getName()) + File.separator
         def configFiles = new ArrayList<String>()
         def suffix = findFileNamePattern()
 
@@ -497,7 +497,7 @@ class ConfigLoader {
      */
     def Pattern findFileNamePattern() {
 
-        def fileSuffix = System.getProperty(JConfigProperties.JCONFIG_FILE_ENVIRONMENT.getName())
+        def fileSuffix = System.getProperty(JigProperties.JCONFIG_FILE_ENVIRONMENT.getName())
         if ( fileSuffix == null || fileSuffix.empty )
         {
             return ~/.*\.(xml|json)/

@@ -3,12 +3,12 @@ package net.config.example.one;
 import net.client.ConfigLookup;
 import net.util.ConfigStatistics;
 import net.util.GenericsHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
 
 /**
  * An enum style config handler.
@@ -56,7 +56,7 @@ public enum ConfigEnumExample {
 
     private final static GenericsHelper _helper = new GenericsHelper();
     private static final ConfigLookup _configLookup = new ConfigLookup();
-    private static final Logger LOG = Logger.getLogger(ConfigEnumExample.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigEnumExample.class);
 
     private ConfigEnumExample(String regex, Class clazz, String configFileName) {
         _pattern = Pattern.compile(regex);

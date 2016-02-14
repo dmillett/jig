@@ -1,7 +1,8 @@
 package net.config
 
 import groovy.json.JsonSlurper
-import org.apache.log4j.Logger
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This uses Groovy's JSON tranformer and flattens the structure
@@ -26,7 +27,7 @@ import org.apache.log4j.Logger
  */
 class JsonFlattener {
 
-    private static final def Logger LOG = Logger.getLogger(JsonFlattener.class)
+    private static final def Logger LOG = LoggerFactory.getLogger(JsonFlattener.class)
     private final def KeyVersion _keyVersion = new KeyVersion()
 
     /**

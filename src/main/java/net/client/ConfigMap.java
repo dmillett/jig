@@ -1,7 +1,8 @@
 package net.client;
 
 import net.util.JavaGroovyConfigBinder;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -31,7 +32,7 @@ import java.util.Map;
  */
 public class ConfigMap {
 
-    private static final Logger LOG = Logger.getLogger(ConfigMap.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigMap.class);
     private static final Map<String, Map<String, String>> CURRENT_CONFIG = new HashMap<String, Map<String, String>>();
     private static final Map<String, Map<String, String>> PREVIOUS_CONFIG = new HashMap<String, Map<String, String>>();
 

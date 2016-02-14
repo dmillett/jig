@@ -1,6 +1,7 @@
 package net.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +40,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ConfigStatistics {
 
-    private static final Logger LOG = Logger.getLogger(ConfigStatistics.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigStatistics.class);
+
     private static final ReentrantLock LOCK = new ReentrantLock();
 
     /** Where the values are thread aware (volatile) mutable objects */

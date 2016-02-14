@@ -2,6 +2,7 @@ package net.util;
 
 
 import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class TextTrieMapTest
 
     public void test__simple_add2() {
 
-        TextTrieMap trieMap = buildTextTrieMap2();
+        TextTrieMap trieMap = buildTextTrieMapTwo();
 
         assertNotNull(trieMap);
         assertEquals(2, trieMap.getNodes().size());
@@ -73,7 +74,7 @@ public class TextTrieMapTest
 
     public void test__getNodesWithPrefix() {
 
-        TextTrieMap trieMap = buildTextTrieMap2();
+        TextTrieMap trieMap = buildTextTrieMapTwo();
 
         Set<TextTrieMap.TextNode> anodes = trieMap.getNodesWithPrefix("a");
         assertEquals(4, anodes.size());
@@ -87,7 +88,7 @@ public class TextTrieMapTest
 
     public void test__getAllNodes() {
 
-        TextTrieMap trieMap = buildTextTrieMap2();
+        TextTrieMap trieMap = buildTextTrieMapTwo();
         assertEquals(6, trieMap.getAllNodes().size());
     }
 
@@ -109,7 +110,7 @@ public class TextTrieMapTest
         return trieMap;
     }
 
-    private TextTrieMap buildTextTrieMap2() {
+    private TextTrieMap buildTextTrieMapTwo() {
 
         String one = "a";
         String two = "a.b";
@@ -187,5 +188,4 @@ public class TextTrieMapTest
 
         return m;
     }
-
 }

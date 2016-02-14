@@ -1,6 +1,6 @@
 package net.config
 
-import net.common.JConfigProperties
+import net.common.JigProperties
 
 /**
  * Useful for setting config locations for individual unit tests.
@@ -24,20 +24,20 @@ class GroovyTestConfigHelper {
 
     def static String updateSystemPropertyConfigLocation() {
 
-        if ( System.getProperty(JConfigProperties.JCONFIG_LOCATION.getName()) == null )
+        if ( System.getProperty(JigProperties.JCONFIG_LOCATION.getName()) == null )
         {
             def testConfigPath = new File('').absolutePath + "/src/test/resources/config/"
-            System.setProperty(JConfigProperties.JCONFIG_LOCATION.getName(), testConfigPath)
+            System.setProperty(JigProperties.JCONFIG_LOCATION.getName(), testConfigPath)
         }
 
-        return System.getProperty(JConfigProperties.JCONFIG_LOCATION.getName())
+        return System.getProperty(JigProperties.JCONFIG_LOCATION.getName())
     }
 
     def static updateSystemPropertiesWithConfigEnv(String envIndicator) {
 
         if ( envIndicator != null )
         {
-            System.setProperty(JConfigProperties.JCONFIG_FILE_ENVIRONMENT.getName(), envIndicator)
+            System.setProperty(JigProperties.JCONFIG_FILE_ENVIRONMENT.getName(), envIndicator)
         }
     }
 
@@ -63,7 +63,7 @@ class GroovyTestConfigHelper {
 
         if ( key != null )
         {
-            return JConfigProperties.JCONFIG_COMMAND_LINE_PROP.getName() + "." + key
+            return JigProperties.JCONFIG_COMMAND_LINE_PROP.getName() + "." + key
         }
 
         return null;

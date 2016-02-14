@@ -2,11 +2,11 @@ package net.util;
 
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Map;
-
 
 /**
  * Bind a Groovy object to load configuration files. See ConfigLoader.groovy.
@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class JavaGroovyConfigBinder {
 
-    private static final Logger LOG = Logger.getLogger(JavaGroovyConfigBinder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JavaGroovyConfigBinder.class);
 
     private static final String _groovyConfigLoaderClass = "net.config.ConfigLoader";
     private final GroovyObject _groovyConfigLoader;
@@ -44,7 +44,7 @@ public class JavaGroovyConfigBinder {
 
         if ( _groovyConfigLoader == null )
         {
-            LOG.fatal("Cannot Retrieve Map From Null Groovy Object. Check Configuration Location And Groovy Files.");
+            LOG.error("Cannot Retrieve Map From Null Groovy Object. Check Configuration Location And Groovy Files.");
             return null;
         }
 
@@ -78,7 +78,7 @@ public class JavaGroovyConfigBinder {
         }
         catch ( Exception e )
         {
-            LOG.fatal("Cannot Create Instance Of Groovy Class: " + className);
+            LOG.error("Cannot Create Instance Of Groovy Class: " + className);
             throw new RuntimeException(e);
         }
     }
@@ -101,7 +101,7 @@ public class JavaGroovyConfigBinder {
         }
         catch ( Exception e )
         {
-            LOG.fatal("Cannot Create Groovy Class From: " + groovySourceName, e);
+            LOG.error("Cannot Create Groovy Class From: " + groovySourceName, e);
             throw new RuntimeException(e);
         }
     }

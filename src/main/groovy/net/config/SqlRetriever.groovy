@@ -1,7 +1,8 @@
 package net.config
 
 import groovy.sql.Sql
-import org.apache.log4j.Logger
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * In order to isolate config retrieval from the database. It performs
@@ -27,7 +28,7 @@ import org.apache.log4j.Logger
  */
 class SqlRetriever {
 
-    private static final def LOG = Logger.getLogger(SqlRetriever.class)
+    private static final def LOG = LoggerFactory.getLogger(SqlRetriever.class)
 
     /**
      * Look up all the key-value property style configs for each row in the

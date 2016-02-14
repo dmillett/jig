@@ -2,7 +2,8 @@ package net.config.example.two;
 
 import net.client.ConfigLookup;
 import net.util.GenericsHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
  */
 public class PojoConfigExample {
 
-    private static final Logger LOG = Logger.getLogger(PojoConfigExample.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PojoConfigExample.class);
     private static final ConfigLookup _configLookup = new ConfigLookup();
     private static final Pattern STOCKS = Pattern.compile("stocks.stock.*");
 
