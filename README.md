@@ -23,6 +23,14 @@ map (see java ConfigMap), can then be used statically for config access.
 * JMX MBean 
 
 ####*installation*
+```xml
+<dependency>
+  <groupId>com.github.dmillett</groupId>
+  <artifactId>jig</artifactId>
+  <version>0.95</version>
+</dependency>
+```
+
 See (https://github.com/dmillett/jConfigMap/wiki)
 ####*easy to use*
 * It took approximately 10 minutes to port a 2600 line XML file into the test directory
