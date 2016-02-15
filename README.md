@@ -1,4 +1,4 @@
-#jConfigMap (See LICENSE AND NOTICE):
+# jig (See LICENSE AND NOTICE):
 
 Is a Java client configuration tool that uses Groovy (for now), to separate client
 configuration access from underlying config storage implementations. For example, it flattens
@@ -11,7 +11,7 @@ Currently jConfigMap supports XML and JSON configuration files during startup. D
 connections maybe specified in XML/JSON files and retrieved in key-value form. A global config
 map (see java ConfigMap), can then be used statically for config access.
 
-##Features
+## Features
 * Supports XML/JSON property style key-value pairs (see 'keyValues')
 * Supports XML/JSON object/config structure (see 'structures')
 * Supports config retrieval from a database
@@ -214,4 +214,4 @@ assertEquals(2, value.getAssociatedPatterns().size());
   * Associated patterns (paths to this key lookup)
 
 ##Future
-See (https://github.com/dmillett/jConfigMap/issues)
+See (https://github.com/dmillett/jig/issues)
