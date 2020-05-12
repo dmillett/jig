@@ -22,13 +22,13 @@ package net.common;
 public enum JigProperties {
 
     /** System Property for local configuration file(s) location outside of 'classpath/config' */
-    JCONFIG_LOCATION("jConfigMap.location"),
+    JIG_LOCATION("jig.location"),
     /** A remote URL based location with config files */
-    JCONFIG_URL_LOCATION("jConfigMap.url"),
-    /** Global overrides entered as JVM args. Ex: jConfigMap.entry.foo=bar */
-    JCONFIG_COMMAND_LINE_PROP("jConfigMap.entry"),
+    JIG_URL_LOCATION("jig.url"),
+    /** Global overrides entered as JVM args. Ex: jig.entry.foo=bar */
+    JIG_COMMAND_LINE_PROP("jig.entry"),
     /** A config file suffix to support environment specific configurations  */
-    JCONFIG_FILE_ENVIRONMENT("jConfigMap.file.env")
+    JIG_FILE_ENVIRONMENT("jig.file.env")
     ;
 
     private final String _systemPropertyName;

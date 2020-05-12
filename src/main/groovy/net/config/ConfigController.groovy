@@ -32,7 +32,7 @@ class ConfigController {
     private final static def CONFIG_CURRENT = new HashMap<String, String>();
     private final static def CONFIG_PREVIOUS = new HashMap<String, String>();
 
-    def Object lock = new Object[0]
+    Object lock = new Object[0]
     def _configLoader = new ConfigLoader()
 
 

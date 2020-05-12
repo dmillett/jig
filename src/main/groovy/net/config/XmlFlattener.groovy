@@ -1,7 +1,8 @@
 package net.config
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import groovy.xml.XmlParser
 
 /**
  * This class flattens xml structures and their values into
@@ -40,8 +41,8 @@ import org.slf4j.LoggerFactory;
  */
 class XmlFlattener {
 
-    private static final def Logger LOG = LoggerFactory.getLogger(XmlFlattener.class)
-    private static final def String DELIM = "."
+    private static final Logger LOG = LoggerFactory.getLogger(XmlFlattener.class)
+    private static final String DELIM = "."
 
     /**
      * This creates a map from the following two XML child nodes in 'configFile'.
@@ -61,7 +62,7 @@ class XmlFlattener {
      * @param configFile The xml configuration file
      * @return A Map (hash) of all the config values for 'keyValues' and 'structures'
      */
-    def Map<String, String> flatten(String configFile) {
+    Map<String, String> flatten(String configFile) {
 
         LOG.info("Loading Xml File To Flatten To Map $configFile")
         def keyValues
@@ -76,7 +77,7 @@ class XmlFlattener {
             }
 
             keyValues = findSimpleKeyValueNodes(configNode)
-            keyValues.putAll(findXmlStructures(configNode.structures[0], ""))
+            keyValues.putAll(findXmlStructures(configNode.structures[0] as Node, ""))
         }
         catch ( Throwable t )
         {
@@ -103,11 +104,10 @@ class XmlFlattener {
      * @param baseNode
      * @return A Hashmap with String keys ('name') and values ('value' or text())
      */
-    def Map<String, String> findSimpleKeyValueNodes(Node baseNode) {
+    Map<String, String> findSimpleKeyValueNodes(Node baseNode) {
 
         LOG.info("Loading Simple Key Values")
         def properties = new HashMap<String, String>()
-
         baseNode.keyValues.property.each { entry ->
             properties.put(entry.@name.toLowerCase(), checkNodeForValue(entry))
         }
@@ -121,10 +121,12 @@ class XmlFlattener {
      * over the attribute ('value'). Note that Groovy treats
      * node.text() as '' instead of null if no value is present.
      *
+     * node.text() can return the flattened values of all sub-nodes, so it broke compatibility around Groovy 2.x
+     *
      * @param node
      * @return
      */
-    def String checkNodeForValue(Node node) {
+    String checkNodeForValue(Node node) {
 
         if ( node == null )
         {
@@ -183,30 +185,38 @@ class XmlFlattener {
      * @param baseNode
      * @return
      */
-    def Map<String, String> findXmlStructures(Node baseNode, String name) {
+    Map<String, String> findXmlStructures(Node baseNode, String name) {
 
         LOG.info("Loading Structured Xml Flattened Key Values")
         def currentName = findCurrentFlattenedName(name, baseNode)
         def duplicateKeyCount = 1
         def keyValues = new HashMap<String, String>()
 
+        if ( baseNode == null )
+        {
+            return keyValues
+        }
+
+        // Getting the name of the last node/attribute twice
         baseNode.children().each { childNode ->
 
-            def childNodeValue = checkNodeForValue(childNode)
+            String nodeName = currentName + DELIM + childNode.name()
+            def updatedName = nameFromAttributes(nodeName, childNode.attributes()).toLowerCase()
 
-            if ( childNodeValue != null )
+
+            if (childNode.value().size() == 1 && isPlainValue(childNode))
             {
-                def lowerCaseKey = buildKeyForChildNode(currentName, childNode)
+                def childNodeValue = checkNodeForValue(childNode)
 
-                if ( keyValues.containsKey(lowerCaseKey) )
+                if ( keyValues.containsKey(updatedName) )
                 {
-                    def keyWithIndex = lowerCaseKey + DELIM + duplicateKeyCount
+                    def keyWithIndex = updatedName + DELIM + duplicateKeyCount
                     keyValues.put(keyWithIndex, childNodeValue)
                     duplicateKeyCount++
                 }
                 else
                 {
-                    keyValues.put(lowerCaseKey, childNodeValue)
+                    keyValues.put(updatedName, childNodeValue)
                 }
 
                 return
@@ -219,6 +229,20 @@ class XmlFlattener {
         return keyValues
     }
 
+    def private isPlainValue(Node node) {
+        return !(node.value().get(0) instanceof NodeList) && !(node.value().get(0) instanceof Node)
+    }
+
+    def private nameFromAttributes(String baseName, Map attributes) {
+
+        String name = baseName
+        attributes.each { k,v ->
+            name += DELIM + v
+        }
+
+        return name
+    }
+
     /**
      * A valid jConfigMap file must have a "config" root node
      * and either/both of "keyValue" or "structures" child
@@ -227,7 +251,7 @@ class XmlFlattener {
      * @param configBaseNode
      * @return
      */
-    def boolean isValidConfigFile(Node configBaseNode) {
+    boolean isValidConfigFile(Node configBaseNode) {
 
         if ( configBaseNode == null || !configBaseNode.name().equals("config") )
         {
@@ -263,7 +287,7 @@ class XmlFlattener {
      * @param attributes
      * @return
      */
-    private def String flattenNodeName(Node node) {
+    private static String flattenNodeName(Node node) {
 
         if ( node == null )
         {
@@ -279,9 +303,9 @@ class XmlFlattener {
     }
 
     // Determine the current name from the current node and base name value
-    private def String findCurrentFlattenedName(String name, Node node) {
+    private static String findCurrentFlattenedName(String name, Node node) {
 
-        def currentName = ""
+        def currentName
         def flattenedNodeName = flattenNodeName(node)
 
         if ( name == null || name.empty )
@@ -297,7 +321,7 @@ class XmlFlattener {
     }
 
     // Append node attributes as names to the current name
-    private def String buildKeyForChildNode(String currentName, Node childNode) {
+    private String buildKeyForChildNode(String currentName, Node childNode) {
 
         def childNodeName = flattenNodeName(childNode)
         return (currentName + DELIM + childNodeName).toLowerCase()

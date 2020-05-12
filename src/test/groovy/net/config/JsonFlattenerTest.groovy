@@ -22,7 +22,7 @@ class JsonFlattenerTest
 
     void test__flattenJsonFile() {
 
-        def fileUrl = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "JsonExampleOne.json"
+        def fileUrl = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "/JsonExampleOne.json"
         def jsonFlattener = new JsonFlattener()
         def exampleThreeKeyValues = jsonFlattener.flatten(fileUrl)
 
@@ -32,7 +32,7 @@ class JsonFlattenerTest
 
     void test__flattenJsonFile_simple2() {
 
-        def fileUrl = "file://" + GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "JsonExampleTwo.json"
+        def fileUrl = "file://" + GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "/JsonExampleTwo.json"
         def jsonFlattener = new JsonFlattener()
         def simpleJsonTwo = jsonFlattener.flatten(fileUrl)
 
@@ -42,7 +42,7 @@ class JsonFlattenerTest
 
     void test__flattenJsonFile_simple3() {
 
-        def fileUrl = "file://" + GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "JsonExampleThree.json"
+        def fileUrl = "file://" + GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "/JsonExampleThree.json"
         def jsonFlattener = new JsonFlattener()
         def simpleJsonThree = jsonFlattener.flatten(fileUrl)
 
@@ -52,7 +52,7 @@ class JsonFlattenerTest
 
     void test__flattenJsonFile_ignored() {
 
-        def fileUrl = "file://" + GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "JsonIgnoredFile.json"
+        def fileUrl = "file://" + GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "/JsonIgnoredFile.json"
         def jsonFlattener = new JsonFlattener()
 
         def emptyMap = jsonFlattener.flatten(fileUrl)

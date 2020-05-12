@@ -2,9 +2,6 @@ package net.util;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -66,7 +63,7 @@ public class StatsValue {
     public StatsValue(String key) {
 
         _key = key;
-        _associatedPatterns = new HashSet<String>();
+        _associatedPatterns = new HashSet<>();
     }
 
     /**
@@ -117,7 +114,14 @@ public class StatsValue {
         try
         {
             _readWriteLock.readLock().lock();
-            _averageLatency = _totalLatency / _count;
+            if (_count == 0)
+            {
+                _averageLatency = _totalLatency;
+            }
+            else
+            {
+                _averageLatency = _totalLatency / _count;
+            }
         }
         finally
         {
@@ -166,12 +170,7 @@ public class StatsValue {
             return false;
         }
 
-        if (!_key.equals(that._key))
-        {
-            return false;
-        }
-
-        return true;
+        return _key.equals(that._key);
     }
 
     @Override

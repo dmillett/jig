@@ -68,8 +68,8 @@ public class PatternHelper {
      * using "match()" instead of "find()". This increases
      * retrieval latency. See 'useFind()'.
      *
-     * @param text
-     * @return
+     * @param text The pattern arguments
+     * @return A Regex pattern
      */
     public static Pattern buildPattern(String... text) {
         return buildPattern(false, text);
@@ -90,12 +90,7 @@ public class PatternHelper {
             return false;
         }
 
-        if ( pattern.pattern().startsWith(".*") )
-        {
-            return false;
-        }
-
-        return true;
+        return !pattern.pattern().startsWith(".*");
     }
 
     /**
@@ -122,11 +117,6 @@ public class PatternHelper {
         }
 
         String patternText = pattern.pattern();
-        if ( patternText.contains("*") || patternText.contains("+") || patternText.contains("\\") )
-        {
-            return false;
-        }
-
-        return true;
+        return !patternText.contains("*") && !patternText.contains("+") && !patternText.contains("\\");
     }
 }

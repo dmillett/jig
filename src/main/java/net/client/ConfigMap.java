@@ -33,12 +33,16 @@ import java.util.Map;
 public class ConfigMap {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigMap.class);
-    private static final Map<String, Map<String, String>> CURRENT_CONFIG = new HashMap<String, Map<String, String>>();
-    private static final Map<String, Map<String, String>> PREVIOUS_CONFIG = new HashMap<String, Map<String, String>>();
+    private static final Map<String, Map<String, String>> CURRENT_CONFIG = new HashMap<>();
+    private static final Map<String, Map<String, String>> PREVIOUS_CONFIG = new HashMap<>();
 
     private volatile boolean _emptyConfig = true;
     private Date _lastUpdated;
 
+    /**
+     * Get or load (first time) the configuration data.
+     * @return A readable Map with configuration data.
+     */
     public Map<String, Map<String, String>> getConfig() {
 
         if ( _emptyConfig )
@@ -50,10 +54,16 @@ public class ConfigMap {
         return CURRENT_CONFIG;
     }
 
+    /**
+     * Re-loading the configuration files.
+     */
     public void reloadConfigFiles() {
         loadConfigMapFromFiles();
     }
 
+    /**
+     * A synchronized revert of newly loaded configuration data.
+     */
     public synchronized void revertConfig() {
 
         CURRENT_CONFIG.clear();
@@ -62,23 +72,23 @@ public class ConfigMap {
 
     public void compareAndLogDifferences() {
 
-        compareMapFiles(CURRENT_CONFIG, PREVIOUS_CONFIG, "Previous Config Missing File");
-        compareMapFiles(PREVIOUS_CONFIG, CURRENT_CONFIG, "Current Config Missing File");
+        logKeyDifferences(CURRENT_CONFIG, PREVIOUS_CONFIG, "Previous Config Missing File");
+        logKeyDifferences(PREVIOUS_CONFIG, CURRENT_CONFIG, "Current Config Missing File");
 
         compareConfigMap(CURRENT_CONFIG, PREVIOUS_CONFIG, "Current Config", "Previous Config");
         compareConfigMap(PREVIOUS_CONFIG, CURRENT_CONFIG, "Previous Config", "Current Config");
     }
 
     public void dumpCurrentConfig() {
-        dumpConfigMap(CURRENT_CONFIG, "Current Config");
+        logConfigMap(CURRENT_CONFIG, "Current Config");
     }
 
     public void dumpAllConfig() {
-        dumpConfigMap(CURRENT_CONFIG, "Current Config");
-        dumpConfigMap(PREVIOUS_CONFIG, "Previous Config");
+        logConfigMap(CURRENT_CONFIG, "Current Config");
+        logConfigMap(PREVIOUS_CONFIG, "Previous Config");
     }
 
-    private void dumpConfigMap(Map<String, Map<String,String>> map, String text) {
+    private void logConfigMap(Map<String, Map<String,String>> map, String text) {
 
         LOG.info("Dumping Config For: " + text);
         for ( Map.Entry<String, Map<String, String>> fileEntry : map.entrySet() )
@@ -105,13 +115,13 @@ public class ConfigMap {
         for ( String configFile : m1.keySet() )
         {
             Map<String,String> map2 = m2.get(configFile);
-            compareEntries(m1, map2, configFile,text2);
+            logEntryDifferences(m1, map2, configFile,text2);
         }
     }
 
     /** Look at config entries */
-    private void compareEntries(Map<String, Map<String, String>> m1, Map<String, String> map2, String configFile,
-                                String text) {
+    private void logEntryDifferences(Map<String, Map<String, String>> m1, Map<String, String> map2, String configFile,
+                                     String text) {
 
         for ( Map.Entry<String, String> entry : m1.get(configFile).entrySet() )
         {
@@ -135,7 +145,7 @@ public class ConfigMap {
     }
 
     /** Look for missing config files for these two version */
-    private void compareMapFiles(Map<String, Map<String,String>> m1, Map<String, Map<String,String>> m2, String msg) {
+    private void logKeyDifferences(Map<String, Map<String,String>> m1, Map<String, Map<String,String>> m2, String msg) {
 
         for ( String keyOneFile : m1.keySet() )
         {

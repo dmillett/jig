@@ -41,11 +41,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ConfigStatistics {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigStatistics.class);
-
     private static final ReentrantLock LOCK = new ReentrantLock();
-
     /** Where the values are thread aware (volatile) mutable objects */
-    private static final Map<String, StatsValue> STATS = new HashMap<String, StatsValue>();
+    private static final Map<String, StatsValue> STATS = new HashMap<>();
     /** To capture or not to capture */
     private static boolean _statsCaptureEnabled;
 
@@ -93,22 +91,20 @@ public class ConfigStatistics {
     }
 
     public Map<String, StatsValue> getStats() {
-        return new HashMap<String, StatsValue>(STATS);
+        return new HashMap<>(STATS);
     }
 
     public boolean isEnabled() {
         return _statsCaptureEnabled;
     }
 
-    public void dumpOutput() {
+    public void logOutput() {
 
         StringBuilder sb = new StringBuilder();
-
         for (Map.Entry<String, StatsValue> entry : STATS.entrySet())
         {
             sb.append(entry.getKey()).append(":").append(entry.getValue()).append("|");
         }
-
         LOG.info(sb.toString());
     }
 

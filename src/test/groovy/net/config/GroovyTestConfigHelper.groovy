@@ -24,20 +24,20 @@ class GroovyTestConfigHelper {
 
     def static String updateSystemPropertyConfigLocation() {
 
-        if ( System.getProperty(JigProperties.JCONFIG_LOCATION.getName()) == null )
+        if ( System.getProperty(JigProperties.JIG_LOCATION.getName()) == null )
         {
             def testConfigPath = new File('').absolutePath + "/src/test/resources/config/"
-            System.setProperty(JigProperties.JCONFIG_LOCATION.getName(), testConfigPath)
+            System.setProperty(JigProperties.JIG_LOCATION.getName(), testConfigPath)
         }
 
-        return System.getProperty(JigProperties.JCONFIG_LOCATION.getName())
+        return System.getProperty(JigProperties.JIG_LOCATION.getName())
     }
 
     def static updateSystemPropertiesWithConfigEnv(String envIndicator) {
 
         if ( envIndicator != null )
         {
-            System.setProperty(JigProperties.JCONFIG_FILE_ENVIRONMENT.getName(), envIndicator)
+            System.setProperty(JigProperties.JIG_FILE_ENVIRONMENT.getName(), envIndicator)
         }
     }
 
@@ -63,7 +63,7 @@ class GroovyTestConfigHelper {
 
         if ( key != null )
         {
-            return JigProperties.JCONFIG_COMMAND_LINE_PROP.getName() + "." + key
+            return JigProperties.JIG_COMMAND_LINE_PROP.getName() + "." + key
         }
 
         return null;

@@ -108,7 +108,6 @@ public class ConfigLookupTest
     public void test__getByKey() {
 
         ConfigLookup cfg = new ConfigLookup();
-
         String key = "key.one.string";
         String fileName = "ConfigOne.xml";
 

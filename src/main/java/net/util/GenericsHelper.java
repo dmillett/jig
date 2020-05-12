@@ -33,10 +33,11 @@ public class GenericsHelper {
      * wrapper object or Java List.
      *
      * @param value Any string value
-     * @param clazz
-     * @param <T>
-     * @return
+     * @param clazz The class of the value to return
+     * @param <T> The value type to return (String, Boolean, etc)
+     * @return A config value as a specific type 'T'
      */
+    @SuppressWarnings("unchecked")
     public <T> T get(String value, Class<T> clazz) {
 
         if ( clazz.equals(String.class) )

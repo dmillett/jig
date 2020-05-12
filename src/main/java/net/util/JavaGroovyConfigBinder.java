@@ -36,7 +36,7 @@ public class JavaGroovyConfigBinder {
     private final GroovyObject _groovyConfigLoader;
 
     public JavaGroovyConfigBinder() {
-        _groovyConfigLoader = createGroovyObject(_groovyConfigLoaderClass);
+        _groovyConfigLoader = createGroovyObject();
     }
 
     @SuppressWarnings("unchecked")
@@ -66,19 +66,18 @@ public class JavaGroovyConfigBinder {
 
     /**
      * Look this up from the Classloader (it better be in there).
-     * @param className
-     * @return
+     * @return A useable Groovy object
      */
-    private GroovyObject createGroovyObject(String className) {
+    private GroovyObject createGroovyObject() {
 
         try
         {
-            Class groovyClass = Class.forName(className);
+            Class<?> groovyClass = Class.forName(JavaGroovyConfigBinder._groovyConfigLoaderClass);
             return (GroovyObject) groovyClass.newInstance();
         }
         catch ( Exception e )
         {
-            LOG.error("Cannot Create Instance Of Groovy Class: " + className);
+            LOG.error("Cannot Create Instance Of Groovy Class: " + JavaGroovyConfigBinder._groovyConfigLoaderClass);
             throw new RuntimeException(e);
         }
     }
@@ -86,8 +85,8 @@ public class JavaGroovyConfigBinder {
     /**
      * Use for any Groovy object needed for execution within Java classes.
      *
-     * @param groovySourceName
-     * @return
+     * @param groovySourceName The Groovy source file name
+     * @return A Groovy object for Java to execute
      */
     private GroovyObject createGroovyObjectFromSource(String groovySourceName) {
 

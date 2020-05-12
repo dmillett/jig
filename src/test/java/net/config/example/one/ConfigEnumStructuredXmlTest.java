@@ -34,7 +34,7 @@ public class ConfigEnumStructuredXmlTest
     public void test__STOCKS() {
 
         Map<String, String> allStocks = ConfigEnumExample.STOCKS.get();
-        assertEquals(12, allStocks.size());
+        assertEquals(6, allStocks.size());
     }
 
     public void test__STOCKS_withArity() {
@@ -52,22 +52,22 @@ public class ConfigEnumStructuredXmlTest
     public void test__COMMISSIONS() {
 
         Map<String, String> commissions = ConfigEnumExample.COMMISSIONS.get();
-        assertEquals(8, commissions.size());
+        assertEquals(4, commissions.size());
     }
 
     public void test__COMMISSION_TYPES() {
 
         Map<String, String> types = ConfigEnumExample.COMMISSION_TYPES.get();
-        assertEquals(8, types.size());
+        assertEquals(4, types.size());
 
         Map<String, String> stockTypes = ConfigEnumExample.COMMISSION_TYPES.get("Stocks");
-        assertEquals(6, stockTypes.size());
+        assertEquals(3, stockTypes.size());
     }
 
     public void test__COMMISSION_TICKERS() {
 
         Map<String, String> tickers = ConfigEnumExample.COMMISSION_TICKERS.get();
-        assertEquals(8, tickers.size());
+        assertEquals(4, tickers.size());
 
         Map<String, String> amdTickers = ConfigEnumExample.COMMISSION_TICKERS.get("AMD");
         assertEquals(2, amdTickers.size());
@@ -76,6 +76,6 @@ public class ConfigEnumStructuredXmlTest
     public void test__STOCKS_TWO() {
 
         Map<String, String> stocksFileTwo = ConfigEnumExample.STOCK_TWO.get();
-        assertEquals(12, stocksFileTwo.size());
+        assertEquals(6, stocksFileTwo.size());
     }
 }

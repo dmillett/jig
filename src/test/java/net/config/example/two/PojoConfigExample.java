@@ -46,12 +46,8 @@ public class PojoConfigExample {
         TreeMap<String,String> matches =
                 (TreeMap<String,String>) _configLookup.getSortedResults(compare, STOCKS, stocks);
 
-        if ( matches.size() > 1 )
-        {
-            LOG.info("Returning First Iterator Value (ordered by comparator)");
-        }
-
-        return matches.firstEntry().getValue();
+        LOG.info("Returning First Iterator Value (ordered by comparator) or null");
+        return matches.isEmpty() ? null : matches.firstEntry().getValue();
     }
 
     public Integer findStockShares(String... stockAndShares) {

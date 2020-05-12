@@ -1,4 +1,4 @@
-//import groovy.sql.Sql
+import groovy.sql.Sql
 
 /**
  * Copyright 2011 David Millett
@@ -14,66 +14,89 @@
  * See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+plugins {
+  id "com.github.ben-manes.versions" version "0.28.0"
+  //id 'com.github.spotbugs' version '1.6.8'
+}
+
 apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'idea'
-apply plugin: 'findbugs'
+apply plugin: 'jacoco'
+apply plugin: "com.github.ben-manes.versions"
+//apply plugin: 'com.github.spotbugs'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.github.dmillett'
 archivesBaseName = 'jig'
-version = '0.95'
+version = '1.0.0-A1'
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
   mavenCentral()
+  jcenter()
 }
+
+wrapper {
+  gradleVersion = '6.4'
+}
+
+build.dependsOn check
 
 dependencies {
-    /*
-    Groovy changed XmlParsing in 2.3.0+, node.text() has a bug and returns all
-    of the nested node text() as one value
-     <foo>
-         <one>"a"</one>
-         <two>"b"</two>
-     </foo>
-
-    foo.text() --> "ab"
-
-    Previous versions, foo.text() --> ""
-    Even though the Javadoc doesn't change, the functionality is very different (in a
-    non backward compatible way).
-    */
-  //compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.5'
-  compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.2.2'
+  compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '3.0.3'
   compile group: 'org.jyaml', name: 'jyaml', version: '1.3'
-  compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.13'
-  compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.0.2'
+  compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
+  compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.13.2'
 
-  testCompile group: 'junit', name: 'junit', version: '4.11'
-  testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
-  testCompile group: 'com.h2database', name: 'h2', version: '1.3.171'
+  testCompile group: 'junit', name: 'junit', version: '4.13'
+  testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+  testCompile group: 'com.h2database', name: 'h2', version: '1.4.200'
 }
-
 
 test  {
   //test.testLogging.showStandardStreams = true
-  def basePath = new File('').absolutePath
-  def testConfigPath = basePath + "/src/test/resources/config/"
-  println "Setting Test Config Path To: ${testConfigPath}"
-
-  systemProperties ['jConfigMap.location'] = "$testConfigPath"
+  def testConfigPath = "$buildDir/resources/test/config"
+  project.logger.info "Setting Test Config Path To: ${testConfigPath}"
+  systemProperties ['jig.location'] = "$testConfigPath"
 }
 
-task wrapper(type: Wrapper) {
-  gradleVersion = '2.10'
+dependencyUpdates.resolutionStrategy = {
+  componentSelection { rules ->
+    rules.all { ComponentSelection selection ->
+      boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+        selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+      }
+      if (rejected) {
+        selection.reject('Release candidate')
+      }
+    }
+  }
 }
 
-tasks.withType(FindBugs) {
+//// Required due to Gradle issue with SpotBugs
+//ext {
+//  SpotBugsTask = com.github.spotbugs.SpotBugsTask
+//}
+
+//spotbugs {
+//  toolVersion = '3.1.9'
+//}
+
+//spotbugsTest.enabled = false
+//
+//tasks.withType(SpotBugsTask) {
+//  reports {
+//    xml.enabled = false
+//    html.enabled = true
+//  }
+//}
+jacocoTestReport {
   reports {
-    xml.enabled = false
-    html.enabled = true
+    xml.enabled false
+    csv.enabled false
   }
 }
 
@@ -84,10 +107,10 @@ task jigSourcesJar(type: Jar) {
   from sourceSets.main.allSource
 }
 
-artifacts {
-  archives jigJar
-  archives jigSourcesJar
-}
+//artifacts {
+//  archives jigJar
+//  archives jigSourcesJar
+//}
 
 task javadocJar(type: Jar) {
   classifier = 'javadoc'
@@ -104,22 +127,22 @@ task javadocJar(type: Jar) {
 //    assertEquals(3, insertedRows.size())
 //}
 
-signing {
-  sign configurations.archives
-}
+//signing {
+//  sign configurations.archives
+//}
 
 uploadArchives {
   repositories {
     mavenDeployer {
       beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
+//      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+//        authentication(userName: ossrhUsername, password: ossrhPassword)
+//      }
+//
+//      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+//        authentication(userName: ossrhUsername, password: ossrhPassword)
+//      }
 
       pom.project {
         name 'jig'

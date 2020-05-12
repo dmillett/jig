@@ -1,5 +1,7 @@
 package net.config
 
+import groovy.xml.XmlParser
+
 /**
  * Testing the xml structure and flattening of nodes.
  *
@@ -18,6 +20,7 @@ package net.config
  * See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+// todo: Spock
 class XmlFlattenerTest
     extends GroovyTestCase {
 
@@ -37,15 +40,14 @@ class XmlFlattenerTest
 
     void test__flatten_IgnoredConfigFile() {
 
-        def ignoredConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "IgnoredConfig.xml"
+        def ignoredConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "/IgnoredConfig.xml"
         def xmlFlatten = new XmlFlattener()
-        
         xmlFlatten.flatten(ignoredConfigFile)
     }
 
     void test__findSimpleKeyValueNodes() {
 
-        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "ConfigOne.xml"
+        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "/ConfigOne.xml"
         def baseNode = new XmlParser().parse(testConfigFile)
 
         def xmlFlatten = new XmlFlattener()
@@ -63,7 +65,7 @@ class XmlFlattenerTest
 
     void test__findXmlStructures() {
 
-        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "ConfigOne.xml"
+        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "/ConfigOne.xml"
         def baseNode = new XmlParser().parse(testConfigFile)
 
         def structureNode = baseNode.structures[0]
@@ -72,7 +74,7 @@ class XmlFlattenerTest
 
         assertNotNull(keyValues)
         assertEquals(14, keyValues.size())
-
-        assertEquals("8.00", keyValues.get("structures.commission.type.stocks.ticker.intc.category.market"))
+        def k1 = "structures.commission.type.stocks.ticker.intc.category.market"
+        assertEquals("8.00", keyValues.get(k1))
     }
 }

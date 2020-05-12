@@ -53,7 +53,7 @@ public class ConfigStatisticsTest
 
         Map<String, String> allStocks = pojo.findAllStocks();
 
-        assertEquals(12, allStocks.size());
+        assertEquals(6, allStocks.size());
         assertEquals(0, pojo.getConfigLookup().getConfigStatistics().getStats().size());
     }
 
@@ -64,12 +64,12 @@ public class ConfigStatisticsTest
 
         Map<String, String> allStocks = pojo.findAllStocks();
         // Sometimes a multi-threaded test seems to throw this count off (bad gradle)
-        assertEquals(12, allStocks.size());
+        assertEquals(6, allStocks.size());
 
         pojo.getConfigLookup().getConfigStatistics().disableStatsCollection();
 
         Map<String, StatsValue> stats = pojo.getConfigLookup().getConfigStatistics().getStats();
-        assertEquals(12, stats.size());
+        assertEquals(6, stats.size());
 
         for ( Map.Entry<String, StatsValue> entry : stats.entrySet() )
         {
@@ -93,12 +93,12 @@ public class ConfigStatisticsTest
 
         PojoConfigExample pojo = new PojoConfigExample();
         Map<String, String> allStocks = pojo.findAllStocks();
-        assertEquals(12, allStocks.size());
+        assertEquals(6, allStocks.size());
 
         pojo.getConfigLookup().getConfigStatistics().disableStatsCollection();
 
         Map<String, StatsValue> stats = pojo.getConfigLookup().getConfigStatistics().getStats();
-        assertEquals(15, stats.size());
+        assertEquals(9, stats.size());
 
         boolean countGreaterThanOne = false;
         for ( Map.Entry<String, StatsValue> entry : stats.entrySet() )

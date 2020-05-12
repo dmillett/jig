@@ -62,7 +62,7 @@ class ConfigLoader {
             return xmlFlattener.flatten(file)
         }
 
-        LOG.fatal("Could Not Load XML Configuration File ${file}. Returning Null")
+        LOG.fatal("Could Not Load XML Configuration File $file. Returning Null")
         return null;
     }
 
@@ -426,12 +426,12 @@ class ConfigLoader {
         def commandLineOverrides = new HashMap<String,String>()
         System.getProperties().entrySet().each { entry ->
 
-            if ( !entry.getKey().startsWith(JigProperties.JCONFIG_COMMAND_LINE_PROP.getName()) )
+            if ( !entry.getKey().startsWith(JigProperties.JIG_COMMAND_LINE_PROP.getName()) )
             {
                 return
             }
 
-            def remove = JigProperties.JCONFIG_COMMAND_LINE_PROP.getName() + "."
+            def remove = JigProperties.JIG_COMMAND_LINE_PROP.getName() + "."
             def overrideKey = "${entry.getKey()}".replace(remove, "")
             LOG.info("Overriding $overrideKey")
             commandLineOverrides.put(overrideKey, entry.getValue())
@@ -453,7 +453,7 @@ class ConfigLoader {
         def urlConfigs = new ArrayList<String>()
         System.getProperties().entrySet().each { entry ->
 
-            if ( entry.getKey().startsWith(JigProperties.JCONFIG_URL_LOCATION.getName()) )
+            if ( entry.getKey().startsWith(JigProperties.JIG_URL_LOCATION.getName()) )
             {
                 urlConfigs.add(entry.getValue())
             }
@@ -470,7 +470,7 @@ class ConfigLoader {
      */
     def List<String> loadConfigFilesFromOverride() {
 
-        def location = System.getProperty(JigProperties.JCONFIG_LOCATION.getName()) + File.separator
+        def location = System.getProperty(JigProperties.JIG_LOCATION.getName()) + File.separator
         def configFiles = new ArrayList<String>()
         def suffix = findFileNamePattern()
 
@@ -497,7 +497,7 @@ class ConfigLoader {
      */
     def Pattern findFileNamePattern() {
 
-        def fileSuffix = System.getProperty(JigProperties.JCONFIG_FILE_ENVIRONMENT.getName())
+        def fileSuffix = System.getProperty(JigProperties.JIG_FILE_ENVIRONMENT.getName())
         if ( fileSuffix == null || fileSuffix.empty )
         {
             return ~/.*\.(xml|json)/

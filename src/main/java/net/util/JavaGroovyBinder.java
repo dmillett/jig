@@ -31,10 +31,10 @@ public class JavaGroovyBinder<T> {
      * A typical Java-Groovy binder to execute Groovy class files from within
      * Java code.
      *
-     * @param groovyFileName
-     * @param methodName
-     * @param args
-     * @return
+     * @param groovyFileName The Groovy file with class to execute
+     * @param methodName The Groovy class method to execute
+     * @param args An paramters to call the Groovy method
+     * @return Whatever the return type is
      * @deprecated Nice to have for information, but not used right now.
      */
     @Deprecated
@@ -46,7 +46,6 @@ public class JavaGroovyBinder<T> {
             ClassLoader parent = getClass().getClassLoader();
             GroovyClassLoader loader = new GroovyClassLoader(parent);
             Class groovyClass = loader.parseClass(new File(groovyFileName));
-
             GroovyObject groovyObject = (GroovyObject) groovyClass.newInstance();
             return (T)groovyObject.invokeMethod(methodName, args);
         }

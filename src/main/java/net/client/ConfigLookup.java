@@ -94,8 +94,7 @@ public class ConfigLookup {
             return getByKey(key);
         }
 
-        Map<String, String> configsForFile = CONFIG_MAP.getConfig().get(fileName);
-        return configsForFile.get(key);
+        return CONFIG_MAP.getConfig().get(fileName).get(key);
     }
 
     /**
@@ -118,7 +117,6 @@ public class ConfigLookup {
 
         GenericsHelper helper = new GenericsHelper();
         String value = getByKey(key);
-
         return helper.get(value, clazz);
     }
 
@@ -134,10 +132,8 @@ public class ConfigLookup {
 
         String result = getByKey(fileName, key);
         GenericsHelper helper = new GenericsHelper();
-
         return helper.get(result, clazz);
     }
-
 
     /**
      * Build a map of results based on a general or specific pattern applied to the
@@ -173,9 +169,8 @@ public class ConfigLookup {
     public Map<String, String> getSortedResults(Comparator<String> comparator, Pattern pattern, String... params) {
 
         Map<String,String> matches = getConfigMatches(CONFIG_MAP.getConfig(), pattern, params);
-        TreeMap<String, String> treeMap = new TreeMap<String, String>(comparator);
+        TreeMap<String, String> treeMap = new TreeMap<>(comparator);
         treeMap.putAll(matches);
-
         return treeMap;
     }
 
@@ -225,7 +220,7 @@ public class ConfigLookup {
      */
     protected Map<String, String> reduce(Map<String, String> originalMap, String... params) {
 
-        Map<String,String> reducedMap = new HashMap<String,String>(originalMap.size());
+        Map<String,String> reducedMap = new HashMap<>(originalMap.size());
         List<String> lowerCaseParams = convertToLowerCase(params);
 
         for ( Map.Entry<String, String> entry : originalMap.entrySet() )
@@ -281,7 +276,7 @@ public class ConfigLookup {
     protected Map<String, String> getConfigMatches(Map<String, Map<String, String>> configMaps, Pattern pattern,
                                                    String... params) {
 
-        Map<String, String> matches = new HashMap<String, String>();
+        Map<String, String> matches = new HashMap<>();
 
         if ( configMaps == null || configMaps.isEmpty() )
         {
@@ -308,7 +303,7 @@ public class ConfigLookup {
 
         if ( configMap == null || configMap.isEmpty() )
         {
-            return new HashMap<String, String>();
+            return new HashMap<>();
         }
 
         return getConfigValues(configMap, pattern, params);
@@ -343,7 +338,7 @@ public class ConfigLookup {
         boolean useFind = PatternHelper.useFind(pattern);
         boolean useContains = PatternHelper.useContains(pattern);
 
-        Map<String, String> matches = new HashMap<String, String>();
+        Map<String, String> matches = new HashMap<>();
 
         for ( Map.Entry<String, String> entry : configMap.entrySet() )
         {
@@ -431,7 +426,6 @@ public class ConfigLookup {
         // 1:1 lookup, so the key is the pattern
         long lookupTime = System.nanoTime() - startTime;
         CONFIG_STATISTICS.addKeyLookup(key, lookupTime, key);
-
         return result;
     }
 
@@ -443,7 +437,7 @@ public class ConfigLookup {
      */
     private List<String> convertToLowerCase(String[] mixedCase) {
 
-        List<String> lowerCase = new ArrayList<String>();
+        List<String> lowerCase = new ArrayList<>();
 
         for (String s : mixedCase)
         {

@@ -27,14 +27,13 @@ class ConfigLoaderTest
 
     @Override
     protected void setUp() {
-
-        GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "ConfigOne.xml"
+        GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "/ConfigOne.xml"
     }
 
     // Load a specific test config file
     void test__loadFromXmlFile_test_location() {
 
-        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "ConfigOne.xml"
+        def testConfigFile = GroovyTestConfigHelper.updateSystemPropertyConfigLocation() + "/ConfigOne.xml"
         def configLoader = new ConfigLoader()
 
         def configMap = configLoader.loadFromXmlFile(testConfigFile)
@@ -50,7 +49,7 @@ class ConfigLoaderTest
         def configFileNames = configLoader.loadConfigFilesFromOverride()
 
         assertNotNull(configFileNames)
-        assertEquals(11, configFileNames.size())
+        assertEquals(10, configFileNames.size())
     }
 
     // Load all the test configs into a single depth map
@@ -61,7 +60,7 @@ class ConfigLoaderTest
 
         assertNotNull(configMap)
         assertFalse(configMap.isEmpty())
-        assertEquals(90, configMap.size())
+        assertEquals(80, configMap.size())
     }
 
     // Load a two deep map with filename as the first level
@@ -77,7 +76,12 @@ class ConfigLoaderTest
         assertFalse(configMaps.isEmpty())
 
         // Note that the entry and values for DatabaseConfig.xml were removed
-        assertEquals(7, configMaps.size())
+        assertEquals(6, configMaps.size())
+        assertTrue(configMaps.containsKey("ConfigOne.xml"))
+        assertTrue(configMaps.containsKey("ExampleConfig.xml"))
+        assertTrue(configMaps.containsKey("JsonExampleOne.json"))
+        assertTrue(configMaps.containsKey("JsonExampleTwo.json"))
+        assertTrue(configMaps.containsKey("EnvironmentConfig_dev.xml"))
     }
 
     void test__loadConfigFilesFromClasspath() {
@@ -119,7 +123,7 @@ class ConfigLoaderTest
         def configMap = configLoader.loadFromFiles()
 
         assertNotNull(configMap)
-        assertEquals(90, configMap.size())
+        assertEquals(80, configMap.size())
         assertEquals("42", configMap.get(testKey))
 
         // Cleanup
